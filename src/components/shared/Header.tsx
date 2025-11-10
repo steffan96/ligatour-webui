@@ -1,5 +1,4 @@
-// Import Link from 'next/link';
-
+import React from 'react';
 const Header = () => (
 	<div className='flex w-full h-[10%] bg-gray-300'>
 		<div className='w-[15%] bg-stone-100'>
@@ -18,7 +17,7 @@ export default Header;
 {
 	/* <nav>
           <ul className="flex space-x-4">
-            <li><Link href="/" className="hover:text-gray-300">Home</Link></li>
+            <li><a href="/" className="hover:text-gray-300"/>Home</li>  TODO check a tag usage
           </ul>
         </nav> */
 }

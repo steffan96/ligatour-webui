@@ -1,12 +1,11 @@
 import useStore from '../../store/useStore';
-
+import React from 'react';
 export default function Modal() {
 	const closeModal = useStore(state => state.closeModal);
 	const leagueTypes = [
 		{id: 1, label: 'Round robin', key: 'round_robin'},
-		{id: 2, label: 'Knockout', key: 'knockout'},
-		{id: 3, label: 'Group stage', key: 'group_stage'},
-		{id: 4, label: 'Swiss', key: 'swiss'},
+		{id: 2, label: 'Group stage', key: 'group_stage'},
+		{id: 3, label: 'Swiss', key: 'swiss'},
 	];
 
 	return (
@@ -28,7 +27,9 @@ export default function Modal() {
 								{leagueTypes.map(type => (
 									<button
 										key={type.id}
-										className='bg-green-800 hover:bg-green-700 p-4 rounded-lg text-white text-lg transition-colors duration-200 border-2 border-transparent hover:border-green-400'
+										className='bg-green-800 hover:bg-green-700 p-4 
+										rounded-lg text-white text-lg transition-colors duration-200 
+										border-2 border-transparent hover:border-green-400'
 										onClick={() => {
 											console.log('Selected:', type.key);
 										}}

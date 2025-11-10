@@ -1,6 +1,6 @@
 import React from 'react';
-import Button from './Button';
 import useStore from '../../store/useStore';
+import Button from './button';
 
 export default function Sidepanel() {
 	const openModal = useStore(state => state.openModal);
