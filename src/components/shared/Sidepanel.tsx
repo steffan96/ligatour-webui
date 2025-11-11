@@ -2,6 +2,17 @@ import React from 'react';
 import useStore from '../../store/useStore';
 import Button from './button';
 
+const leagueTypes = [
+	{id: 1, label: 'Round robin', key: 'round_robin'},
+	{id: 2, label: 'Group stage', key: 'group_stage'},
+	{id: 3, label: 'Swiss', key: 'swiss'},
+];
+
+const tournamentTypes = [
+	{id: 1, label: 'Single elimination', key: 'single_elimination'},
+	{id: 2, label: 'Double elimination', key: 'double_elimination'},
+];
+
 export default function Sidepanel() {
 	const openModal = useStore(state => state.openModal);
 	return (
@@ -17,8 +28,16 @@ export default function Sidepanel() {
 			{/* Categories */}
 			<div className='mb-6'>
 				<div className='flex flex-wrap gap-2'>
-					<Button onClick={openModal} text='Create league' className='bg-amber-700 hover:bg-gray-700 text-white'></Button>
-					<Button onClick={openModal} text='Create Tournament' className='text-gray-700 hover:bg-amber-700'></Button>
+					<Button
+						onClick={() => openModal({title: 'Create League', competitionTypes: leagueTypes})}
+						text='Create league'
+						className='bg-amber-700 hover:bg-gray-700 text-white'>
+					</Button>
+					<Button
+						onClick={() => openModal({title: 'Create Tournament', competitionTypes: tournamentTypes})}
+						text='Create Tournament'
+						className='text-gray-700 hover:bg-amber-700'>
+					</Button>
 				</div>
 			</div>
 
