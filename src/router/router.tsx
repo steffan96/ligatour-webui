@@ -1,5 +1,5 @@
 import {createHashRouter} from 'react-router-dom';
-import Sidepanel from '../components/shared/sidepanel';
+import Sidepanel from '../components/shared/Sidepanel';
 import RootLayout from '../components/layouts/rootLayout';
 import React from 'react';
 

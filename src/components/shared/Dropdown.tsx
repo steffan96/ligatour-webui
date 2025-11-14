@@ -1,4 +1,15 @@
 export default function Dropdown() {
+	const leagueTypes = [
+		{id: 1, label: 'Round robin', key: 'round_robin'},
+		{id: 2, label: 'Group stage', key: 'group_stage'},
+		{id: 3, label: 'Swiss', key: 'swiss'},
+	];
+
+	const tournamentTypes = [
+		{id: 1, label: 'Single elimination', key: 'single_elimination'},
+		{id: 2, label: 'Double elimination', key: 'double_elimination'},
+	];
+	
 	const menuItems = [
 		{id: 1, label: 'Round robin', key: 'round_robin'},
 	];

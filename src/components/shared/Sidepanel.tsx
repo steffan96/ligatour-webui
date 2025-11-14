@@ -1,6 +1,6 @@
 import React from 'react';
 import useStore from '../../store/useStore';
-import Button from './button';
+import Button from './Button';
 
 export default function Sidepanel() {
 	const openModal = useStore(state => state.openModal);
@@ -20,14 +20,24 @@ export default function Sidepanel() {
 					<Button
 						onClick={() => openModal({title: 'Create League'})}
 						text='Create league'
-						className='bg-amber-700 hover:bg-gray-700 text-white'>
+						className='w-full bg-white border border-amber-700 text-amber-700 hover:bg-amber-700 hover:text-white transition-colors'>
 					</Button>
 					<Button
 						onClick={() => openModal({title: 'Create Tournament'})}
 						text='Create Tournament'
-						className='text-gray-700 hover:bg-amber-700'>
+						className='w-full mt-2 bg-white border border-amber-700 text-amber-700 hover:bg-amber-700 hover:text-white transition-colors'>
 					</Button>
 				</div>
+				<Button
+					text='My Leagues'
+					className='w-full mt-4 bg-white border border-amber-700 text-amber-700 hover:bg-amber-700 hover:text-white transition-colors'
+					onClick={() => openModal({title: 'My Leagues'})}
+				/>
+				<Button
+					text='My Tournaments'
+					className='w-full mt-2 bg-white border border-amber-700 text-amber-700 hover:bg-amber-700 hover:text-white transition-colors'
+					onClick={() => openModal({title: 'My Tournaments'})}
+				/>
 			</div>
 
 			{/* Auth Buttons */}
