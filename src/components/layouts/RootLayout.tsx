@@ -1,7 +1,7 @@
 import {Outlet} from 'react-router-dom';
 import React from 'react';
 import Header from '../shared/header';
-import Modal from '../shared/modal';
+import Modal from '../shared/Modal';
 import useStore from '../../store/useStore';
 
 export default function RootLayout() {

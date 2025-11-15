@@ -18,25 +18,20 @@ export default function Sidepanel() {
 			<div className='mb-6'>
 				<div className='flex flex-wrap gap-2'>
 					<Button
-						onClick={() => openModal({title: 'Create League'})}
-						text='Create league'
-						className='w-full bg-white border border-amber-700 text-amber-700 hover:bg-amber-700 hover:text-white transition-colors'>
+						onClick={() => openModal({title: 'Create Competition'})}
+						text='Create competition'
+						className='w-full bg-white border border-amber-700 text-amber-700 font-semibold rounded-lg shadow-sm hover:shadow-md hover:bg-amber-700 hover:text-white transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-amber-400 focus:ring-opacity-50 py-2 px-4'>
 					</Button>
-					<Button
+					{/* <Button
 						onClick={() => openModal({title: 'Create Tournament'})}
 						text='Create Tournament'
 						className='w-full mt-2 bg-white border border-amber-700 text-amber-700 hover:bg-amber-700 hover:text-white transition-colors'>
-					</Button>
+					</Button> */}
 				</div>
 				<Button
-					text='My Leagues'
-					className='w-full mt-4 bg-white border border-amber-700 text-amber-700 hover:bg-amber-700 hover:text-white transition-colors'
-					onClick={() => openModal({title: 'My Leagues'})}
-				/>
-				<Button
-					text='My Tournaments'
-					className='w-full mt-2 bg-white border border-amber-700 text-amber-700 hover:bg-amber-700 hover:text-white transition-colors'
-					onClick={() => openModal({title: 'My Tournaments'})}
+					text='My Competitions'
+					className='w-full mt-4 bg-white border border-amber-700 text-amber-700 font-semibold rounded-lg shadow-sm hover:shadow-md hover:bg-amber-700 hover:text-white transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-amber-400 focus:ring-opacity-50 py-2 px-4'
+					//onClick={}
 				/>
 			</div>
 

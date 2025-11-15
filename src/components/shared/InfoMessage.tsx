@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 
-export default function InfoMessage({ message }: { message: string }) {
+export default function InfoMessage({ message, type }: { message: string, type?: 'success' | 'error' }) {
   const [visible, setVisible] = useState(true);
 
   if (!message || !visible) return null;
@@ -108,7 +108,7 @@ export default function InfoMessage({ message }: { message: string }) {
           }
         `}
       </style>
-      <div className="notification-card">
+      <div className={`notification-card${type ? ' ' + type : ''}`}>
         {message}
         <button className="close-button" onClick={() => setVisible(false)}>×</button>
       </div>

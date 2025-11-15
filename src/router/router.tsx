@@ -1,6 +1,6 @@
 import {createHashRouter} from 'react-router-dom';
 import Sidepanel from '../components/shared/Sidepanel';
-import RootLayout from '../components/layouts/rootLayout';
+import RootLayout from '../components/layouts/RootLayout';
 import React from 'react';
 
 export const router = createHashRouter([
