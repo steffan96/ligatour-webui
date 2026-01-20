@@ -1,6 +1,6 @@
 import {createHashRouter} from 'react-router-dom';
 import RootLayout from '../components/layouts/RootLayout';
-import MyCompetitions from '../components/layouts/MyCompetitions';
+import MyCompetitions from '../components/layouts/MyCompetitionsLayout';
 import RegisterComponent from '../components/auth/RegisterComponent';
 import React from 'react';
 
