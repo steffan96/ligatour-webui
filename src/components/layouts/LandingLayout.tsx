@@ -16,7 +16,7 @@ export default function LandingLayout() {
 					<Button
 						onClick={() => {
 							setSelected('leagues');
-							navigate('/my-competitions');
+							// navigate('/my-competitions');
 						}}
 						text='Leagues'
 						className={`rounded-l-full ${selected === 'leagues' ? 'opacity-100' : 'opacity-50'}`}>
@@ -24,7 +24,7 @@ export default function LandingLayout() {
 					<Button
 						onClick={() => {
 							setSelected('tournaments');
-							navigate('/my-competitions');
+							// navigate('/my-competitions');
 						}}
 						text='Tournaments'
 						className={`ml-0 rounded-r-full ${selected === 'tournaments' ? 'opacity-100' : 'opacity-50'}`}>
