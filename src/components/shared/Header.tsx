@@ -1,4 +1,5 @@
 import React from 'react';
+
 const Header = () => (
 	<div className='flex w-full h-[10%] bg-gray-300'>
 		<header className='w-[85%] ml-auto bg-green-900 flex justify-end rounded-bl-[5rem]'>

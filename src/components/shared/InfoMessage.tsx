@@ -1,14 +1,16 @@
-import React, { useState } from 'react';
+import React, {useState} from 'react';
 
-export default function InfoMessage({ message, type }: { message: string, type?: 'success' | 'error' }) {
-  const [visible, setVisible] = useState(true);
+export default function InfoMessage({message, type}: {message: string; type?: 'success' | 'error'}) {
+	const [visible, setVisible] = useState(true);
 
-  if (!message || !visible) return null;
+	if (!message || !visible) {
+		return null;
+	}
 
-  return (
-    <>
-      <style>
-        {`
+	return (
+		<>
+			<style>
+				{`
           .notification-card {
             position: fixed;
             top: 20px;
@@ -107,11 +109,13 @@ export default function InfoMessage({ message, type }: { message: string, type?:
             }
           }
         `}
-      </style>
-      <div className={`notification-card${type ? ' ' + type : ''}`}>
-        {message}
-        <button className="close-button" onClick={() => setVisible(false)}>×</button>
-      </div>
-    </>
-  );
+			</style>
+			<div className={`notification-card${type ? ' ' + type : ''}`}>
+				{message}
+				<button className='close-button' onClick={() => {
+					setVisible(false);
+				}}>×</button>
+			</div>
+		</>
+	);
 }

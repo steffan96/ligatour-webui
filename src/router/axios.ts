@@ -1,28 +1,28 @@
-import axios from 'axios'
+import axios from 'axios';
 
 const axiosInstance = axios.create({
-  baseURL: process.env.REACT_APP_BASE_URL,
-  timeout: 30000,
-  headers: {
-    'Content-Type': 'application/json',
-  },
-  responseType: 'json',
-  //withCredentials: true,
-})
+	baseURL: process.env.REACT_APP_BASE_URL,
+	timeout: 30000,
+	headers: {
+		'Content-Type': 'application/json',
+	},
+	responseType: 'json',
+	// WithCredentials: true,
+});
 
 axiosInstance.interceptors.request.use(
-  config => {
-    const token = localStorage.getItem('token') //TODO use httpOnly cookie instead of localStorage
+	config => {
+		const token = localStorage.getItem('token'); // TODO use httpOnly cookie instead of localStorage
 
-    if (token) {
-      config.headers.Authorization = `Bearer ${token}`
-    }
+		if (token) {
+			config.headers.Authorization = `Bearer ${token}`;
+		}
 
-    return config
-  },
-  error => {
-    return Promise.reject(error)
-  }
-)
+		return config;
+	},
+	async error => {
+		throw error;
+	},
+);
 
-export default axiosInstance
+export default axiosInstance;

@@ -1,16 +1,22 @@
-import React from "react";
-import Button from "../shared/Button";
+import React from 'react';
+import Button from '../shared/Button';
+import CreateComponentHeader from './CreateComponentHeader';
 
-export default function CreateComponent({title, description}: {title: string; description: string}) {
-    return (
-        <div className="ml-4 flex flex-row justify-between items-start w-[80%]">
-            <div className="mb-2">
-                <h1 className="text-lg font-semibold">{title}</h1>
-                <p className="text-sm opacity-70">{description}</p>
-            </div>
-            <Button text={`+ Create ${title}`} className="mt-4 ml-4 rounded-md" onClick={() => {
-                // TODO: Implement create functionality
-            }} />
-        </div>
-    );
+export default function CreateComponent({type}: {type: 'leagues' | 'tournaments'}) {
+	return (
+		<>
+			<div className='flex flex-row justify-between items-start mt-8'>
+				<CreateComponentHeader
+					title={type === 'leagues' ? 'Leagues' : 'Tournaments'}
+					description={`Create and manage your ${type}s`}
+				/>
+				<Button text={`+ Create ${type === 'leagues' ? 'League' : 'Tournament'}`} className='mt-4 ml-4 rounded-md' onClick={() => {
+					// TODO: Implement create functionality
+				}} />
+			</div>
+			<div className=''>
+
+			</div>
+		</>
+	);
 }

@@ -1,7 +1,7 @@
 import React from 'react';
+import {useNavigate} from 'react-router-dom';
 import useStore from '../../store/useStore';
 import Button from './Button';
-import { useNavigate } from 'react-router-dom';
 
 export default function Sidepanel() {
 	const openModal = useStore(state => state.openModal);
@@ -20,12 +20,14 @@ export default function Sidepanel() {
 			<div className='mb-6'>
 				<div className='flex flex-wrap gap-2'>
 					<Button
-						onClick={() =>navigate('/registration')}
+						onClick={async () => navigate('/registration')}
 						text='Register'
 						className='w-full bg-white border border-amber-700 text-amber-700 font-semibold rounded-lg shadow-sm hover:shadow-md hover:bg-amber-700 hover:text-white transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-amber-400 focus:ring-opacity-50 py-2 px-4'>
 					</Button>
 					<Button
-						onClick={() => openModal({title: 'Create Competition'})}
+						onClick={() => {
+							openModal({title: 'Create Competition'});
+						}}
 						text='Create competition'
 						className='w-full bg-white border border-amber-700 text-amber-700 font-semibold rounded-lg shadow-sm hover:shadow-md hover:bg-amber-700 hover:text-white transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-amber-400 focus:ring-opacity-50 py-2 px-4'>
 					</Button>
@@ -38,7 +40,7 @@ export default function Sidepanel() {
 				<Button
 					text='My Competitions'
 					className='w-full mt-4 bg-white border border-amber-700 text-amber-700 font-semibold rounded-lg shadow-sm hover:shadow-md hover:bg-amber-700 hover:text-white transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-amber-400 focus:ring-opacity-50 py-2 px-4'
-					onClick={() => navigate('/my-competitions')}
+					onClick={async () => navigate('/my-competitions')}
 				/>
 			</div>
 

@@ -3,7 +3,7 @@ import {create} from 'zustand';
 type Store = {
 	isModalOpen: boolean;
 	modalArgs: ModalArgs;
-	openModal: (args: ModalArgs) => void;
+	openModal: (arguments_: ModalArgs) => void;
 	closeModal: () => void;
 	toggleModal: () => void;
 };
@@ -11,14 +11,14 @@ type Store = {
 const useStore = create<Store>(set => ({
 	isModalOpen: false,
 	modalArgs: undefined as unknown as ModalArgs,
-	openModal(args: ModalArgs) {
-		set({ isModalOpen: true, modalArgs: args });
+	openModal(arguments_: ModalArgs) {
+		set({isModalOpen: true, modalArgs: arguments_});
 	},
 	closeModal() {
-		set(() => ({ isModalOpen: false, modalArgs: undefined as unknown as ModalArgs }));
+		set(() => ({isModalOpen: false, modalArgs: undefined as unknown as ModalArgs}));
 	},
 	toggleModal() {
-		set(state => ({ isModalOpen: !state.isModalOpen }));
+		set(state => ({isModalOpen: !state.isModalOpen}));
 	},
 }));
 
