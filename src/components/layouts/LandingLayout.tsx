@@ -19,7 +19,7 @@ export default function LandingLayout() {
 							// navigate('/my-competitions');
 						}}
 						text='Leagues'
-						className={`rounded-l-full ${selected === 'leagues' ? 'opacity-100' : 'opacity-50'}`}>
+						className={`h-8 w-48 bg-green-800 text-gray-300 rounded-l-full ${selected === 'leagues' ? 'opacity-100' : 'opacity-50'}`}>
 					</Button>
 					<Button
 						onClick={() => {
@@ -27,7 +27,7 @@ export default function LandingLayout() {
 							// navigate('/my-competitions');
 						}}
 						text='Tournaments'
-						className={`ml-0 rounded-r-full ${selected === 'tournaments' ? 'opacity-100' : 'opacity-50'}`}>
+						className={`h-8 w-48 bg-green-800 text-gray-300 ml-0 rounded-r-full ${selected === 'tournaments' ? 'opacity-100' : 'opacity-50'}`}>
 					</Button>
 					<CreateComponent type={selected} />
 				</div>

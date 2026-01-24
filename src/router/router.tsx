@@ -3,6 +3,7 @@ import React from 'react';
 import RootLayout from '../components/layouts/RootLayout';
 import MyCompetitions from '../components/layouts/MyCompetitionsLayout';
 import RegisterComponent from '../components/auth/RegisterComponent';
+import LandingLayout from '../components/layouts/LandingLayout';
 
 export const router = createHashRouter([
 	{
@@ -10,13 +11,18 @@ export const router = createHashRouter([
 		element: <RootLayout />,
 		children: [
 			{
+				path: '/',
+				index: true,
+				element: <LandingLayout />,
+			},
+			{
 				path: '/my-competitions',
 				element: <MyCompetitions />,
 			},
-	  {
-				path: '/registration',
+			{
+				path: '/register',
 				element: <RegisterComponent />,
-	  },
+			},
 		],
 	},
 ]);

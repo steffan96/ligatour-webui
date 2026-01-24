@@ -10,7 +10,7 @@ export default function CreateComponent({type}: {type: 'leagues' | 'tournaments'
 					title={type === 'leagues' ? 'Leagues' : 'Tournaments'}
 					description={`Create and manage your ${type}`}
 				/>
-				<Button text={`+ Create ${type === 'leagues' ? 'League' : 'Tournament'}`} className='mt-4 ml-4 rounded-md' onClick={() => {
+				<Button text={`+ Create ${type === 'leagues' ? 'League' : 'Tournament'}`} className='h-8 w-48 bg-green-800 text-gray-300 mt-4 ml-4 rounded-md' onClick={() => {
 					// TODO: Implement create functionality
 				}} />
 			</div>
@@ -18,7 +18,7 @@ export default function CreateComponent({type}: {type: 'leagues' | 'tournaments'
 				<div className='flex flex-col justify-center items-center'>
 					<h1 className='text-lg font-semibold mb-4'>{`No ${type} yet`}</h1>
 					<p>{`Create your first ${type === 'leagues' ? 'league' : 'tournament'} to get started.`}</p>
-					<Button text={`+ Create ${type === 'leagues' ? 'League' : 'Tournament'}`} className='mt-4 ml-4 rounded-md' onClick={() => {
+					<Button text={`+ Create ${type === 'leagues' ? 'League' : 'Tournament'}`} className='h-8 w-48 bg-green-800 text-gray-300 mt-4 ml-4 rounded-md' onClick={() => {
 						// TODO: Implement create functionality
 					}} />
 				</div>

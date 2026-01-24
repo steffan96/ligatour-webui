@@ -1,60 +1,9 @@
 import React, {useState} from 'react';
 
-const europeanCountries = [
-	'Albania',
-	'Andorra',
-	'Austria',
-	'Belarus',
-	'Belgium',
-	'Bosnia & Herzegovina',
-	'Bulgaria',
-	'Croatia',
-	'Cyprus',
-	'Czech Republic',
-	'Denmark',
-	'Estonia',
-	'Finland',
-	'France',
-	'Germany',
-	'Greece',
-	'Hungary',
-	'Iceland',
-	'Ireland {Republic}',
-	'Italy',
-	'Kosovo',
-	'Latvia',
-	'Liechtenstein',
-	'Lithuania',
-	'Luxembourg',
-	'Macedonia',
-	'Malta',
-	'Moldova',
-	'Monaco',
-	'Montenegro',
-	'Netherlands',
-	'Norway',
-	'Poland',
-	'Portugal',
-	'Romania',
-	'San Marino',
-	'Serbia',
-	'Slovakia',
-	'Slovenia',
-	'Spain',
-	'Sweden',
-	'Switzerland',
-	'Ukraine',
-	'United Kingdom',
-	'Vatican City',
-];
-
 const RegisterComponent = () => {
-	const [username, setUsername] = useState('');
 	const [email, setEmail] = useState('');
 	const [password, setPassword] = useState('');
 	const [confirmPassword, setConfirmPassword] = useState('');
-	const [eloRating, setEloRating] = useState('');
-	const [country, setCountry] = useState('');
 	const [errors, setErrors] = useState<any>({});
 	const [isLoading, setIsLoading] = useState(false);
 	const [success, setSuccess] = useState(false);
@@ -69,10 +18,6 @@ const RegisterComponent = () => {
 	const handleSubmit = (e: React.FormEvent) => {
 		e.preventDefault();
 		const newErrors: any = {};
-		if (!username) {
-			newErrors.username = 'Username is required.';
-		}
-
 		if (!validateEmail(email)) {
 			newErrors.email = 'Invalid email address.';
 		}
@@ -83,10 +28,6 @@ const RegisterComponent = () => {
 
 		if (password !== confirmPassword) {
 			newErrors.confirmPassword = 'Passwords do not match.';
-		}
-
-		if (!country) {
-			newErrors.country = 'Country is required.';
 		}
 
 		setErrors(newErrors);
@@ -108,19 +49,6 @@ const RegisterComponent = () => {
 					<div className='text-green-600 text-center font-semibold'>Registration successful!</div>
 				) : (
 					<form onSubmit={handleSubmit} className='space-y-4'>
-						<div>
-							<input
-								type='text'
-								className='w-full px-4 py-2 rounded-md border border-gray-300 focus:border-green-500 focus:outline-none text-gray-800'
-								placeholder='Username'
-								value={username}
-								onChange={e => {
-									setUsername(e.target.value);
-								}}
-								required
-							/>
-							{errors.username && <p className='text-red-500 text-xs mt-1'>{errors.username}</p>}
-						</div>
 						<div>
 							<input
 								type='email'
@@ -159,34 +87,6 @@ const RegisterComponent = () => {
 								required
 							/>
 							{errors.confirmPassword && <p className='text-red-500 text-xs mt-1'>{errors.confirmPassword}</p>}
-						</div>
-						<div>
-							<input
-								type='number'
-								className='w-full px-4 py-2 rounded-md border border-gray-300 focus:border-green-500 focus:outline-none text-gray-800'
-								placeholder='Rating (optional)'
-								value={eloRating}
-								onChange={e => {
-									setEloRating(e.target.value);
-								}}
-								min={0}
-							/>
-						</div>
-						<div>
-							<select
-								className='w-full px-4 py-2 rounded-md border border-gray-300 focus:border-green-500 focus:outline-none text-gray-800'
-								value={country}
-								onChange={e => {
-									setCountry(e.target.value);
-								}}
-								required
-							>
-								<option value=''>Select Country</option>
-								{europeanCountries.map(c => (
-									<option key={c} value={c}>{c}</option>
-								))}
-							</select>
-							{errors.country && <p className='text-red-500 text-xs mt-1'>{errors.country}</p>}
 						</div>
 						<button
 							type='submit'
