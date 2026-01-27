@@ -1,4 +1,5 @@
 import React, {useState} from 'react';
+import { registerUser } from '../../api/auth';
 
 const RegisterComponent = () => {
 	const [email, setEmail] = useState('');
@@ -15,7 +16,7 @@ const RegisterComponent = () => {
 
 	const validatePassword = (password: string) => /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z\d]).{8,}$/.test(password);
 
-	const handleSubmit = (e: React.FormEvent) => {
+	const handleSubmit = async (e: React.FormEvent) => {
 		e.preventDefault();
 		const newErrors: any = {};
 		if (!validateEmail(email)) {
@@ -33,18 +34,27 @@ const RegisterComponent = () => {
 		setErrors(newErrors);
 		if (Object.keys(newErrors).length === 0) {
 			setIsLoading(true);
-			setTimeout(() => {
-				setIsLoading(false);
+			try {
+				await registerUser(email, password, confirmPassword);
 				setSuccess(true);
-			}, 1200);
+			} catch (err: any) {
+				setErrors({ api: err?.response?.data?.message || 'Registration failed.' });
+			} finally {
+				setIsLoading(false);
+			}
 		}
 	};
 
+	const inputClass = 'w-full px-4 py-2 rounded-md border border-gray-300 focus:border-green-600 focus:ring-2 focus:ring-green-200 focus:outline-none text-gray-800 bg-white shadow-sm transition duration-150';
+	const buttonClass = 'w-full py-2 rounded-md bg-green-600 hover:bg-green-700 text-white font-semibold transition duration-150 flex items-center justify-center';
+
 	return (
-		<div className='flex items-center justify-center min-h-[80vh] bg-gradient-to-r from-blue-900 to-indigo-700 py-8'>
-			<div className='bg-white bg-opacity-90 rounded-xl shadow-lg p-8 w-full max-w-md'>
+		<div className='flex flex-col items-center w-full p-8'>
+			<div className='w-[85%] ml-auto'>
 				<h1 className='text-2xl font-bold text-gray-800 mb-2 text-center'>Create an Account</h1>
-				<p className='text-gray-600 mb-6 text-center'>Please fill in the details to register.</p>
+				<p className='text-gray-600 mb-6 text-center'>Join us today and start competing!</p>
+			</div>
+			<div className='flex flex-col items-center w-[85%] ml-auto p-8 rounded-lg shadow-md'>
 				{success ? (
 					<div className='text-green-600 text-center font-semibold'>Registration successful!</div>
 				) : (
@@ -52,7 +62,7 @@ const RegisterComponent = () => {
 						<div>
 							<input
 								type='email'
-								className='w-full px-4 py-2 rounded-md border border-gray-300 focus:border-green-500 focus:outline-none text-gray-800'
+								className={inputClass}
 								placeholder='Email'
 								value={email}
 								onChange={e => {
@@ -65,7 +75,7 @@ const RegisterComponent = () => {
 						<div>
 							<input
 								type='password'
-								className='w-full px-4 py-2 rounded-md border border-gray-300 focus:border-green-500 focus:outline-none text-gray-800'
+								className={inputClass}
 								placeholder='Password'
 								value={password}
 								onChange={e => {
@@ -78,7 +88,7 @@ const RegisterComponent = () => {
 						<div>
 							<input
 								type='password'
-								className='w-full px-4 py-2 rounded-md border border-gray-300 focus:border-green-500 focus:outline-none text-gray-800'
+								className={inputClass}
 								placeholder='Confirm Password'
 								value={confirmPassword}
 								onChange={e => {
@@ -90,7 +100,7 @@ const RegisterComponent = () => {
 						</div>
 						<button
 							type='submit'
-							className='w-full py-2 rounded-md bg-green-600 hover:bg-green-700 text-white font-semibold transition duration-150 flex items-center justify-center'
+							className={buttonClass}
 							disabled={isLoading}
 						>
 							{isLoading && (
