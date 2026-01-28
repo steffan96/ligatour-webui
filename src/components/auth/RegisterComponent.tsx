@@ -1,5 +1,5 @@
 import React, {useState} from 'react';
-import { registerUser } from '../../api/auth';
+import { registerUser } from '../../api/auth/auth';
 
 const RegisterComponent = () => {
 	const [email, setEmail] = useState('');
@@ -45,7 +45,7 @@ const RegisterComponent = () => {
 		}
 	};
 
-	const inputClass = 'w-full px-4 py-2 rounded-md border border-gray-300 focus:border-green-600 focus:ring-2 focus:ring-green-200 focus:outline-none text-gray-800 bg-white shadow-sm transition duration-150';
+	const inputClass = 'w-full px-12 py-2 rounded-md border border-gray-300 focus:border-green-600 focus:ring-2 focus:ring-green-200 focus:outline-none text-gray-800 bg-white shadow-sm transition duration-150';
 	const buttonClass = 'w-full py-2 rounded-md bg-green-600 hover:bg-green-700 text-white font-semibold transition duration-150 flex items-center justify-center';
 
 	return (

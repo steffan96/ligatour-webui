@@ -4,6 +4,7 @@ import RootLayout from '../components/layouts/RootLayout';
 import MyCompetitions from '../components/layouts/MyCompetitionsLayout';
 import RegisterComponent from '../components/auth/RegisterComponent';
 import LandingLayout from '../components/layouts/LandingLayout';
+import LoginComponent from '../components/auth/LoginComponent';
 
 export const router = createHashRouter([
 	{
@@ -23,6 +24,10 @@ export const router = createHashRouter([
 				path: '/register',
 				element: <RegisterComponent />,
 			},
+			{
+				path: '/login',
+				element: <LoginComponent />,
+			}
 		],
 	},
 ]);
