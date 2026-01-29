@@ -1,11 +1,14 @@
 import React, {useState} from 'react';
-import { loginUser } from '../../api/auth/auth';
+import {useNavigate} from 'react-router-dom';
+import useAuthStore from '../../api/store';
 
 const LoginComponent = () => {
+	const { isUserLoggedIn, login, logout } = useAuthStore();
 	const [email, setEmail] = useState('');
 	const [password, setPassword] = useState('');
 	const [errors, setErrors] = useState<any>({});
 	const [isLoading, setIsLoading] = useState(false);
+	const navigate = useNavigate();
 
 	const validateEmail = (email: string) => {
 		const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -30,11 +33,12 @@ const LoginComponent = () => {
 		if (Object.keys(newErrors).length === 0) {
 			setIsLoading(true);
 			try {
-				await loginUser(email, password);
+				await login(email, password);
 				// You might want to redirect or handle successful login differently
 				// For now, we'll just clear the form
 				setEmail('');
 				setPassword('');
+				navigate('/')
 			} catch (err: any) {
 				setErrors({ api: err?.response?.data?.message || 'Login failed. Please check your credentials.' });
 			} finally {

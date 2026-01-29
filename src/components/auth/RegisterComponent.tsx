@@ -1,5 +1,5 @@
 import React, {useState} from 'react';
-import { registerUser } from '../../api/auth/auth';
+import { registerUser } from '../../api/auth';
 
 const RegisterComponent = () => {
 	const [email, setEmail] = useState('');

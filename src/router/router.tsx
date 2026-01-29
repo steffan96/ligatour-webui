@@ -1,9 +1,9 @@
 import {createHashRouter} from 'react-router-dom';
 import React from 'react';
-import RootLayout from '../components/layouts/RootLayout';
-import MyCompetitions from '../components/layouts/MyCompetitionsLayout';
+import RootLayout from '../components/home/RootLayout';
+import MyCompetitions from '../components/home/MyCompetitionsLayout';
 import RegisterComponent from '../components/auth/RegisterComponent';
-import LandingLayout from '../components/layouts/LandingLayout';
+import LandingLayout from '../components/home/LandingLayout';
 import LoginComponent from '../components/auth/LoginComponent';
 
 export const router = createHashRouter([
