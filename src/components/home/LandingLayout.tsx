@@ -1,10 +1,8 @@
 import React, {useState} from 'react';
-import {useNavigate} from 'react-router-dom';
 import Button from '../shared/Button';
 import CreateComponent from '../leagues/CreateComponent';
 
 export default function LandingLayout() {
-	const navigate = useNavigate();
 	const [selected, setSelected] = useState<'leagues' | 'tournaments'>('leagues');
 
 	return (

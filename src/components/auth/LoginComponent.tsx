@@ -1,9 +1,8 @@
 import React, {useState} from 'react';
 import {useNavigate} from 'react-router-dom';
-import useAuthStore from '../../api/store';
+import {loginUser} from '../../api/auth';
 
 const LoginComponent = () => {
-	const { isUserLoggedIn, login, logout } = useAuthStore();
 	const [email, setEmail] = useState('');
 	const [password, setPassword] = useState('');
 	const [errors, setErrors] = useState<any>({});
@@ -33,7 +32,7 @@ const LoginComponent = () => {
 		if (Object.keys(newErrors).length === 0) {
 			setIsLoading(true);
 			try {
-				await login(email, password);
+				await loginUser(email, password);
 				// You might want to redirect or handle successful login differently
 				// For now, we'll just clear the form
 				setEmail('');
@@ -47,8 +46,12 @@ const LoginComponent = () => {
 		}
 	};
 
-	const inputClass = 'w-full px-8 py-3 rounded-md border border-gray-300 focus:border-green-600 focus:ring-2 focus:ring-green-200 focus:outline-none text-gray-800 bg-white shadow-sm transition duration-150';
-	const buttonClass = 'w-full py-2 rounded-md bg-green-600 hover:bg-green-700 text-white font-semibold transition duration-150 flex items-center justify-center';
+	const inputClass = 'w-full px-8 py-3 rounded-md border border-gray-300 focus:border-green-600 ' +
+	'focus:ring-2 focus:ring-green-200 focus:outline-none text-gray-800 bg-white ' +
+	'shadow-sm transition duration-150';
+	
+	const buttonClass = 'w-full py-2 rounded-md bg-green-600 hover:bg-green-700 text-white ' +
+	'font-semibold transition duration-150 flex items-center justify-center';
 
 	return (
 		<div className='flex flex-col items-center w-full p-8'>

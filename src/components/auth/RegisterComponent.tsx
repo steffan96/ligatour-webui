@@ -24,7 +24,8 @@ const RegisterComponent = () => {
 		}
 
 		if (!validatePassword(password)) {
-			newErrors.password = 'Password must be at least 8 characters, include uppercase, lowercase, number, and special character.';
+			newErrors.password = 'Password must be at least 8 characters, ' +
+			'include uppercase, lowercase, number, and special character.';
 		}
 
 		if (password !== confirmPassword) {
@@ -45,8 +46,11 @@ const RegisterComponent = () => {
 		}
 	};
 
-	const inputClass = 'w-full px-12 py-2 rounded-md border border-gray-300 focus:border-green-600 focus:ring-2 focus:ring-green-200 focus:outline-none text-gray-800 bg-white shadow-sm transition duration-150';
-	const buttonClass = 'w-full py-2 rounded-md bg-green-600 hover:bg-green-700 text-white font-semibold transition duration-150 flex items-center justify-center';
+	const inputClass = 'w-full px-12 py-2 rounded-md border border-gray-300 ' + 
+	'focus:border-green-600 focus:ring-2 focus:ring-green-200 focus:outline-none' + 
+	' text-gray-800 bg-white shadow-sm transition duration-150';
+	const buttonClass = 'w-full py-2 rounded-md bg-green-600 hover:bg-green-700 ' + 
+	'text-white font-semibold transition duration-150 flex items-center justify-center';
 
 	return (
 		<div className='flex flex-col items-center w-full p-8'>

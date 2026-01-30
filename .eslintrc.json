@@ -17,7 +17,7 @@
       "tabWidth": 2,
       "ignoreComments": true,
       "ignoreUrls": true,
-      "ignoreStrings": true,
+      // "ignoreStrings": true,
       "ignoreTemplateLiterals": true,
       "ignoreRegExpLiterals": true,
       "ignorePattern": "^import\\s.+\\sfrom\\s.+|^export\\s.+\\sfrom\\s.+"

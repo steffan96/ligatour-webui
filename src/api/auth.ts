@@ -1,4 +1,3 @@
-import React, { useState, useContext } from 'react';
 import axiosInstance from '../router/axios';
 
 export const registerUser = async (email: string, password: string, confirmPassword: string) => {
@@ -11,10 +10,13 @@ export const loginUser = async (email: string, password: string) => {
 	const response = await axiosInstance.post('/api/auth/login', { email, password });
 	localStorage.setItem('token', response.data.token);
 	localStorage.setItem('refreshToken', response.data.refresh_token);
+	localStorage.setItem('userID', response.data.user.id);
 };
 
 export const logoutUser = async () => {
 	localStorage.removeItem('token');
 	localStorage.removeItem('refreshToken');
-	await axiosInstance.post('/api/auth/logout');
+	localStorage.removeItem('userID');
+	const userID = localStorage.getItem('userID');
+	await axiosInstance.post('/api/auth/logout', { userID });
 };
