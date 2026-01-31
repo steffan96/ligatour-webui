@@ -5,6 +5,8 @@ import MyCompetitions from '../components/home/MyCompetitionsLayout';
 import RegisterComponent from '../components/auth/RegisterComponent';
 import LandingLayout from '../components/home/LandingLayout';
 import LoginComponent from '../components/auth/LoginComponent';
+import ResetPasswordComponent from '../components/auth/ResetPasswordComponent';
+import ForgotPasswordComponent from '../components/auth/ForgotPasswordComponent';
 
 export const router = createHashRouter([
 	{
@@ -27,6 +29,14 @@ export const router = createHashRouter([
 			{
 				path: '/login',
 				element: <LoginComponent />,
+			},
+			{
+				path: '/reset-password',
+				element: <ResetPasswordComponent />,
+			},
+			{
+				path: '/forgot-password',
+				element: <ForgotPasswordComponent />,
 			}
 		],
 	},

@@ -20,3 +20,14 @@ export const logoutUser = async () => {
 	const userID = localStorage.getItem('userID');
 	await axiosInstance.post('/api/auth/logout', { userID });
 };
+
+export const requestPasswordReset = async (email: string) => {
+    const response = await axiosInstance.post('/api/auth/request-password-reset', { email });
+    return response.data;
+};
+
+export const resetPassword = async (token: string, newPassword: string, confirmPassword: string) => {
+    const payload = { token, newPassword, confirmPassword };
+    const response = await axiosInstance.post('/api/auth/reset-password', payload);
+    return response.data;
+};

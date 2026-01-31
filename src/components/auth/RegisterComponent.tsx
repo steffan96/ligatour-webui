@@ -1,5 +1,6 @@
 import React, {useState} from 'react';
 import { registerUser } from '../../api/auth';
+import { Link } from 'react-router-dom';
 
 const RegisterComponent = () => {
 	const [email, setEmail] = useState('');
@@ -47,9 +48,9 @@ const RegisterComponent = () => {
 	};
 
 	const inputClass = 'w-full px-12 py-2 rounded-md border border-gray-300 ' + 
-	'focus:border-green-600 focus:ring-2 focus:ring-green-200 focus:outline-none' + 
+	'focus:border-green-900 focus:ring-2 focus:ring-green-200 focus:outline-none' + 
 	' text-gray-800 bg-white shadow-sm transition duration-150';
-	const buttonClass = 'w-full py-2 rounded-md bg-green-600 hover:bg-green-700 ' + 
+	const buttonClass = 'w-full py-2 rounded-md bg-green-900 hover:bg-green-900 ' + 
 	'text-white font-semibold transition duration-150 flex items-center justify-center';
 
 	return (
@@ -60,7 +61,7 @@ const RegisterComponent = () => {
 			</div>
 			<div className='flex flex-col items-center w-[85%] ml-auto p-8 rounded-lg shadow-md'>
 				{success ? (
-					<div className='text-green-600 text-center font-semibold'>Registration successful!</div>
+					<div className='text-green-900 text-center font-semibold'>Registration successful!</div>
 				) : (
 					<form onSubmit={handleSubmit} className='space-y-4'>
 						<div>
@@ -119,7 +120,7 @@ const RegisterComponent = () => {
 				)}
 				<p className='text-gray-600 mt-6 text-center'>
           Already have an account?{' '}
-					<a href='/login' className='text-green-700 hover:underline font-medium'>Login here</a>
+					<Link to='/login' className='text-green-900 hover:underline font-medium'>Login here</Link>
 				</p>
 			</div>
 		</div>

@@ -1,5 +1,5 @@
 import React, {useState} from 'react';
-import {useNavigate} from 'react-router-dom';
+import {useNavigate, Link} from 'react-router-dom';
 import {loginUser} from '../../api/auth';
 
 const LoginComponent = () => {
@@ -46,11 +46,11 @@ const LoginComponent = () => {
 		}
 	};
 
-	const inputClass = 'w-full px-8 py-3 rounded-md border border-gray-300 focus:border-green-600 ' +
+	const inputClass = 'w-full px-8 py-3 rounded-md border border-gray-300 focus:border-green-900 ' +
 	'focus:ring-2 focus:ring-green-200 focus:outline-none text-gray-800 bg-white ' +
 	'shadow-sm transition duration-150';
 	
-	const buttonClass = 'w-full py-2 rounded-md bg-green-600 hover:bg-green-700 text-white ' +
+	const buttonClass = 'w-full py-2 rounded-md bg-green-900 hover:bg-green-900 text-white ' +
 	'font-semibold transition duration-150 flex items-center justify-center';
 
 	return (
@@ -112,10 +112,10 @@ const LoginComponent = () => {
 				</form>
 				<p className='text-gray-600 mt-6 text-center'>
 					Don&apos;t have an account?{' '}
-					<a href='/register' className='text-green-700 hover:underline font-medium'>Register here</a>
+					<a href='/register' className='text-green-900 hover:underline font-medium'>Register here</a>
 				</p>
 				<p className='text-gray-500 text-sm mt-3 text-center'>
-					<a href='/forgot-password' className='text-green-600 hover:underline'>Forgot your password?</a>
+					<Link to='/forgot-password' className='text-green-900 hover:underline'>Forgot your password?</Link>
 				</p>
 			</div>
 		</div>
