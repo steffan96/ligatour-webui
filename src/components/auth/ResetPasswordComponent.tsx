@@ -1,41 +1,42 @@
 import React, { useState } from 'react';
-import { useSearchParams, useNavigate } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 import { resetPassword } from '../../api/auth';
+import { useToastStore } from '../../api/stores/useToastStore';
 
 const ResetPasswordComponent = () => {
-    const [searchParams] = useSearchParams();
-    const token = searchParams.get('token') || '';
-    const [newPassword, setNewPassword] = useState('');
+    const { token = '' } = useParams<{ token: string }>();
+    const [password, setpassword] = useState('');
     const [confirmPassword, setConfirmPassword] = useState('');
-    const [errors, setErrors] = useState<any>({});
     const [isLoading, setIsLoading] = useState(false);
-    const [success, setSuccess] = useState(false);
     const navigate = useNavigate();
+    const { showToast } = useToastStore();
 
     const validatePassword = (password: string) => /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z\d]).{8,}$/.test(password);
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
-        const newErrors: any = {};
-        if (!validatePassword(newPassword)) {
-            newErrors.newPassword = 'Password must be at least 8 characters, include uppercase, ' +
-            'lowercase, number, and special character.';
+        if (!validatePassword(password)) {
+            showToast(
+                'Password must be at least 8 characters, include uppercase, lowercase, number, and special character.', 
+                false
+            );
+            return;
         }
-        if (newPassword !== confirmPassword) {
-            newErrors.confirmPassword = 'Passwords do not match.';
+        if (password !== confirmPassword) {
+            console.log(password, confirmPassword);
+            showToast('Passwords do not match.', false);
+            return;
         }
-        setErrors(newErrors);
-        if (Object.keys(newErrors).length === 0) {
-            setIsLoading(true);
-            try {
-                await resetPassword(token, newPassword, confirmPassword);
-                setSuccess(true);
-                setTimeout(() => navigate('/login'), 2000);
-            } catch (err: any) {
-                setErrors({ api: err?.response?.data?.message || 'Password reset failed.' });
-            } finally {
-                setIsLoading(false);
-            }
+
+        setIsLoading(true);
+        try {
+            await resetPassword(token, password, confirmPassword);
+            navigate('/login')
+            showToast('Password reset successful!', true);
+        } catch (err: any) {
+            showToast(err?.response?.data?.message || 'Password reset failed.', false);
+        } finally {
+            setIsLoading(false);
         }
     };
 
@@ -52,23 +53,17 @@ const ResetPasswordComponent = () => {
                 <p className='text-gray-600 mb-6 text-center'>Enter your new password below.</p>
             </div>
             <div className='flex flex-col items-center w-[85%] ml-auto p-8 rounded-lg shadow-md'>
-                {success ? (
-                    <div 
-                        className='text-green-900 text-center font-semibold'>
-                        Password reset successful! Redirecting to login...
-                    </div>
-                ) : (
+                
                     <form onSubmit={handleSubmit} className='space-y-4'>
                         <div>
                             <input
                                 type='password'
                                 className={inputClass}
                                 placeholder='New Password'
-                                value={newPassword}
-                                onChange={e => setNewPassword(e.target.value)}
+                                value={password}
+                                onChange={e => setpassword(e.target.value)}
                                 required
                             />
-                            {errors.newPassword && <p className='text-red-500 text-xs mt-1'>{errors.newPassword}</p>}
                         </div>
                         <div>
                             <input
@@ -79,17 +74,7 @@ const ResetPasswordComponent = () => {
                                 onChange={e => setConfirmPassword(e.target.value)}
                                 required
                             />
-                            {
-                                errors.confirmPassword && 
-                                <p className='text-red-500 text-xs mt-1'>{errors.confirmPassword}</p>
-                            }
                         </div>
-                        {errors.api && (
-                            <div 
-                            className='text-red-500 text-sm text-center bg-red-50 p-3 rounded-md border border-red-200'>
-                            {errors.api}
-                            </div>
-                        )}
                         <button
                             type='submit'
                             className={buttonClass}
@@ -111,7 +96,7 @@ const ResetPasswordComponent = () => {
                             {isLoading ? 'Resetting...' : 'Reset Password'}
                         </button>
                     </form>
-                )}
+                
             </div>
         </div>
     );

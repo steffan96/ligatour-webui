@@ -1,13 +1,15 @@
 import React, {useState} from 'react';
 import {useNavigate, Link} from 'react-router-dom';
 import {loginUser} from '../../api/auth';
+import { useToastStore } from '../../api/stores/useToastStore';
+import { InfoMessageCard } from '../shared/InfoMessageCard';
 
 const LoginComponent = () => {
 	const [email, setEmail] = useState('');
 	const [password, setPassword] = useState('');
-	const [errors, setErrors] = useState<any>({});
 	const [isLoading, setIsLoading] = useState(false);
 	const navigate = useNavigate();
+	const { toast, showToast, hideToast } = useToastStore();
 
 	const validateEmail = (email: string) => {
 		const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -16,33 +18,29 @@ const LoginComponent = () => {
 
 	const handleSubmit = async (e: React.FormEvent) => {
 		e.preventDefault();
-		const newErrors: any = {};
 		
 		if (!validateEmail(email)) {
-			newErrors.email = 'Invalid email address.';
+			showToast('Invalid email format.', false);
+			return;
 		}
 
 		if (!password) {
-			newErrors.password = 'Password is required.';
+			showToast('Password is required.', false);
+			return;
 		} else if (password.length < 6) {
-			newErrors.password = 'Password must be at least 6 characters.';
+			showToast('Password must be at least 6 characters.', false);
+			return;
 		}
 
-		setErrors(newErrors);
-		if (Object.keys(newErrors).length === 0) {
-			setIsLoading(true);
-			try {
-				await loginUser(email, password);
-				// You might want to redirect or handle successful login differently
-				// For now, we'll just clear the form
-				setEmail('');
-				setPassword('');
-				navigate('/')
-			} catch (err: any) {
-				setErrors({ api: err?.response?.data?.message || 'Login failed. Please check your credentials.' });
-			} finally {
-				setIsLoading(false);
-			}
+		setIsLoading(true);
+		try {
+			await loginUser(email, password);
+			navigate('/');
+			showToast('Login successful!', true);
+		} catch (err: any) {
+			showToast(err?.response?.data?.message || 'Login failed. Please check your credentials.', false);
+		} finally {
+			setIsLoading(false);
 		}
 	};
 
@@ -55,6 +53,9 @@ const LoginComponent = () => {
 
 	return (
 		<div className='flex flex-col items-center w-full p-8'>
+				{toast && (
+				<InfoMessageCard message={toast.message} isSuccess={toast.isSuccess} onClose={hideToast} />
+			)}
 			<div className='w-[85%] ml-auto'>
 				<h1 className='text-2xl font-bold text-gray-800 mb-2 text-center'>Welcome Back</h1>
 				<p className='text-gray-600 mb-6 text-center'>Sign in to continue</p>
@@ -69,11 +70,9 @@ const LoginComponent = () => {
 							value={email}
 							onChange={e => {
 								setEmail(e.target.value);
-								if (errors.email) setErrors({...errors, email: ''});
 							}}
 							required
 						/>
-						{errors.email && <p className='text-red-500 text-xs mt-1'>{errors.email}</p>}
 					</div>
 					<div>
 						<input
@@ -83,19 +82,11 @@ const LoginComponent = () => {
 							value={password}
 							onChange={e => {
 								setPassword(e.target.value);
-								if (errors.password) setErrors({...errors, password: ''});
 							}}
 							required
 						/>
-						{errors.password && <p className='text-red-500 text-xs mt-1'>{errors.password}</p>}
 					</div>
-					
-					{errors.api && (
-						<div className='text-red-500 text-sm text-center bg-red-50 p-3 rounded-md border border-red-200'>
-							{errors.api}
-						</div>
-					)}
-					
+
 					<button
 						type='submit'
 						className={buttonClass}

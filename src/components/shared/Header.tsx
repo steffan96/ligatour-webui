@@ -2,10 +2,12 @@ import React from 'react';
 import Button from '../shared/Button';
 import {useNavigate} from 'react-router-dom';
 import {logoutUser} from '../../api/auth';
+import { useToastStore } from '../../api/stores/useToastStore';
 
 const Header = () => {
 	const navigate = useNavigate();
 	const isUserLoggedIn = Boolean(localStorage.getItem('token'));
+	const { showToast } = useToastStore();
 
 	return (
 		<div className='flex w-full h-[10%] bg-gray-300'>
@@ -17,14 +19,15 @@ const Header = () => {
 							<Button
 								text="Home"
 								className={`
-									bg-gray-300 
-									text-green-900 
+									bg-transparent 
+									border-2 border-white 
+									text-white 
 									px-6 py-2 
 									rounded-full 
 									font-semibold 
-									hover:bg-gray-100 
-									transition-colors 
-									duration-200
+									hover:bg-gray-300 
+									hover:text-green-900 
+									transition-colors
 								`}
 								onClick={() => navigate('/')}
 							/>
@@ -91,7 +94,7 @@ const Header = () => {
 							`}
 							onClick={() => {
 								logoutUser();
-								window.location.reload();
+								showToast('Logout successful!', true);
 							}}
 							/>
 						</>

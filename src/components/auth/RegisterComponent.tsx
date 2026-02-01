@@ -1,14 +1,16 @@
 import React, {useState} from 'react';
 import { registerUser } from '../../api/auth';
 import { Link } from 'react-router-dom';
+import { InfoMessageCard } from '../shared/InfoMessageCard';
+import { useToastStore } from '../../api/stores/useToastStore';
 
 const RegisterComponent = () => {
 	const [email, setEmail] = useState('');
 	const [password, setPassword] = useState('');
 	const [confirmPassword, setConfirmPassword] = useState('');
-	const [errors, setErrors] = useState<any>({});
 	const [isLoading, setIsLoading] = useState(false);
-	const [success, setSuccess] = useState(false);
+
+  	const { toast, showToast, hideToast } = useToastStore();
 
 	const validateEmail = (email: string) => {
 		const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -19,31 +21,32 @@ const RegisterComponent = () => {
 
 	const handleSubmit = async (e: React.FormEvent) => {
 		e.preventDefault();
-		const newErrors: any = {};
 		if (!validateEmail(email)) {
-			newErrors.email = 'Invalid email address.';
+			showToast('Invalid email format.', false);
+			return;
 		}
 
 		if (!validatePassword(password)) {
-			newErrors.password = 'Password must be at least 8 characters, ' +
-			'include uppercase, lowercase, number, and special character.';
+			showToast(
+				'Password must be at least 8 characters long and include uppercase, lowercase, number, and special character.',
+				false
+			);
+			return;
 		}
 
 		if (password !== confirmPassword) {
-			newErrors.confirmPassword = 'Passwords do not match.';
+			showToast('Passwords do not match.', false);
+			return;
 		}
 
-		setErrors(newErrors);
-		if (Object.keys(newErrors).length === 0) {
-			setIsLoading(true);
-			try {
-				await registerUser(email, password, confirmPassword);
-				setSuccess(true);
-			} catch (err: any) {
-				setErrors({ api: err?.response?.data?.message || 'Registration failed.' });
-			} finally {
-				setIsLoading(false);
-			}
+		setIsLoading(true);
+		try {
+			await registerUser(email, password, confirmPassword);
+			showToast('Registration successful!', true);
+		} catch (err: any) {
+			showToast(err?.response?.data?.message || 'Registration failed.', false);
+		} finally {
+			setIsLoading(false);
 		}
 	};
 
@@ -55,14 +58,14 @@ const RegisterComponent = () => {
 
 	return (
 		<div className='flex flex-col items-center w-full p-8'>
+      {toast && (
+        <InfoMessageCard message={toast.message} isSuccess={toast.isSuccess} onClose={hideToast} />
+      )}
 			<div className='w-[85%] ml-auto'>
 				<h1 className='text-2xl font-bold text-gray-800 mb-2 text-center'>Create an Account</h1>
 				<p className='text-gray-600 mb-6 text-center'>Join us today and start competing!</p>
 			</div>
 			<div className='flex flex-col items-center w-[85%] ml-auto p-8 rounded-lg shadow-md'>
-				{success ? (
-					<div className='text-green-900 text-center font-semibold'>Registration successful!</div>
-				) : (
 					<form onSubmit={handleSubmit} className='space-y-4'>
 						<div>
 							<input
@@ -75,7 +78,6 @@ const RegisterComponent = () => {
 								}}
 								required
 							/>
-							{errors.email && <p className='text-red-500 text-xs mt-1'>{errors.email}</p>}
 						</div>
 						<div>
 							<input
@@ -88,7 +90,6 @@ const RegisterComponent = () => {
 								}}
 								required
 							/>
-							{errors.password && <p className='text-red-500 text-xs mt-1'>{errors.password}</p>}
 						</div>
 						<div>
 							<input
@@ -101,7 +102,6 @@ const RegisterComponent = () => {
 								}}
 								required
 							/>
-							{errors.confirmPassword && <p className='text-red-500 text-xs mt-1'>{errors.confirmPassword}</p>}
 						</div>
 						<button
 							type='submit'
@@ -117,7 +117,6 @@ const RegisterComponent = () => {
 							{isLoading ? 'Registering...' : 'Register'}
 						</button>
 					</form>
-				)}
 				<p className='text-gray-600 mt-6 text-center'>
           Already have an account?{' '}
 					<Link to='/login' className='text-green-900 hover:underline font-medium'>Login here</Link>

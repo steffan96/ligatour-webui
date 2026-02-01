@@ -20,7 +20,7 @@ export const InfoMessageCard: React.FC<InfoMessageCardProps> = ({ message, isSuc
     if (message) {
       const timer = setTimeout(() => {
         onClose();
-      }, 8000);
+      }, 4000);
       return () => clearTimeout(timer);
     }
   }, [message, onClose]);
