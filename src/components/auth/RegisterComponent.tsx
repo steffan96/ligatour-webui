@@ -1,7 +1,6 @@
 import React, {useState} from 'react';
 import { registerUser } from '../../api/auth';
 import { Link } from 'react-router-dom';
-import { InfoMessageCard } from '../shared/InfoMessageCard';
 import { useToastStore } from '../../api/stores/useToastStore';
 
 const RegisterComponent = () => {
@@ -10,7 +9,7 @@ const RegisterComponent = () => {
 	const [confirmPassword, setConfirmPassword] = useState('');
 	const [isLoading, setIsLoading] = useState(false);
 
-  	const { toast, showToast, hideToast } = useToastStore();
+  	const { showToast } = useToastStore();
 
 	const validateEmail = (email: string) => {
 		const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -58,9 +57,6 @@ const RegisterComponent = () => {
 
 	return (
 		<div className='flex flex-col items-center w-full p-8'>
-      {toast && (
-        <InfoMessageCard message={toast.message} isSuccess={toast.isSuccess} onClose={hideToast} />
-      )}
 			<div className='w-[85%] ml-auto'>
 				<h1 className='text-2xl font-bold text-gray-800 mb-2 text-center'>Create an Account</h1>
 				<p className='text-gray-600 mb-6 text-center'>Join us today and start competing!</p>

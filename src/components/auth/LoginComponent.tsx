@@ -2,14 +2,13 @@ import React, {useState} from 'react';
 import {useNavigate, Link} from 'react-router-dom';
 import {loginUser} from '../../api/auth';
 import { useToastStore } from '../../api/stores/useToastStore';
-import { InfoMessageCard } from '../shared/InfoMessageCard';
 
 const LoginComponent = () => {
 	const [email, setEmail] = useState('');
 	const [password, setPassword] = useState('');
 	const [isLoading, setIsLoading] = useState(false);
 	const navigate = useNavigate();
-	const { toast, showToast, hideToast } = useToastStore();
+	const { showToast } = useToastStore();
 
 	const validateEmail = (email: string) => {
 		const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -53,9 +52,6 @@ const LoginComponent = () => {
 
 	return (
 		<div className='flex flex-col items-center w-full p-8'>
-				{toast && (
-				<InfoMessageCard message={toast.message} isSuccess={toast.isSuccess} onClose={hideToast} />
-			)}
 			<div className='w-[85%] ml-auto'>
 				<h1 className='text-2xl font-bold text-gray-800 mb-2 text-center'>Welcome Back</h1>
 				<p className='text-gray-600 mb-6 text-center'>Sign in to continue</p>
