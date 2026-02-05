@@ -1,33 +1,14 @@
-import React, {useState} from 'react';
-import Button from '../shared/Button';
-import CreateComponent from '../leagues/CreateComponent';
+import React from 'react';
+import CreateComponent from '../competitions/CreateCompetition';
 
 export default function LandingLayout() {
-	const [selected, setSelected] = useState<'leagues' | 'tournaments'>('leagues');
-
 	return (
 		<div className='flex w-full p-8'>
 			<div className='w-[85%] ml-auto'>
 				<div className='ml-4'>
 					<h1 className='text-4xl p-2'>Competition Manager</h1>
 					<h4 className='text-lg p-2 ml-2'>Create and manage your leagues and tournaments</h4>
-					<Button
-						onClick={() => {
-							setSelected('leagues');
-							// navigate('/my-competitions');
-						}}
-						text='Leagues'
-						className={`h-8 w-48 bg-green-800 text-gray-300 rounded-l-full ${selected === 'leagues' ? 'opacity-100' : 'opacity-50'}`}>
-					</Button>
-					<Button
-						onClick={() => {
-							setSelected('tournaments');
-							// navigate('/my-competitions');
-						}}
-						text='Tournaments'
-						className={`h-8 w-48 bg-green-800 text-gray-300 ml-0 rounded-r-full ${selected === 'tournaments' ? 'opacity-100' : 'opacity-50'}`}>
-					</Button>
-					<CreateComponent type={selected} />
+					<CreateComponent />
 				</div>
 			</div>
 		</div>

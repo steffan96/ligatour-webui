@@ -1,5 +1,5 @@
 import React, {useState} from 'react';
-import { createLeague } from '../../api/leagues';
+import { createCompetition } from '../../api/competitions';
 import { useToastStore } from '../../api/stores/useToastStore';
 
 export default function CreateModal({ isOpen, onClose }: { isOpen?: boolean; onClose?: () => void; }) {
@@ -25,7 +25,7 @@ export default function CreateModal({ isOpen, onClose }: { isOpen?: boolean; onC
         e.preventDefault();
 
         try {
-            await createLeague(name, type);
+            await createCompetition(name, type);
             onClose?.();
             showToast('Competition created successfully!', true);
         } catch (err: any) {
@@ -35,12 +35,12 @@ export default function CreateModal({ isOpen, onClose }: { isOpen?: boolean; onC
 
     const inputClass = 'w-full bg-gray-300 px-8 py-2 rounded-md' + 
     ' focus:outline-none text-gray-800 border-2 border-black';
-    const buttonClass = 'w-32 h-8 px-2 py-1 rounded-md font-semibold text-xs text-white transition duration-150';
+    const buttonClass = 'w-32 h-12 px-2 py-1 rounded-md font-semibold text-xs text-white transition duration-150';
 
 	return (
 		<div className={`flex flex-col p-4 bg-gray-300 rounded-md shadow-md ${isOpen ? 'block' : 'hidden'} w-[50%] h-[75%]`}>
             <div className="flex flex-row items-center justify-between">
-                <h1 className='font-semibold mb-2'>Create New League</h1>
+                <h1 className='font-semibold mb-2'>Create New Competition</h1>
                 <button className="flex justify-end" onClick={onClose}>
                     &#10005;
                 </button>
@@ -51,7 +51,7 @@ export default function CreateModal({ isOpen, onClose }: { isOpen?: boolean; onC
 				 <input
                     type="text"
                     className={inputClass}
-                    placeholder="e.g. Premier League 2025"
+                    placeholder="e.g. Premier Competition 2025"
                     required
                     value={name}
                     onChange={e => setName(e.target.value)}
@@ -80,7 +80,7 @@ export default function CreateModal({ isOpen, onClose }: { isOpen?: boolean; onC
                     <button
                         type="submit"
                         className={`${buttonClass} bg-green-900 hover:bg-green-800`}
-                    >Create League</button>
+                    >Create Competition</button>
                 </div>
 			</form>
 		</div>
