@@ -1,9 +1,11 @@
 import React, {useState} from 'react';
 import { registerUser } from '../../api/auth';
+import { useNavigate } from 'react-router-dom';
 import { Link } from 'react-router-dom';
 import { useToastStore } from '../../api/stores/useToastStore';
 
 const RegisterComponent = () => {
+	const navigate = useNavigate();
 	const [email, setEmail] = useState('');
 	const [password, setPassword] = useState('');
 	const [confirmPassword, setConfirmPassword] = useState('');
@@ -41,6 +43,7 @@ const RegisterComponent = () => {
 		setIsLoading(true);
 		try {
 			await registerUser(email, password, confirmPassword);
+			navigate('/login');
 			showToast('Registration successful!', true);
 		} catch (err: any) {
 			showToast(err?.response?.data?.message || 'Registration failed.', false);

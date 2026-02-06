@@ -1,10 +1,23 @@
 import React from 'react';
 import Button from '../shared/Button';
 import CreateModal from './CreateCompetitionModal';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import CompetitionCard from './CompetitionCard';
+import { listCompetitions } from 'api/competitions';
 
 export default function CreateComponent() {
 	const [isModalOpen, setIsModalOpen] = useState(false);
+	const [competitions, setCompetitions] = useState([]);
+
+	useEffect(() => {
+		const fetchCompetitions = async () => {
+			const data = await listCompetitions();
+			setCompetitions(data);
+		};
+
+		fetchCompetitions();
+	}, []);
+
 	return (
 		<>
 			<div className='flex flex-row justify-between items-start mt-8'>
@@ -23,16 +36,8 @@ export default function CreateComponent() {
 				</div>
 			)}
 			<div className='flex flex-col'>
-				<div className='flex ml-4 border-2 border-black p-4'>
-					<div className='flex flex-col justify-center items-center'>
-						<p className='text-lg font-semibold mb-8'>Competitions</p>
-					</div>
-				</div>
-				<div className='flex ml-4 border-2 border-black p-4'>
-					<div className='flex flex-col justify-center items-center'>
-						<p className='text-lg font-semibold mb-8'>Tournaments</p>
-					</div>
-				</div>
+				<CompetitionCard name='Tournaments' />
+				<CompetitionCard name='Leagues' />
 			</div>
 		</>
 	);

@@ -1,4 +1,6 @@
 import axios from 'axios';
+import { useToastStore } from '../api/stores/useToastStore';
+import { useNavigate } from 'react-router-dom';
 
 const axiosInstance = axios.create({
 	baseURL: process.env.REACT_APP_BASE_URL,
@@ -30,23 +32,33 @@ axiosInstance.interceptors.response.use(
   async (error) => {
     const originalRequest = error.config;
 
-    // If the error status is 401 and there is no originalRequest._retry flag,
-    // it means the token has expired and we need to refresh it
-    if (error.response.status === 401 && !originalRequest._retry) {
+    // Prevent infinite loop: do not retry refresh-token endpoint
+    if (
+      error.response &&
+      error.response.status === 401 &&
+      !originalRequest._retry &&
+      !originalRequest.url.includes('/api/auth/refresh-token')
+    ) {
       originalRequest._retry = true;
 
       try {
         const refreshToken = localStorage.getItem('refreshToken');
-        const response = await axios.post('/api/auth/refresh-token', { refreshToken });
+        const response = await axiosInstance.post('/api/auth/refresh-token', { refresh_token: refreshToken });
         const { token } = response.data;
 
         localStorage.setItem('token', token);
 
         // Retry the original request with the new token
         originalRequest.headers.Authorization = `Bearer ${token}`;
-        return axios(originalRequest);
-      } catch (error) {
-        // Handle refresh token error or redirect to login
+        return axiosInstance(originalRequest);
+      } catch (error: any) {
+        if ( error.config?.url?.includes('/auth/refresh-token')) {
+          localStorage.removeItem('token');
+          localStorage.removeItem('refreshToken');
+          // window.location.href = '/login';
+          // const { showToast } = useToastStore();
+          // showToast('Session expired. Please log in again.', false);
+        }
       }
     }
 
