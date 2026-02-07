@@ -6,7 +6,7 @@ import { useToastStore } from '../../api/stores/useToastStore';
 
 const Header = () => {
 	const navigate = useNavigate();
-	const isUserLoggedIn = Boolean(localStorage.getItem('token'));
+	const isUserLoggedIn = Boolean(localStorage.getItem('token') || localStorage.getItem('refreshToken'));
 	const { showToast } = useToastStore();
 
 	return (
