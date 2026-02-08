@@ -1,5 +1,6 @@
 import React from 'react';
 import CreateComponent from '../competitions/CreateCompetition';
+import MyCompetitions from './MyCompetitionsLayout';
 
 export default function LandingLayout() {
 	return (
@@ -10,6 +11,7 @@ export default function LandingLayout() {
 					<h4 className='text-lg p-2 ml-2'>Create and manage your leagues and tournaments</h4>
 					<CreateComponent />
 				</div>
+				<MyCompetitions />
 			</div>
 		</div>
 	);
