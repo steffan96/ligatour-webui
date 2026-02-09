@@ -30,7 +30,11 @@ const ResetPasswordComponent = () => {
 
         setIsLoading(true);
         try {
-            await resetPassword(token, password, confirmPassword);
+            const data = await resetPassword(token, password, confirmPassword);
+            if (!data) {
+                showToast('Password reset failed. Please try again.', false);
+                return;
+            }
             navigate('/login')
             showToast('Password reset successful!', true);
         } catch (err: any) {

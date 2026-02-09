@@ -42,7 +42,11 @@ const RegisterComponent = () => {
 
 		setIsLoading(true);
 		try {
-			await registerUser(email, password, confirmPassword);
+			const data = await registerUser(email, password, confirmPassword);
+			if (!data) {
+				showToast('Registration failed. Please try again.', false);
+				return;
+			}
 			navigate('/login');
 			showToast('Registration successful!', true);
 		} catch (err: any) {

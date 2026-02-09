@@ -15,7 +15,9 @@ export const loginUser = async (email: string, password: string) => {
 		localStorage.setItem('token', response.data.token);
 		localStorage.setItem('refreshToken', response.data.refresh_token);
 		localStorage.setItem('userID', response.data.user.id);
+		return response.data;
 	}
+	return null;
 };
 
 export const logoutUser = async () => {
@@ -23,7 +25,11 @@ export const logoutUser = async () => {
 	localStorage.removeItem('refreshToken');
 	localStorage.removeItem('userID');
 	const userID = localStorage.getItem('userID');
-	await axiosInstance.post('/api/auth/logout', { userID });
+	const response = await axiosInstance.post('/api/auth/logout', { userID });
+	if (response && response.data) {
+		return response.data;
+	}
+	return null;
 };
 
 export const requestPasswordReset = async (email: string) => {

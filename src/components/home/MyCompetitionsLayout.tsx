@@ -9,7 +9,7 @@ export default function MyCompetitions() {
 		useEffect(() => {
 			const fetchCompetitions = async () => {
 				const data = await listCompetitions();
-				setCompetitions(data);
+				setCompetitions(data || []);
 			};
 			fetchCompetitions();
 		}, []);

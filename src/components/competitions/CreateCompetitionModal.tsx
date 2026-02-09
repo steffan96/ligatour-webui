@@ -25,7 +25,11 @@ export default function CreateModal({ isOpen, onClose }: { isOpen?: boolean; onC
         e.preventDefault();
 
         try {
-            await createCompetition(name, type);
+            const data = await createCompetition(name, type);
+            if (!data) {
+                showToast('Competition creation failed. Please try again.', false);
+                return;
+            }
             onClose?.();
             showToast('Competition created successfully!', true);
         } catch (err: any) {
