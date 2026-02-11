@@ -1,117 +1,97 @@
 import React from 'react';
 import Button from '../shared/Button';
-import {useNavigate} from 'react-router-dom';
-import {logoutUser} from '../../api/auth';
+import { useNavigate } from 'react-router-dom';
+import { logoutUser } from '../../api/auth';
 import { useToastStore } from '../../api/stores/useToastStore';
+import { useState } from 'react';
 
 const Header = () => {
 	const navigate = useNavigate();
-	const isUserLoggedIn = Boolean(localStorage.getItem('token') || localStorage.getItem('refreshToken'));
 	const { showToast } = useToastStore();
+	const isUserLoggedIn = Boolean(localStorage.getItem('token') || localStorage.getItem('refreshToken'));
+	const [activeButton, setActiveButton] = useState('home');
+
+	const HomeButton = () => (
+		<Button
+			text="Home"
+			className={activeButton === 'home' ? buttonStyles.active : buttonStyles.inactive}
+			onClick={() => {
+				navigate('/');
+				setActiveButton('home');
+			}}
+		/>
+	);
+
+	const handleLogout = () => {
+		logoutUser();
+		showToast('Logout successful!', true);
+	};
+
+	const buttonStyles = {
+	active: `bg-gray-300 text-green-900 px-6 py-2 rounded-full 
+		font-semibold border-2 border-white`,
+	inactive: `bg-transparent border-2 border-white text-white 
+		px-6 py-2 rounded-full font-semibold
+		hover:bg-gray-300 hover:text-green-900 transition-colors`,
+	logout: `bg-transparent border-2 text-white 
+		px-6 py-2 rounded-full font-semibold
+		hover:bg-red-700 hover:text-white transition-colors`,
+	};
 
 	return (
 		<div className='flex w-full h-[10%] bg-gray-300'>
 			<header className='w-[85%] ml-auto bg-green-900 flex justify-between rounded-bl-[5rem]'>
 				<div className='flex items-center justify-start gap-4 ml-12'>
-					{/* Show Login/Register if not logged in, Logout if logged in */}
-					{!isUserLoggedIn && (
+					{!isUserLoggedIn ? (
 						<>
-							<Button
-								text="Home"
-								className={`
-									bg-transparent 
-									border-2 border-white 
-									text-white 
-									px-6 py-2 
-									rounded-full 
-									font-semibold 
-									hover:bg-gray-300 
-									hover:text-green-900 
-									transition-colors
-								`}
-								onClick={() => navigate('/')}
-							/>
+							<HomeButton />
 							<Button
 								text="Login"
-								className={`
-									bg-gray-300 
-									text-green-900 
-									px-6 py-2 
-									rounded-full 
-									font-semibold 
-									hover:bg-gray-100 
-									transition-colors 
-									duration-200
-								`}
-								onClick={() => navigate('login')}
+								className={activeButton === 'login' ? buttonStyles.active : buttonStyles.inactive}
+								onClick={() => {
+									navigate('login');
+									setActiveButton('login');
+								}}
 							/>
 							<Button
 								text="Register"
-								className={`
-									bg-transparent 
-									border-2 border-white 
-									text-white 
-									px-6 py-2 
-									rounded-full 
-									font-semibold 
-									hover:bg-gray-300 
-									hover:text-green-900 
-									transition-colors
-								`}
+								className={activeButton === 'register' ? buttonStyles.active : buttonStyles.inactive}
 								onClick={() => {
 									navigate('register');
+									setActiveButton('register');
 								}}
 							/>
 						</>
-					)}
-					{isUserLoggedIn && (
+					) : (
 						<>
-							<Button
-							text="Home"
-							className={`
-								bg-gray-300 
-								text-green-900 
-								px-6 py-2 
-								rounded-full 
-								font-semibold 
-								hover:bg-gray-100 
-								transition-colors 
-								duration-200
-							`}
-							onClick={() => navigate('/')}
-							/>
-							<Button
-							text="Logout"
-							className={`
-								bg-red-500 
-								text-white 
-								px-6 py-2 
-								rounded-full 
-								font-semibold 
-								hover:bg-red-700 
-								transition-colors 
-								duration-200
-							`}
-							onClick={() => {
-								logoutUser();
-								showToast('Logout successful!', true);
-							}}
-							/>
+						<HomeButton />
+						<Button
+						text="Admin"
+						className={activeButton === 'admin' ? buttonStyles.active : buttonStyles.inactive}
+						onClick={() => {
+							navigate('/competitions');
+							setActiveButton('admin');
+						}}
+						/>
 						</>
 					)}
 				</div>
-				<div className='flex justify-end items-center text-4xl text-gray-300 p-2'>Start your own adventure.</div>
+				<div className='flex justify-end items-center text-4xl text-gray-300 p-2'>
+					{isUserLoggedIn ? (
+					<Button
+							text="Log out"
+							className={buttonStyles.logout}
+							onClick={handleLogout}
+						/>
+					) : (
+						<div className='flex justify-end items-center text-4xl text-gray-300 p-2'>
+							Start your own competition.
+						</div>
+					)}
+				</div>
 			</header>
 		</div>
 	);
 };
 
 export default Header;
-
-{
-	/* <nav>
-          <ul className="flex space-x-4">
-            <li><a href="/" className="hover:text-gray-300"/>Home</li>  TODO check a tag usage
-          </ul>
-        </nav> */
-}

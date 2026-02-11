@@ -1,7 +1,7 @@
 import React from 'react';
 import { useState, useEffect } from 'react';
 import { listCompetitions } from 'api/competitions';
-import CompetitionCard from '../competitions/CompetitionCard';
+import CompetitionCard from './CompetitionCard';
 
 export default function MyCompetitions() {
 	const [competitions, setCompetitions] = useState<{ id: string, name: string }[]>([]);

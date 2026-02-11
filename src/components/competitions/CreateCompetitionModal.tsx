@@ -1,8 +1,10 @@
 import React, {useState} from 'react';
 import { createCompetition } from '../../api/competitions';
 import { useToastStore } from '../../api/stores/useToastStore';
+import { useNavigate } from 'react-router-dom';
 
 export default function CreateModal({ isOpen, onClose }: { isOpen?: boolean; onClose?: () => void; }) {
+    const navigate = useNavigate();
     const [name, setName] = useState('');
     const [type, setType] = useState('');
     enum CompetitionType {
@@ -32,6 +34,7 @@ export default function CreateModal({ isOpen, onClose }: { isOpen?: boolean; onC
             }
             onClose?.();
             showToast('Competition created successfully!', true);
+            navigate(`/competitions/${data.id}`);
         } catch (err: any) {
             showToast(err?.response?.data?.message || 'Competition creation failed.', false);
         }
