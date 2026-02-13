@@ -3,7 +3,7 @@ import { Outlet } from 'react-router-dom';
 import Header from '../shared/Header';
 import { InfoMessageCard } from '../shared/InfoMessageCard';
 import { useToastStore } from '../../api/stores/useToastStore';
-import SidebarCompetitions from '../competitions/SidebarCompetitions';
+import SidebarCompetitions from './SidebarComponent';
 
 export default function RootLayout() {
 	const { toast, hideToast } = useToastStore();
@@ -14,10 +14,12 @@ export default function RootLayout() {
 			)}
 			<div className='flex flex-col h-full w-full'>
 				<Header />
-				<SidebarCompetitions />
-				<main className='flex-1 bg-gray-300 overflow-auto'>
-					<Outlet />
-				</main>
+				<div className='flex overflow-hidden'>
+					<SidebarCompetitions />
+					<main className='flex-1 bg-gray-300 overflow-auto'>
+						<Outlet />
+					</main>
+				</div>
 				{/* <Footer /> */}
 			</div>
 		</div>

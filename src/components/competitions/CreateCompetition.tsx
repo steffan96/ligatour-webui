@@ -1,5 +1,5 @@
 import React from 'react';
-import Button from '../shared/Button';
+import Button from '../shared/HeaderButton';
 import CreateModal from './CreateCompetitionModal';
 import { useState } from 'react';
 

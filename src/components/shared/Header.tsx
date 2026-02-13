@@ -1,5 +1,5 @@
 import React from 'react';
-import Button from '../shared/Button';
+import HeaderButton from './HeaderButton';
 import { useNavigate } from 'react-router-dom';
 import { logoutUser } from '../../api/auth';
 import { useToastStore } from '../../api/stores/useToastStore';
@@ -10,17 +10,6 @@ const Header = () => {
 	const { showToast } = useToastStore();
 	const isUserLoggedIn = Boolean(localStorage.getItem('token') || localStorage.getItem('refreshToken'));
 	const [activeButton, setActiveButton] = useState('home');
-
-	const HomeButton = () => (
-		<Button
-			text="Home"
-			className={activeButton === 'home' ? buttonStyles.active : buttonStyles.inactive}
-			onClick={() => {
-				navigate('/');
-				setActiveButton('home');
-			}}
-		/>
-	);
 
 	const handleLogout = () => {
 		logoutUser();
@@ -39,13 +28,12 @@ const Header = () => {
 	};
 
 	return (
-		<div className='flex w-full h-[10%] bg-gray-300'>
+		<div className='flex w-full h-[10%] bg-gray-300 mb-8'>
 			<header className='w-[85%] ml-auto bg-green-900 flex justify-between rounded-bl-[5rem]'>
 				<div className='flex items-center justify-start gap-4 ml-12'>
 					{!isUserLoggedIn ? (
 						<>
-							<HomeButton />
-							<Button
+							<HeaderButton
 								text="Login"
 								className={activeButton === 'login' ? buttonStyles.active : buttonStyles.inactive}
 								onClick={() => {
@@ -53,7 +41,7 @@ const Header = () => {
 									setActiveButton('login');
 								}}
 							/>
-							<Button
+							<HeaderButton
 								text="Register"
 								className={activeButton === 'register' ? buttonStyles.active : buttonStyles.inactive}
 								onClick={() => {
@@ -64,21 +52,12 @@ const Header = () => {
 						</>
 					) : (
 						<>
-						<HomeButton />
-						<Button
-						text="Admin"
-						className={activeButton === 'admin' ? buttonStyles.active : buttonStyles.inactive}
-						onClick={() => {
-							navigate('/competitions');
-							setActiveButton('admin');
-						}}
-						/>
 						</>
 					)}
 				</div>
 				<div className='flex justify-end items-center text-4xl text-gray-300 p-2'>
 					{isUserLoggedIn ? (
-					<Button
+					<HeaderButton
 							text="Log out"
 							className={buttonStyles.logout}
 							onClick={handleLogout}

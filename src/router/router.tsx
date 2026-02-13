@@ -14,6 +14,7 @@ export const router = createBrowserRouter([
 		path: '/',
 		element: <RootLayout />,
 		children: [
+			// Competitions routes
 			{
 				path: '/',
 				index: true,
@@ -27,6 +28,8 @@ export const router = createBrowserRouter([
 				path: '/competition/:id',
 				element: <SingleCompetition />,
 			},
+
+			// Auth routes
 			{
 				path: '/register',
 				element: <RegisterComponent />,
