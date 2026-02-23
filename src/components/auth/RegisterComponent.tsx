@@ -64,11 +64,11 @@ const RegisterComponent = () => {
 
 	return (
 		<div className='flex flex-col items-center w-full p-8'>
-			<div className='w-[85%] ml-auto'>
+			<div className='w-[95%] ml-auto'>
 				<h1 className='text-2xl font-bold text-gray-800 mb-2 text-center'>Create an Account</h1>
 				<p className='text-gray-600 mb-6 text-center'>Join us today and start competing!</p>
 			</div>
-			<div className='flex flex-col items-center w-[85%] ml-auto p-8 rounded-lg shadow-md'>
+			<div className='flex flex-col items-center w-[95%] ml-auto p-8 rounded-lg shadow-md'>
 					<form onSubmit={handleSubmit} className='space-y-4'>
 						<div>
 							<input

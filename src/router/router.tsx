@@ -1,13 +1,14 @@
 import { createBrowserRouter } from 'react-router-dom';
 import React from 'react';
 import RootLayout from '../components/home/RootLayout';
-import MyCompetitions from '../components/competitions/MyCompetitionsLayout';
+import DashboardComponent from '../components/competitions/DashboardComponent';
 import RegisterComponent from '../components/auth/RegisterComponent';
-import LandingLayout from '../components/home/LandingLayout';
+import HomeComponent from '../components/home/HomeComponent';
 import LoginComponent from '../components/auth/LoginComponent';
 import ResetPasswordComponent from '../components/auth/ResetPasswordComponent';
 import ForgotPasswordComponent from '../components/auth/ForgotPasswordComponent';
 import SingleCompetition from '../components/competitions/SingleCompetition';
+import ProfileComponent from '../components/auth/ProfileComponent';
 
 export const router = createBrowserRouter([
 	{
@@ -18,11 +19,11 @@ export const router = createBrowserRouter([
 			{
 				path: '/',
 				index: true,
-				element: <LandingLayout />,
+				element: <HomeComponent />,
 			},
 			{
 				path: '/competitions',
-				element: <MyCompetitions />,
+				element: <DashboardComponent />,
 			},
 			{
 				path: '/competition/:id',
@@ -45,6 +46,10 @@ export const router = createBrowserRouter([
 			{
 				path: '/forgot-password',
 				element: <ForgotPasswordComponent />,
+			},
+			{
+				path: '/profile',
+				element: <ProfileComponent />,
 			}
 		],
 	},

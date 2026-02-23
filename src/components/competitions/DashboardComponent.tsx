@@ -2,8 +2,9 @@ import React from 'react'
 import { useState, useEffect } from 'react'
 import { listCompetitions } from 'api/competitions'
 import CompetitionCard from './CompetitionCard'
+import CreateComponentComponent from './CreateCompetitionComponent'
 
-export default function MyCompetitions() {
+export default function DashboardComponent() {
   const [competitions, setCompetitions] = useState<{ id: string; name: string }[]>([])
   const fetchCompetitions = async () => {
     const data = await listCompetitions()
@@ -15,11 +16,14 @@ export default function MyCompetitions() {
   }, [])
 
   return (
-    <div className="flex flex-col">
-      <h3 className="text-1xl font-bold ml-8">List of competitions</h3>
-      {competitions.map(competition => (
-        <CompetitionCard key={competition.id} name={competition.name} />
-      ))}
+    <div className="flex flex-col w-full p-2">
+      <div className="w-[95%] ml-auto">
+        <CreateComponentComponent />
+        <h3 className="text-1xl font-bold ml-8">List of competitions</h3>
+        {competitions.map(competition => (
+          <CompetitionCard key={competition.id} name={competition.name} />
+        ))}
+      </div>
     </div>
   )
 }

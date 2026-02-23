@@ -1,18 +1,18 @@
 import React, { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 
-const SidebarCompetitions = () => {
+const SidebarComponent = () => {
   const navigate = useNavigate()
-  const [activeButton, setActiveButton] = useState('Dashboard')
+  const [activeButton, setActiveButton] = useState('Home')
 
   const menuItems = [
     { icon: '🏠', label: 'Home', onClick: () => navigate('/') },
     { icon: '▦', label: 'Dashboard', onClick: () => navigate('/competitions') },
-    { icon: '👥', label: 'Profile', onClick: () => console.log('') },
+    { icon: '👥', label: 'Profile', onClick: () => navigate('profile') },
   ]
 
   return (
-    <div className="w-[13%] h-full border-r p-4">
+    <div className="w-[13%] border-r p-4">
       <div>
         <h3 className="text-xs text-gray-500 mb-2">Administration</h3>
         <div className="space-y-1">
@@ -37,4 +37,4 @@ const SidebarCompetitions = () => {
   )
 }
 
-export default SidebarCompetitions
+export default SidebarComponent
