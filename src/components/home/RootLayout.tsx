@@ -17,7 +17,7 @@ export default function RootLayout() {
 				<div className='h-[10%]'>
 					<Header />
 				</div>
-				<main className='flex-1 bg-gray-300 overflow-y-auto'>
+				<main className='flex-1 bg-gray-300 overflow-hidden'>
 					<Outlet />
 				</main>
 				{/* <Footer /> */}
