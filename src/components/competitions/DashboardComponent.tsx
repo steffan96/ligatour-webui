@@ -75,7 +75,8 @@ export default function DashboardComponent() {
         <div className="grid grid-cols-1 border border-gray-200 rounded-lg p-4 mr-8">
           {filteredCompetitions.length > 0 ? (
             filteredCompetitions.map(competition => (
-              <CompetitionCard key={competition.id} name={competition.name} type={competition.type} />
+              <CompetitionCard id={competition.id} key={competition.id} 
+              name={competition.name} type={competition.type} />
             ))
           ) : (
             <p className="text-gray-500 text-center py-4">No competitions found</p>

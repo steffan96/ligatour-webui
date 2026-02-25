@@ -6,7 +6,7 @@ const SidebarComponent = () => {
   const [activeButton, setActiveButton] = useState('Home')
 
   const menuItems = [
-    { icon: '🏠', label: 'Home', onClick: () => navigate('/') },
+    // { icon: '🏠', label: 'Home', onClick: () => navigate('/') },
     { icon: '▦', label: 'Dashboard', onClick: () => navigate('/competitions') },
     { icon: '👥', label: 'Profile', onClick: () => navigate('profile') },
   ]

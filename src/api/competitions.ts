@@ -16,3 +16,19 @@ export const listCompetitions = async () => {
 	}
 	return [];
 };
+
+export const getCompetition = async (id: string) => {
+	const response = await axiosInstance.get(`/api/v1/competitions/${id}`);
+	if (response && response.data) {
+		return response.data;
+	}
+	return null;
+};
+
+export const deleteCompetition = async (id: string) => {
+	const response = await axiosInstance.delete(`/api/v1/competitions/${id}`);
+	if (response && response.status === 204) {
+		return true;
+	}
+	return false;
+};
