@@ -45,7 +45,7 @@ export default function DashboardComponent() {
       <div className="w-[98%] ml-auto">
         <CreateComponentComponent />
         
-        <div className="flex items-center gap-4 m-2">
+        <div className="flex items-center gap-4 m-4">
           <h3 className="text-1xl font-bold">List of competitions</h3>
           
           {/* Search input */}

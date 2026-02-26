@@ -17,7 +17,7 @@ export const listCompetitions = async () => {
 	return [];
 };
 
-export const getCompetition = async (id: string) => {
+export const getCompetition = async (id: number) => {
 	const response = await axiosInstance.get(`/api/v1/competitions/${id}`);
 	if (response && response.data) {
 		return response.data;
@@ -25,7 +25,15 @@ export const getCompetition = async (id: string) => {
 	return null;
 };
 
-export const deleteCompetition = async (id: string) => {
+export const updateCompetition = async (id: number, updates: { name?: string; type?: string }) => {
+	const response = await axiosInstance.put(`/api/v1/competitions/${id}`, updates);
+	if (response && response.data) {
+		return response.data;
+	}
+	return null;
+};
+
+export const deleteCompetition = async (id: number) => {
 	const response = await axiosInstance.delete(`/api/v1/competitions/${id}`);
 	if (response && response.status === 204) {
 		return true;
