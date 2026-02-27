@@ -170,33 +170,23 @@ const SingleCompetition = () => {
         <div className="m-4 flex items-start justify-between">
           <div>
             {isEditing ? (
-              <input
-                type="text"
-                value={draft.name}
-                onChange={e => set('name')(e.target.value)}
-                className="text-xl font-bold border-b-2 border-blue-400 bg-transparent focus:outline-none w-64"
-              />
+              <div className="flex flex-col gap-1">
+                <input
+                  type="text"
+                  value={draft.name}
+                  onChange={e => set('name')(e.target.value)}
+                  className="text-xl font-bold border-b-2 border-blue-400
+                  bg-transparent focus:outline-none w-64 px-0.5 py-1 rounded"
+                  style={{ fontSize: '1.25rem', lineHeight: '1.75rem' }}
+                />
+                <span className="text-xs text-gray-400">Competition Name</span>
+              </div>
             ) : (
               <h3 className="text-xl font-bold">{competition.name}</h3>
             )}
-            {isEditing ? (
-              <select
-                value={draft.type}
-                onChange={e => set('type')(e.target.value)}
-                className="text-sm text-gray-500 mt-0.5 border 
-                border-gray-300 rounded px-1 py-0.5 focus:outline-none focus:ring-2 focus:ring-blue-300 bg-white"
-              >
-                {Object.entries(CompetitionTypeDisplay).map(([val, label]) => (
-                  <option key={val} value={val}>
-                    {label}
-                  </option>
-                ))}
-              </select>
-            ) : (
-              <p className="text-sm text-gray-500 mt-0.5">
-                {CompetitionTypeDisplay[competition.type as CompetitionType] || competition.type}
-              </p>
-            )}
+            <p className="text-sm text-gray-500 mt-0.5">
+              {CompetitionTypeDisplay[competition.type as CompetitionType] || competition.type}
+            </p>
           </div>
 
           {/* Action buttons */}
@@ -272,8 +262,10 @@ const SingleCompetition = () => {
         <div className="border border-gray-200 rounded-lg p-4 mr-8 bg-gray-200">
           {/* Header row */}
           <div className="flex items-center gap-4 pb-4 border-b border-gray-200">
-            <div className="w-14 h-14 rounded-xl bg-gray-100 flex 
-            items-center justify-center flex-shrink-0 overflow-hidden">
+            <div
+              className="w-14 h-14 rounded-xl bg-gray-100 flex 
+            items-center justify-center flex-shrink-0 overflow-hidden"
+            >
               {current.logo ? (
                 <img src={current.logo} alt={current.name} className="w-full h-full object-cover" />
               ) : (
