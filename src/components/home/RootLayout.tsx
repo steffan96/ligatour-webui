@@ -7,20 +7,22 @@ import SidebarComponent from './SidebarComponent';
 
 export default function RootLayout() {
 	const { toast, hideToast } = useToastStore();
+	
 	return (
-		<div className='flex bg-gray-300 h-screen w-full'>
+		<div className='flex bg-gray-300 h-screen w-full overflow-hidden'>
 			<SidebarComponent />
-			<div className='flex flex-col flex-1 h-screen'>
+			<div className='flex flex-col flex-1 h-screen overflow-hidden'>
 				{toast && (
-					<InfoMessageCard message={toast.message} isSuccess={toast.isSuccess} onClose={hideToast} />
+					<div className="flex-shrink-0">
+						<InfoMessageCard message={toast.message} isSuccess={toast.isSuccess} onClose={hideToast} />
+					</div>
 				)}
-				<div className='h-[8%]'>
+				<div className='flex-shrink-0'>
 					<Header />
 				</div>
-				<main className='flex-1 bg-gray-300 overflow-hidden'>
+				<main className='flex-1 min-h-0 overflow-hidden'>
 					<Outlet />
 				</main>
-				{/* <Footer /> */}
 			</div>
 		</div>
 	);

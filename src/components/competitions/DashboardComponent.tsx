@@ -40,7 +40,7 @@ export default function DashboardComponent() {
       <CreateComponentComponent />
 
       {/* Search & Filter */}
-      <div className="flex items-center gap-3 flex-wrap">
+      <div className="flex items-center gap-3 flex-wrap mb-6">
         <input
           type="text"
           placeholder="Search competitions..."
@@ -63,19 +63,21 @@ export default function DashboardComponent() {
       </div>
 
       {/* Competition List */}
-      <div className="bg-gray-100 border border-gray-300 rounded-xl p-4 grid grid-cols-1 gap-2">
-        {filteredCompetitions.length > 0 ? (
-          filteredCompetitions.map(competition => (
-            <CompetitionCard
-              key={competition.id}
-              id={competition.id}
-              name={competition.name}
-              type={competition.type}
-            />
-          ))
-        ) : (
-          <p className="text-gray-500 text-center py-4">No competitions found</p>
-        )}
+      <div className="bg-gray-100 border border-gray-300 rounded-xl p-4">
+        <div className="grid grid-cols-1 gap-2">
+          {filteredCompetitions.length > 0 ? (
+            filteredCompetitions.map(competition => (
+              <CompetitionCard
+                key={competition.id}
+                id={competition.id}
+                name={competition.name}
+                type={competition.type}
+              />
+            ))
+          ) : (
+            <p className="text-gray-500 text-center py-4">No competitions found</p>
+          )}
+        </div>
       </div>
     </PageWindow>
   )
