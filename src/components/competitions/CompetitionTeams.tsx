@@ -56,8 +56,8 @@ export default function CompetitionTeamsComponent() {
   }
 
   return (
-    <div className="h-full w-full mr-auto p-4">
-      <div className="bg-white rounded-2xl shadow overflow-hidden h-full flex flex-col">
+    <div className="w-full mr-auto p-4">
+      <div className="bg-white rounded-2xl shadow overflow-hidden flex flex-col">
         {/* Header */}
         <div className="bg-green-900 px-6 py-4 flex items-center justify-between">
           <div className="flex items-center gap-4">

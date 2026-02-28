@@ -28,7 +28,7 @@ const Header = () => {
 	};
 
 	return (
-		<div className='flex w-full h-full bg-gray-300 mb-8'>
+		<div className='flex w-full bg-gray-300 mb-8'>
 			<header className='w-[95%] ml-auto bg-green-900 flex justify-between rounded-bl-[5rem]'>
 				<div className='flex items-center justify-start gap-4 ml-12'>
 					{!isUserLoggedIn ? (
