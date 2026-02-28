@@ -14,7 +14,7 @@ export default function RootLayout() {
 				{toast && (
 					<InfoMessageCard message={toast.message} isSuccess={toast.isSuccess} onClose={hideToast} />
 				)}
-				<div className='h-[10%]'>
+				<div className='h-[8%]'>
 					<Header />
 				</div>
 				<main className='flex-1 bg-gray-300 overflow-hidden'>

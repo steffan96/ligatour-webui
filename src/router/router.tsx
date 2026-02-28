@@ -3,7 +3,7 @@ import React from 'react';
 import RootLayout from '../components/home/RootLayout';
 import DashboardComponent from '../components/competitions/DashboardComponent';
 import RegisterComponent from '../components/auth/RegisterComponent';
-import HomeComponent from '../components/home/HomeComponent';
+import CompetitionTeams from '../components/competitions/CompetitionTeams';
 import LoginComponent from '../components/auth/LoginComponent';
 import ResetPasswordComponent from '../components/auth/ResetPasswordComponent';
 import ForgotPasswordComponent from '../components/auth/ForgotPasswordComponent';
@@ -19,7 +19,7 @@ export const router = createBrowserRouter([
 			{
 				path: '/',
 				index: true,
-				element: <HomeComponent />,
+				element: <DashboardComponent />,
 			},
 			{
 				path: '/competitions',
@@ -28,6 +28,10 @@ export const router = createBrowserRouter([
 			{
 				path: '/competition/:id',
 				element: <SingleCompetition />,
+			},
+			{
+				path: '/competition/:id/teams',
+				element: <CompetitionTeams />,
 			},
 
 			// Auth routes

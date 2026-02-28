@@ -72,7 +72,7 @@ export default function DashboardComponent() {
           </select>
         </div>
 
-        <div className="grid grid-cols-1 border border-gray-200 rounded-lg p-4 mr-8">
+        <div className="bg-gray-200 grid grid-cols-1 border border-gray-500 rounded-lg p-4 mr-8">
           {filteredCompetitions.length > 0 ? (
             filteredCompetitions.map(competition => (
               <CompetitionCard id={competition.id} key={competition.id} 

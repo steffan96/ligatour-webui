@@ -15,7 +15,7 @@ export default function CompetitionCard({ id, name, type }: { id: string; name: 
 
   return (
     <div 
-      className="p-4 border-b border-gray-200 hover:bg-gray-50 transition-colors cursor-pointer"
+      className="p-4 border-b border-gray-900 transition-colors cursor-pointer"
       onClick={handleClick}
     >
       <div className="flex justify-between items-center">
