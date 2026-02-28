@@ -2,7 +2,7 @@ import React from 'react'
 import { useState, useEffect } from 'react'
 import { listCompetitions } from 'api/competitions'
 import CompetitionCard from './CompetitionCard'
-import CreateComponentComponent from './CreateCompetitionComponent'
+import CreateCompetitionComponent from './CreateCompetitionComponent'
 import { CompetitionTypeDisplay } from './constants'
 import PageWindow from './PageWindow'
 
@@ -37,29 +37,30 @@ export default function DashboardComponent() {
 
   return (
     <PageWindow title="Dashboard" subtitle="">
-      <CreateComponentComponent />
-
       {/* Search & Filter */}
-      <div className="flex items-center gap-3 flex-wrap mb-6">
-        <input
-          type="text"
-          placeholder="Search competitions..."
-          value={searchTerm}
-          onChange={e => setSearchTerm(e.target.value)}
-          className="px-3 py-2 border border-gray-300 
-          rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500"
-        />
-        <select
-          value={selectedType}
-          onChange={e => setSelectedType(e.target.value)}
-          className="px-3 py-2 border border-gray-300 
-          rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500"
-        >
-          <option value="">All Types</option>
-          {Object.entries(CompetitionTypeDisplay).map(([type, displayName]) => (
-            <option key={type} value={type}>{displayName}</option>
-          ))}
-        </select>
+      <div className="flex items-center justify-between gap-3 flex-wrap mb-6">
+        <div className="flex items-center gap-3">
+          <input
+            type="text"
+            placeholder="Search competitions..."
+            value={searchTerm}
+            onChange={e => setSearchTerm(e.target.value)}
+            className="px-3 py-2 border border-gray-300 
+            rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500"
+          />
+          <select
+            value={selectedType}
+            onChange={e => setSelectedType(e.target.value)}
+            className="px-3 py-2 border border-gray-300 
+            rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500"
+          >
+            <option value="">All Types</option>
+            {Object.entries(CompetitionTypeDisplay).map(([type, displayName]) => (
+              <option key={type} value={type}>{displayName}</option>
+            ))}
+          </select>
+        </div>
+        <CreateCompetitionComponent />
       </div>
 
       {/* Competition List */}
