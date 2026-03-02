@@ -1,49 +1,41 @@
 import React from 'react'
-import { useNavigate } from 'react-router-dom'
-import { CompetitionType } from './interfaces'
+import { Link } from 'react-router-dom'
+import { CompetitionTypeDisplay } from './interfaces'
 
-function isValidCompetitionType(type: string): type is CompetitionType {
-  return Object.values(CompetitionType).includes(type as CompetitionType)
+interface CompetitionCardProps {
+  id: string
+  name: string
+  type?: string
+  numberOfTeams?: number
 }
 
-export default function CompetitionCard({ id, name, type }: { id: string; name: string; type?: string }) {
-  const navigate = useNavigate()
-
-  const handleClick = () => {
-    navigate(`/competition/${id}`)
-  }
-
+export default function CompetitionCard({ id, name, type, numberOfTeams }: CompetitionCardProps) {
   return (
-    <div 
-      className="p-4 border-b border-gray-900 transition-colors cursor-pointer"
-      onClick={handleClick}
-    >
-      <div className="flex justify-between items-center">
-        <span className="font-medium">{name}</span>
-        {type && isValidCompetitionType(type) && (
-          <button
-            className="w-7 h-7 flex items-center justify-center rounded-full 
-         bg-gray-100 hover:bg-gray-200 text-gray-600 hover:text-gray-900 transition-all duration-150 shadow-sm"
-            onClick={(e) => {
-              e.stopPropagation() // Prevent the card's onClick from firing
-              handleClick()
-            }}
-          >
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              className="w-3.5 h-3.5"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2.5"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-            >
-              <polyline points="9 18 15 12 9 6" />
-            </svg>
-          </button>
-        )}
+    <Link to={`/competition/${id}`}>
+      <div className="bg-gray-100
+      border border-gray-200 rounded-lg p-4 hover:shadow-md transition-shadow cursor-pointer">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+          <div className="flex-1">
+            <h3 className="font-semibold text-gray-900">{name}</h3>
+            <div className="flex items-center gap-3 mt-1">
+              {type && (
+                <span
+                  className="inline-flex items-center px-2.5 py-0.5
+                rounded-full text-xs font-medium bg-green-100 text-green-800"
+                >
+                  {CompetitionTypeDisplay[type as keyof typeof CompetitionTypeDisplay] || type}
+                </span>
+              )}
+              {numberOfTeams !== undefined && (
+                <span className="text-sm text-gray-600">
+                  {numberOfTeams} team{numberOfTeams !== 1 ? 's' : ''}
+                </span>
+              )}
+            </div>
+          </div>
+          <div className="text-sm text-gray-500">View Details →</div>
+        </div>
       </div>
-    </div>
+    </Link>
   )
 }

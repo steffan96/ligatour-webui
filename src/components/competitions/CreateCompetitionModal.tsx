@@ -22,7 +22,7 @@ export default function CreateModal({ isOpen, onClose }: { isOpen?: boolean; onC
             }
             onClose?.();
             showToast('Competition created successfully!', true);
-            navigate(`/competitions/${data.id}`);
+            navigate(`/competition/${data.id}`);
         } catch (err: any) {
             showToast(err?.response?.data?.message || 'Competition creation failed.', false);
         }

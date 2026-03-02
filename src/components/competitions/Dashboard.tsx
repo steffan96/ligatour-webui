@@ -7,15 +7,21 @@ import { CompetitionTypeDisplay } from './interfaces'
 import PageWindow from '../shared/PageWindow'
 
 export default function DashboardComponent() {
-  const [competitions, setCompetitions] = useState<{ id: string; name: string; type?: string }[]>([])
+  const [competitions, setCompetitions] = useState<
+    { id: string; name: string; type?: string; number_of_teams?: number }[]
+  >([])
   const [searchTerm, setSearchTerm] = useState('')
   const [selectedType, setSelectedType] = useState<string>('')
-  const [filteredCompetitions, setFilteredCompetitions] = useState<{ id: string; name: string; type?: string }[]>([])
+  const [filteredCompetitions, setFilteredCompetitions] = useState<
+    { id: string; name: string; type?: string; number_of_teams?: number }[]
+  >([])
 
   // Pagination states
   const [currentPage, setCurrentPage] = useState(1)
-  const [itemsPerPage] = useState(6)
-  const [paginatedCompetitions, setPaginatedCompetitions] = useState<{ id: string; name: string; type?: string }[]>([])
+  const [itemsPerPage] = useState(4)
+  const [paginatedCompetitions, setPaginatedCompetitions] = useState<
+    { id: string; name: string; type?: string; number_of_teams?: number }[]
+  >([])
 
   const fetchCompetitions = async () => {
     const data = await listCompetitions()
@@ -94,21 +100,20 @@ export default function DashboardComponent() {
       </div>
 
       {/* Competition List */}
-      <div className="bg-gray-100 border border-gray-300 rounded-xl p-4">
-        <div className="grid grid-cols-1 gap-2">
-          {paginatedCompetitions.length > 0 ? (
-            paginatedCompetitions.map(competition => (
-              <CompetitionCard
-                key={competition.id}
-                id={competition.id}
-                name={competition.name}
-                type={competition.type}
-              />
-            ))
-          ) : (
-            <p className="text-gray-500 text-center py-4">No competitions found</p>
-          )}
-        </div>
+      <div className="grid grid-cols-1 gap-2">
+        {paginatedCompetitions.length > 0 ? (
+          paginatedCompetitions.map(competition => (
+            <CompetitionCard
+              key={competition.id}
+              id={competition.id}
+              name={competition.name}
+              type={competition.type}
+              numberOfTeams={competition.number_of_teams}
+            />
+          ))
+        ) : (
+          <p className="text-gray-500 text-center py-4">No competitions found</p>
+        )}
       </div>
 
       {/* Pagination Controls */}

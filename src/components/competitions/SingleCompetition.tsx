@@ -179,7 +179,7 @@ const SingleCompetition = () => {
       {/* Save */}
       <button onClick={handleSave} disabled={isSaving || ro}
         className="w-full bg-green-900 text-white 
-        font-medium py-2.5 rounded-lg disabled:opacity-50 hover:bg-green-800 transition-colors">
+        font-medium py-2.5 rounded-lg disabled:opacity-50 hover:bg-green-900 transition-colors">
         {isSaving ? 'Saving…' : '💾 Save Changes'}
       </button>
 
