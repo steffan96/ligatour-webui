@@ -2,7 +2,7 @@ import React, {useState} from 'react';
 import { createCompetition } from '../../api/competitions';
 import { useToastStore } from '../../api/stores/useToastStore';
 import { useNavigate } from 'react-router-dom';
-import { CompetitionTypeDisplay } from './constants';
+import { CompetitionTypeDisplay } from './interfaces';
 
 export default function CreateModal({ isOpen, onClose }: { isOpen?: boolean; onClose?: () => void; }) {
     const navigate = useNavigate();

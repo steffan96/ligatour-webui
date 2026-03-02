@@ -1,6 +1,6 @@
 import React from 'react'
 import { useNavigate } from 'react-router-dom'
-import { CompetitionType } from './constants'
+import { CompetitionType } from './interfaces'
 
 function isValidCompetitionType(type: string): type is CompetitionType {
   return Object.values(CompetitionType).includes(type as CompetitionType)

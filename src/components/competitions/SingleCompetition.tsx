@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react'
 import { useParams } from 'react-router-dom'
 import { getCompetition, updateCompetition } from 'api/competitions'
 import { CompetitionInterface } from 'api/competitions'
-import PageWindow from './PageWindow'
+import PageWindow from '../shared/PageWindow'
 
 const statusOptions = [
   { value: 'pending', label: 'Pending' },

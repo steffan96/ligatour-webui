@@ -1,14 +1,14 @@
 import { createBrowserRouter } from 'react-router-dom';
 import React from 'react';
 import RootLayout from '../components/home/RootLayout';
-import DashboardComponent from '../components/competitions/DashboardComponent';
-import RegisterComponent from '../components/auth/RegisterComponent';
+import DashboardComponent from '../components/competitions/Dashboard';
+import RegisterComponent from '../components/auth/Register';
 import CompetitionTeams from '../components/competitions/CompetitionTeams';
-import LoginComponent from '../components/auth/LoginComponent';
-import ResetPasswordComponent from '../components/auth/ResetPasswordComponent';
-import ForgotPasswordComponent from '../components/auth/ForgotPasswordComponent';
+import LoginComponent from '../components/auth/Login';
+import ResetPasswordComponent from '../components/auth/ResetPassword';
+import ForgotPasswordComponent from '../components/auth/ForgotPassword';
 import SingleCompetition from '../components/competitions/SingleCompetition';
-import ProfileComponent from '../components/auth/ProfileComponent';
+import ProfileComponent from '../components/auth/Profile';
 
 export const router = createBrowserRouter([
 	{

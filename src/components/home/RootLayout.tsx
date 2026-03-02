@@ -3,7 +3,7 @@ import { Outlet } from 'react-router-dom';
 import Header from '../shared/Header';
 import { InfoMessageCard } from '../shared/InfoMessageCard';
 import { useToastStore } from '../../api/stores/useToastStore';
-import SidebarComponent from './SidebarComponent';
+import SidebarComponent from './Sidebar';
 
 export default function RootLayout() {
 	const { toast, hideToast } = useToastStore();

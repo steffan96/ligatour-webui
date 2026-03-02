@@ -2,9 +2,9 @@ import React from 'react'
 import { useState, useEffect } from 'react'
 import { listCompetitions } from 'api/competitions'
 import CompetitionCard from './CompetitionCard'
-import CreateCompetitionComponent from './CreateCompetitionComponent'
-import { CompetitionTypeDisplay } from './constants'
-import PageWindow from './PageWindow'
+import CreateCompetitionComponent from './CreateCompetition'
+import { CompetitionTypeDisplay } from './interfaces'
+import PageWindow from '../shared/PageWindow'
 
 export default function DashboardComponent() {
   const [competitions, setCompetitions] = useState<{ id: string; name: string; type?: string }[]>([])
