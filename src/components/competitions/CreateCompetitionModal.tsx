@@ -16,10 +16,6 @@ export default function CreateModal({ isOpen, onClose }: { isOpen?: boolean; onC
 
         try {
             const data = await createCompetition(name, type);
-            if (!data) {
-                showToast('Competition creation failed. Please try again.', false);
-                return;
-            }
             onClose?.();
             showToast('Competition created successfully!', true);
             navigate(`/competition/${data.id}`);

@@ -8,6 +8,7 @@ const axiosInstance = axios.create({
 	},
 	responseType: 'json',
 	withCredentials: true,
+	validateStatus: (status) => status < 400
 });
 
 axiosInstance.interceptors.request.use(
@@ -40,7 +41,7 @@ axiosInstance.interceptors.response.use(
         return axiosInstance(originalRequest);
       }
     }
-    return Promise.resolve();
+    return Promise.reject(error);
   }
 );
 

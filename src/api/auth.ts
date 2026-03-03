@@ -1,50 +1,82 @@
 import axiosInstance from '../router/axios';
 
 export const registerUser = async (email: string, password: string, confirmPassword: string) => {
-	const payload = {email, password, confirmPassword};
-	const response = await axiosInstance.post('/api/auth/register', payload);
-	if (response && response.data) {
-		return response.data;
+	try {
+		const payload = {email, password, confirmPassword};
+		const response = await axiosInstance.post('/api/auth/register', payload);
+		return response;
+	} catch(error: any) {
+		if (error.response?.data?.message) {
+			throw error.response.data.message;
+		}
+		throw error.message || 'Registration failed.';
 	}
-	return null;
 };
 
 export const loginUser = async (email: string, password: string) => {
-	const response = await axiosInstance.post('/api/auth/login', { email, password });
-	if (response && response.data) {
-		localStorage.setItem('token', response.data.token);
-		localStorage.setItem('refreshToken', response.data.refresh_token);
-		localStorage.setItem('userID', response.data.user.id);
-		return response.data;
+	try {
+		const response = await axiosInstance.post('/api/auth/login', { email, password });
+		if (response && response.data) {
+			localStorage.setItem('token', response.data.token);
+			localStorage.setItem('refreshToken', response.data.refresh_token);
+			localStorage.setItem('userID', response.data.user.id);
+			return response.data;
+		}
+		return null;
+	} catch(error: any) {
+		if (error.response?.data?.message) {
+			throw error.response.data.message;
+		}
+		throw error.message || 'Login failed.';
 	}
-	return null;
 };
 
 export const logoutUser = async () => {
-	localStorage.removeItem('token');
-	localStorage.removeItem('refreshToken');
-	localStorage.removeItem('userID');
-	const userID = localStorage.getItem('userID');
-	const response = await axiosInstance.post('/api/auth/logout', { userID });
-	if (response && response.data) {
-		return response.data;
+	try {
+		localStorage.removeItem('token');
+		localStorage.removeItem('refreshToken');
+		localStorage.removeItem('userID');
+		const userID = localStorage.getItem('userID');
+		const response = await axiosInstance.post('/api/auth/logout', { userID });
+		if (response && response.data) {
+			return response.data;
+		}
+		return null;
+	} catch(error: any) {
+		if (error.response?.data?.message) {
+			throw error.response.data.message;
+		}
+		throw error.message || 'Logout failed.';
 	}
-	return null;
 };
 
 export const requestPasswordReset = async (email: string) => {
-    const response = await axiosInstance.post('/api/auth/request-password-reset', { email });
-    if (response && response.data) {
-		return response.data;
+	try {
+		const response = await axiosInstance.post('/api/auth/request-password-reset', { email });
+		if (response && response.data) {
+			return response.data;
+		}
+		return null;
+	} catch(error: any) {
+		if (error.response?.data?.message) {
+			throw error.response.data.message;
+		}
+		throw error.message || 'Password reset request failed.';
 	}
-	return null;
 };
 
 export const resetPassword = async (token: string, password: string, confirmPassword: string) => {
-    const payload = { token, password, confirmPassword };
-    const response = await axiosInstance.post('/api/auth/reset-password', payload);
-    if (response && response.data) {
-        return response.data;
-    }
-    return null;
+	try {
+		const payload = { token, password, confirmPassword };
+		const response = await axiosInstance.post('/api/auth/reset-password', payload);
+		if (response && response.data) {
+			return response.data;
+		}
+		return null;
+	} catch(error: any) {
+		if (error.response?.data?.message) {
+			throw error.response.data.message;
+		}
+		throw error.message || 'Password reset failed.';
+	}
 };

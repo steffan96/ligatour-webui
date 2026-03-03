@@ -33,13 +33,9 @@ const LoginComponent = () => {
 
 		setIsLoading(true);
 		try {
-			const data = await loginUser(email, password);
-			if (data) {
-				navigate('/');
-				showToast('Login successful!', true);
-			} else {
-				showToast('Login failed. Please check your credentials.', false);
-			}
+			await loginUser(email, password);
+			navigate('/');
+			showToast('Login successful!', true);
 		} catch (err: any) {
 			showToast(err?.response?.data?.message || 'Login failed. Please check your credentials.', false);
 		} finally {

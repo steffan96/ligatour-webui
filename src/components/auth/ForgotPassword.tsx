@@ -22,11 +22,7 @@ const ForgotPasswordComponent = () => {
         if (Object.keys(newErrors).length === 0) {
             setIsLoading(true);
             try {
-                const data = await requestPasswordReset(email);
-                if (!data) {
-                    setErrors({ api: 'Failed to send reset email. Please try again.' });
-                    return;
-                }
+                await requestPasswordReset(email);
                 setSuccess(true);
             } catch (err: any) {
                 setErrors({ api: err?.response?.data?.message || 'Failed to send reset email.' });
