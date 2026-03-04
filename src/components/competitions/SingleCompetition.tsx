@@ -1,8 +1,9 @@
 import React, { useEffect, useState } from 'react'
-import { useParams } from 'react-router-dom'
+import { useParams, useNavigate } from 'react-router-dom'
 import { getCompetition, updateCompetition } from 'api/competitions'
 import { CompetitionInterface } from 'api/competitions'
 import PageWindow from '../shared/PageWindow'
+import { useToastStore } from '../../api/stores/useToastStore';
 
 const statusOptions = [
   { value: 'pending', label: 'Pending' },
@@ -59,23 +60,33 @@ const Toggle = ({
 
 const SingleCompetition = () => {
   const { id } = useParams<{ id: string }>()
+  const navigate = useNavigate()
+  const { showToast } = useToastStore();
   const [competition, setCompetition] = useState<CompetitionInterface | null>(null)
   const [draft, setDraft] = useState<CompetitionInterface | null>(null)
   const [isSaving, setIsSaving] = useState(false)
-  const [error, setError] = useState<string | null>(null)
   const [isEditing, setIsEditing] = useState(false)
 
   useEffect(() => {
     if (!id) return
-    getCompetition(Number(id))
-      .then(data => {
-        setCompetition(data || null)
-        setDraft(data || null)
-      })
-      .catch(() => setError('Failed to load competition.'))
-  }, [id])
+    
+    const fetchCompetition = async () => {
+      try {
+        const response = await getCompetition(Number(id))
+        setCompetition(response?.data || null)
+        setDraft(response?.data || null)
+      } catch (err: any) {
+        showToast(err || 'Failed to load competition.', false)
+        navigate('/competitions') // Navigate back on error
+      }
+    }
 
-  if (!competition || !draft) return <p className="text-gray-500 text-center py-8">Competition not found</p>
+    fetchCompetition()
+  }, [id, navigate, showToast])
+
+  if (!competition || !draft) {
+    return null // Don't show anything while loading/redirecting
+  }
 
   const set = (field: keyof CompetitionInterface, value: any) =>
     setDraft(prev => (prev ? { ...prev, [field]: value } : prev))
@@ -83,154 +94,224 @@ const SingleCompetition = () => {
   const handleSave = async () => {
     if (!draft || !id) return
     setIsSaving(true)
-    setError(null)
     try {
-      const updated = await updateCompetition(Number(id), draft)
-      setCompetition(updated)
-      setDraft(updated)
+      const response = await updateCompetition(Number(id), draft)
+      setCompetition(response?.data)
+      setDraft(response?.data)
       setIsEditing(false)
-    } catch {
-      setError('Failed to save changes. Please try again.')
+      showToast('Changes saved successfully!', true)
+    } catch (err: any) {
+      showToast(err || 'Failed to save changes. Please try again.', false)
     } finally {
       setIsSaving(false)
     }
   }
 
+  const handleCancel = () => {
+    setDraft(competition)
+    setIsEditing(false)
+  }
+
   const ro = !isEditing
 
-  const editButton = (
-    <button
-      className="bg-white text-green-900 text-sm font-semibold px-4 py-1.5 rounded-lg hover:bg-green-50"
-      onClick={() => {
-        setIsEditing(!isEditing)
-        setDraft(competition)
-      }}
-    >
-      {isEditing ? 'Cancel' : 'Edit'}
-    </button>
-  )
-
   return (
-    <PageWindow headerActionButton={editButton}>
-      {/* Name + Status */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-        {draft.name !== undefined && (
-          <Field label="Competition Name">
-            <input
-              type="text"
-              value={draft.name}
-              readOnly={ro}
-              onChange={e => set('name', e.target.value)}
-              className={inputCls(ro)}
-              placeholder="Competition name"
-            />
-          </Field>
-        )}
-        {draft.status !== undefined && (
-          <Field label="Status">
-            <select
-              value={draft.status}
-              disabled={ro}
-              onChange={e => set('status', e.target.value)}
-              className={inputCls(ro)}
-            >
-              {statusOptions.map(o => (
-                <option key={o.value} value={o.value}>
-                  {o.label}
-                </option>
-              ))}
-            </select>
-          </Field>
-        )}
-      </div>
-
-      {/* Points */}
-      <div>
-        <p className="text-sm font-medium text-gray-700 mb-2 pb-1 border-b">Points</p>
-        <div className="grid grid-cols-3 gap-4">
-          {(['points_for_win', 'points_for_draw', 'points_for_loss'] as const).map(
-            (f, i) =>
-              draft[f] !== undefined && (
-                <Field key={f} label={['Win', 'Draw', 'Loss'][i]}>
-                  <input
-                    type="number"
-                    min="0"
-                    value={draft[f] as number}
-                    readOnly={ro}
-                    onChange={e => set(f, parseInt(e.target.value) || 0)}
-                    className={`${inputCls(ro)} text-center font-semibold`}
-                  />
-                </Field>
-              )
-          )}
+    <PageWindow
+      headerActionButtons={
+        <div className="flex items-center gap-3">
+          <button
+            className="bg-gray-100 text-gray-700 text-sm font-semibold 
+            px-4 py-1.5 rounded-lg hover:bg-gray-200 flex items-start gap-2"
+            onClick={() => navigate('/competitions')}
+          >
+            <span>←</span> Back
+          </button>
+          <button
+            className="bg-white text-green-900 text-sm font-semibold px-4 py-1.5 rounded-lg hover:bg-green-50"
+            onClick={() => {
+              setIsEditing(!isEditing)
+              setDraft(competition)
+            }}
+          >
+            {isEditing ? 'Cancel' : 'Edit'}
+          </button>
         </div>
+      }
+    >
+      {/* Name + Status - Always visible */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        <Field label="Competition Name">
+          <input
+            type="text"
+            value={draft.name}
+            readOnly={ro}
+            onChange={e => set('name', e.target.value)}
+            className={inputCls(ro)}
+            placeholder="Competition name"
+          />
+        </Field>
+        <Field label="Status">
+          <select
+            value={draft.status}
+            disabled={ro}
+            onChange={e => set('status', e.target.value)}
+            className={inputCls(ro)}
+          >
+            {statusOptions.map(o => (
+              <option key={o.value} value={o.value}>
+                {o.label}
+              </option>
+            ))}
+          </select>
+        </Field>
       </div>
 
-      {/* Tournament Details */}
+      {/* Points - Only for types that use points */}
+      {(draft.points_for_win !== undefined || 
+        draft.points_for_draw !== undefined || 
+        draft.points_for_loss !== undefined) && (
+        <div>
+          <p className="text-sm font-medium text-gray-700 mb-2 pb-1 border-b">Points</p>
+          <div className="grid grid-cols-3 gap-4">
+            {draft.points_for_win !== undefined && (
+              <Field label="Win">
+                <input
+                  type="number"
+                  min="0"
+                  value={draft.points_for_win}
+                  readOnly={ro}
+                  onChange={e => set('points_for_win', parseInt(e.target.value) || 0)}
+                  className={`${inputCls(ro)} text-center font-semibold`}
+                />
+              </Field>
+            )}
+            {draft.points_for_draw !== undefined && (
+              <Field label="Draw">
+                <input
+                  type="number"
+                  min="0"
+                  value={draft.points_for_draw}
+                  readOnly={ro}
+                  onChange={e => set('points_for_draw', parseInt(e.target.value) || 0)}
+                  className={`${inputCls(ro)} text-center font-semibold`}
+                />
+              </Field>
+            )}
+            {draft.points_for_loss !== undefined && (
+              <Field label="Loss">
+                <input
+                  type="number"
+                  min="0"
+                  value={draft.points_for_loss}
+                  readOnly={ro}
+                  onChange={e => set('points_for_loss', parseInt(e.target.value) || 0)}
+                  className={`${inputCls(ro)} text-center font-semibold`}
+                />
+              </Field>
+            )}
+          </div>
+        </div>
+      )}
+
+      {/* Tournament Details - Common fields + type-specific */}
       <div>
         <p className="text-sm font-medium text-gray-700 mb-2 pb-1 border-b">Tournament Details</p>
         <div className="grid grid-cols-2 gap-4">
-          {(
-            [
-              ['current_round', 'Current Round'],
-              ['number_of_teams', 'Teams'],
-              ['number_of_groups', 'Groups'],
-              ['teams_per_group', 'Teams per Group'],
-            ] as const
-          ).map(
-            ([f, label]) =>
-              draft[f] !== undefined && (
-                <Field key={f} label={label}>
-                  <input
-                    type="number"
-                    min="0"
-                    value={draft[f] as number}
-                    readOnly={ro}
-                    onChange={e => set(f, parseInt(e.target.value) || 0)}
-                    className={inputCls(ro)}
-                  />
-                </Field>
-              )
+          {/* Common fields */}
+          <Field label="Current Round">
+            <input
+              type="number"
+              min="0"
+              value={draft.current_round}
+              readOnly={ro}
+              onChange={e => set('current_round', parseInt(e.target.value) || 0)}
+              className={inputCls(ro)}
+            />
+          </Field>
+          <Field label="Number of Teams">
+            <input
+              type="number"
+              min="0"
+              value={draft.number_of_teams}
+              readOnly={ro}
+              onChange={e => set('number_of_teams', parseInt(e.target.value) || 0)}
+              className={inputCls(ro)}
+            />
+          </Field>
+
+          {/* Group stage specific fields */}
+          {draft.number_of_groups !== undefined && (
+            <Field label="Number of Groups">
+              <input
+                type="number"
+                min="0"
+                value={draft.number_of_groups}
+                readOnly={ro}
+                onChange={e => set('number_of_groups', parseInt(e.target.value) || 0)}
+                className={inputCls(ro)}
+              />
+            </Field>
+          )}
+          {draft.teams_per_group !== undefined && (
+            <Field label="Teams per Group">
+              <input
+                type="number"
+                min="0"
+                value={draft.teams_per_group}
+                readOnly={ro}
+                onChange={e => set('teams_per_group', parseInt(e.target.value) || 0)}
+                className={inputCls(ro)}
+              />
+            </Field>
           )}
         </div>
       </div>
 
-      {/* Toggles */}
-      <div>
-        <p className="text-sm font-medium text-gray-700 mb-1 pb-1 border-b">Match Settings</p>
-        {draft.has_third_place !== undefined && (
-          <Toggle
-            label="3rd Place Match"
-            description="Enable third place playoff"
-            checked={draft.has_third_place}
-            disabled={ro}
-            onChange={() => set('has_third_place', !draft.has_third_place)}
-          />
-        )}
-        {draft.two_legged !== undefined && (
-          <Toggle
-            label="Two-Legged"
-            description="Enable home and away matches"
-            checked={draft.two_legged}
-            disabled={ro}
-            onChange={() => set('two_legged', !draft.two_legged)}
-          />
-        )}
-      </div>
+      {/* Match Settings - Only for types that use these toggles */}
+      {(draft.has_third_place !== undefined || draft.two_legged !== undefined) && (
+        <div>
+          <p className="text-sm font-medium text-gray-700 mb-1 pb-1 border-b">Match Settings</p>
+          {draft.has_third_place !== undefined && (
+            <Toggle
+              label="3rd Place Match"
+              description="Enable third place playoff"
+              checked={draft.has_third_place}
+              disabled={ro}
+              onChange={() => set('has_third_place', !draft.has_third_place)}
+            />
+          )}
+          {draft.two_legged !== undefined && (
+            <Toggle
+              label="Two-Legged"
+              description="Enable home and away matches"
+              checked={draft.two_legged}
+              disabled={ro}
+              onChange={() => set('two_legged', !draft.two_legged)}
+            />
+          )}
+        </div>
+      )}
 
-      {/* Save */}
-      <div className="flex justify-end">
+      {/* Action Buttons */}
+      <div className="flex justify-end gap-3">
+        {isEditing && (
+          <button
+            onClick={handleCancel}
+            disabled={isSaving}
+            className="w-[15%] m-8 bg-gray-100 
+            text-gray-700 font-medium py-2.5 rounded-lg hover:bg-gray-200 transition-colors"
+          >
+            Cancel
+          </button>
+        )}
         <button
           onClick={handleSave}
           disabled={isSaving || ro}
-          className="w-[15%] m-8 bg-green-900 text-white
-    font-medium py-2.5 rounded-lg disabled:opacity-50 hover:bg-green-900 transition-colors"
+          className="w-[15%] m-8 bg-green-900 
+          text-white font-medium py-2.5 rounded-lg disabled:opacity-50 hover:bg-green-900 transition-colors"
         >
           {isSaving ? 'Saving…' : '💾 Save Changes'}
         </button>
       </div>
-
-      {error && <p className="text-sm text-red-600 bg-red-50 border border-red-200 rounded-lg px-3 py-2">{error}</p>}
     </PageWindow>
   )
 }

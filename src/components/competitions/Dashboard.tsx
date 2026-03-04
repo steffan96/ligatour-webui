@@ -5,8 +5,10 @@ import CompetitionCard from './CompetitionCard'
 import CreateCompetitionComponent from './CreateCompetition'
 import { CompetitionTypeDisplay } from './interfaces'
 import PageWindow from '../shared/PageWindow'
+import { useToastStore } from '../../api/stores/useToastStore';
 
 export default function DashboardComponent() {
+  const { showToast } = useToastStore();
   const [competitions, setCompetitions] = useState<
     { id: string; name: string; type?: string; number_of_teams?: number }[]
   >([])
@@ -15,6 +17,7 @@ export default function DashboardComponent() {
   const [filteredCompetitions, setFilteredCompetitions] = useState<
     { id: string; name: string; type?: string; number_of_teams?: number }[]
   >([])
+  const [isLoading, setIsLoading] = useState(true)
 
   // Pagination states
   const [currentPage, setCurrentPage] = useState(1)
@@ -24,9 +27,19 @@ export default function DashboardComponent() {
   >([])
 
   const fetchCompetitions = async () => {
-    const data = await listCompetitions()
-    setCompetitions(data || [])
-    setFilteredCompetitions(data || [])
+    setIsLoading(true)
+    try {
+      const response = await listCompetitions()
+      const data = response?.data || []
+      setCompetitions(data)
+      setFilteredCompetitions(data)
+    } catch (err: any) {
+      showToast(err || 'Failed to load competitions.', false)
+      setCompetitions([])
+      setFilteredCompetitions([])
+    } finally {
+      setIsLoading(false)
+    }
   }
 
   useEffect(() => {
@@ -51,7 +64,7 @@ export default function DashboardComponent() {
 
   useEffect(() => {
     fetchCompetitions()
-  }, [])
+  }, []) // Removed showToast from dependencies to avoid infinite loops
 
   // Calculate total pages
   const totalPages = Math.ceil(filteredCompetitions.length / itemsPerPage)
@@ -101,7 +114,9 @@ export default function DashboardComponent() {
 
       {/* Competition List */}
       <div className="grid grid-cols-1 gap-2">
-        {paginatedCompetitions.length > 0 ? (
+        {isLoading ? (
+          <p className="text-gray-500 text-center py-4">Loading competitions...</p>
+        ) : paginatedCompetitions.length > 0 ? (
           paginatedCompetitions.map(competition => (
             <CompetitionCard
               key={competition.id}
@@ -117,7 +132,7 @@ export default function DashboardComponent() {
       </div>
 
       {/* Pagination Controls */}
-      {totalPages > 1 && (
+      {!isLoading && totalPages > 1 && (
         <div className="flex items-center justify-between mt-4 px-2">
           <div className="text-sm text-gray-700">Number of total competitions: {filteredCompetitions.length}</div>
           <div className="flex items-center gap-2">

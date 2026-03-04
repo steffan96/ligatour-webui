@@ -20,66 +20,98 @@ export interface CompetitionInterface {
 }
 
 export const createCompetition = async (name: string, type: string) => {
-	const payload = {name, type};
-	const response = await axiosInstance.post('/api/v1/competitions', payload);
-	if (response && response.data) {
-		return response.data;
-	}
-	return null;
+  try {
+    const payload = { name, type };
+    const response = await axiosInstance.post('/api/v1/competitions', payload);
+    return response;
+  } catch (error: any) {
+    if (error.response?.data?.message) {
+      throw error.response.data.message;
+    }
+    throw error.message || 'Failed to create competition.';
+  }
 };
 
 export const listCompetitions = async () => {
-	const response = await axiosInstance.get('/api/v1/competitions');
-	if (response && response.data) {
-		return response.data;
-	}
-	return [];
+  try {
+    const response = await axiosInstance.get('/api/v1/competitions');
+    return response;
+  } catch (error: any) {
+    if (error.response?.data?.message) {
+      throw error.response.data.message;
+    }
+    throw error.message || 'Failed to fetch competitions.';
+  }
 };
 
 export const getCompetition = async (id: number) => {
-	const response = await axiosInstance.get(`/api/v1/competitions/${id}`);
-	if (response && response.data) {
-		return response.data;
-	}
-	return null;
+  try {
+    const response = await axiosInstance.get(`/api/v1/competitions/${id}`);
+    return response;
+  } catch (error: any) {
+    if (error.response?.data?.message) {
+      throw error.response.data.message;
+    }
+    throw error.message || 'Failed to fetch competition.';
+  }
 };
 
 export const updateCompetition = async (id: number, updates: { name?: string; type?: string }) => {
-	const response = await axiosInstance.put(`/api/v1/competitions/${id}`, updates);
-	if (response && response.data) {
-		return response.data;
-	}
-	return null;
+  try {
+    const response = await axiosInstance.put(`/api/v1/competitions/${id}`, updates);
+    return response;
+  } catch (error: any) {
+    if (error.response?.data?.message) {
+      throw error.response.data.message;
+    }
+    throw error.message || 'Failed to update competition.';
+  }
 };
 
 export const deleteCompetition = async (id: number) => {
-	const response = await axiosInstance.delete(`/api/v1/competitions/${id}`);
-	if (response && response.status === 204) {
-		return true;
-	}
-	return false;
+  try {
+    const response = await axiosInstance.delete(`/api/v1/competitions/${id}`);
+    return response;
+  } catch (error: any) {
+    if (error.response?.data?.message) {
+      throw error.response.data.message;
+    }
+    throw error.message || 'Failed to delete competition.';
+  }
 };
 
 export const getCompetitionTeams = async (competitionId: string) => {
-  const response = await axiosInstance.get(`/api/v1/competitions/${competitionId}/teams`);
-  if (response && response.data) {
-    return response.data;
+  try {
+    const response = await axiosInstance.get(`/api/v1/competitions/${competitionId}/teams`);
+    return response;
+  } catch (error: any) {
+    if (error.response?.data?.message) {
+      throw error.response.data.message;
+    }
+    throw error.message || 'Failed to fetch competition teams.';
   }
-  return [];
 };
 
 export const addTeamToCompetition = async (competitionId: string, teamId: string) => {
-  const response = await axiosInstance.post(`/api/v1/competitions/${competitionId}/teams`, { team_id: teamId });
-  if (response && response.data) {
-    return response.data;
+  try {
+    const response = await axiosInstance.post(`/api/v1/competitions/${competitionId}/teams`, { team_id: teamId });
+    return response;
+  } catch (error: any) {
+    if (error.response?.data?.message) {
+      throw error.response.data.message;
+    }
+    throw error.message || 'Failed to add team to competition.';
   }
-  return null;
 };
 
 export const removeTeamFromCompetition = async (competitionId: string, teamId: string) => {
-  const response = await axiosInstance.delete(`/api/v1/competitions/${competitionId}/teams/${teamId}`);
-  if (response && response.status === 204) {
-    return true;
+  try {
+    const response = await axiosInstance.delete(`/api/v1/competitions/${competitionId}/teams/${teamId}`);
+    return response;
+  } catch (error: any) {
+    if (error.response?.data?.message) {
+      throw error.response.data.message;
+    }
+    throw error.message || 'Failed to remove team from competition.';
   }
-  return false;
 };

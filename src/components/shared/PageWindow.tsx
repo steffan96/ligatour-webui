@@ -2,12 +2,12 @@ import React from 'react'
 // import { useNavigate } from 'react-router-dom'
 
 interface PageWindowProps {
-  headerActionButton?: React.ReactNode
+  headerActionButtons?: React.ReactNode
   children: React.ReactNode
   title?: string
 }
 
-const PageWindow = ({ headerActionButton, children, title }: PageWindowProps) => {
+const PageWindow = ({ headerActionButtons, children, title }: PageWindowProps) => {
   return (
     <div className="h-full w-full p-2">
       <div className="bg-white rounded-lg shadow-lg flex flex-col h-full overflow-hidden border border-gray-100">
@@ -17,11 +17,11 @@ const PageWindow = ({ headerActionButton, children, title }: PageWindowProps) =>
         >
           <div className="flex items-center space-x-2">
             {/* Window control dots (like macOS) */}
-            <div className="flex space-x-2 mr-4">
+            {/* <div className="flex space-x-2 mr-4">
               <div className="w-3 h-3 rounded-full bg-red-400 hover:bg-red-500 "></div>
               <div className="w-3 h-3 rounded-full bg-yellow-400 hover:bg-yellow-500 "></div>
               <div className="w-3 h-3 rounded-full bg-green-400 hover:bg-green-500 "></div>
-            </div>
+            </div> */}
 
             {/* Title with subtle styling */}
             {title && (
@@ -31,9 +31,9 @@ const PageWindow = ({ headerActionButton, children, title }: PageWindowProps) =>
             )}
           </div>
 
-          {headerActionButton && (
+          {headerActionButtons && (
             <div className="flex-shrink-0 transform hover:scale-105 transition-transform duration-200">
-              {headerActionButton}
+              {headerActionButtons}
             </div>
           )}
         </div>
