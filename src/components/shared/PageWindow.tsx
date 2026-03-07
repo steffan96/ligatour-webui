@@ -1,5 +1,4 @@
 import React from 'react'
-// import { useNavigate } from 'react-router-dom'
 
 interface PageWindowProps {
   headerActionButtons?: React.ReactNode
@@ -7,55 +6,73 @@ interface PageWindowProps {
   title?: string
 }
 
-const PageWindow = ({ headerActionButtons, children, title }: PageWindowProps) => {
+const PageWindow = ({
+  headerActionButtons,
+  children,
+  title
+}: PageWindowProps) => {
   return (
-    <div className="h-full w-full p-2">
-      <div className="bg-white rounded-lg shadow-lg flex flex-col h-full overflow-hidden border border-gray-100">
+    <div className="h-[99%] w-full">
+      <div
+        className="bg-white rounded-xl shadow-md flex flex-col h-full 
+                   overflow-hidden border border-gray-200"
+      >
+        {/* Header */}
         <div
-          className="px-6 py-4 flex items-center 
-        justify-between flex-shrink-0 border-b border-gray-100"
+          className="px-8 py-5 flex items-center justify-between 
+                     flex-shrink-0 bg-gradient-to-r from-gray-50 
+                     to-gray-100 border-b border-gray-200"
         >
-          <div className="flex items-center space-x-2">
-            {/* Window control dots (like macOS) */}
-            {/* <div className="flex space-x-2 mr-4">
-              <div className="w-3 h-3 rounded-full bg-red-400 hover:bg-red-500 "></div>
-              <div className="w-3 h-3 rounded-full bg-yellow-400 hover:bg-yellow-500 "></div>
-              <div className="w-3 h-3 rounded-full bg-green-400 hover:bg-green-500 "></div>
-            </div> */}
+          <div className="flex items-center space-x-3">
+            {/* Decorative accent */}
+            <div className="w-1 h-6 bg-green-900 rounded-full" />
 
-            {/* Title with subtle styling */}
+            {/* Title */}
             {title && (
-              <div className="flex items-center">
-                <span className="text-sm font-medium text-gray-700 bg-gray-100 px-3 py-1 rounded-full">{title}</span>
-              </div>
+              <h2
+                className="text-lg font-semibold text-gray-900 
+                           tracking-tight"
+              >
+                {title}
+              </h2>
             )}
           </div>
 
+          {/* Action buttons */}
           {headerActionButtons && (
-            <div className="flex-shrink-0 transform hover:scale-105 transition-transform duration-200">
+            <div className="flex-shrink-0">
               {headerActionButtons}
             </div>
           )}
         </div>
 
-        {/* Subtle decorative element */}
-        <div className="h-1 bg-green-700"></div>
+        {/* Accent line */}
+        <div className="h-0.5 bg-gradient-to-r from-green-900 
+                       via-amber-500 to-transparent" />
 
-        {/* Body - Scrollable with improved spacing */}
-        <div className="flex-1 overflow-y-auto p-6 bg-gray-50">
-          <div className="bg-white rounded-lg shadow-sm p-6">{children}</div>
+        {/* Body */}
+        <div
+          className="flex-1 overflow-y-auto p-8 bg-white"
+        >
+          <div className="max-w-full space-y-8">
+            {children}
+          </div>
         </div>
 
-        {/* Optional footer with subtle border */}
-        <div className="px-6 py-3 border-t border-gray-100 bg-gray-50 text-xs text-gray-400 flex justify-between">
+        {/* Footer */}
+        <div
+          className="px-8 py-4 border-t border-gray-200 
+                     bg-gray-50 text-xs text-gray-600 
+                     flex justify-between items-center"
+        >
           <span>Ready</span>
-          <span className="flex items-center space-x-4">
-            <span className="flex items-center">
-              <span className="w-2 h-2 bg-green-400 rounded-full mr-2"></span>
-              Connected
+          <div className="flex items-center space-x-6">
+            <span className="flex items-center space-x-2">
+              <span className="w-2 h-2 bg-green-900 rounded-full" />
+              <span>Connected</span>
             </span>
-            <span>v1.0.0</span>
-          </span>
+            <span className="text-gray-400">v1.0.0</span>
+          </div>
         </div>
       </div>
     </div>

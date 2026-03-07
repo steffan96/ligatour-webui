@@ -83,7 +83,7 @@ export default function DashboardComponent() {
   }
 
   return (
-    <PageWindow>
+    <PageWindow title='Main Dashboard'>
       {/* Search & Filter */}
       <div className="flex items-center justify-between gap-3 flex-wrap mb-6">
         <div className="flex items-center gap-3">

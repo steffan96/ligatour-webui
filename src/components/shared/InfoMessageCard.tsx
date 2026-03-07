@@ -29,7 +29,7 @@ export const InfoMessageCard: React.FC<InfoMessageCardProps> = ({ message, isSuc
 
   return (
     <div
-      className={`fixed top-5 right-5 px-6 py-4 bg-white text-gray-800 border-l-4 
+      className={`fixed top-5 right-5 px-6 py-4 bg-gray-50 text-gray-800 border-l-4 
         rounded-lg shadow-lg z-[9999] font-medium text-sm flex items-center gap-3 transition-all duration-300 animate-slideIn 
         ${
           isSuccess

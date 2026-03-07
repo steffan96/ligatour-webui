@@ -3,24 +3,34 @@ import { useParams, useNavigate } from 'react-router-dom'
 import { getCompetition, updateCompetition } from 'api/competitions'
 import { CompetitionInterface } from 'api/competitions'
 import PageWindow from '../shared/PageWindow'
-import { useToastStore } from '../../api/stores/useToastStore';
+import { useToastStore } from '../../api/stores/useToastStore'
 
 const statusOptions = [
   { value: 'pending', label: 'Pending' },
   { value: 'active', label: 'Active' },
-  { value: 'finished', label: 'Finished' },
+  { value: 'completed', label: 'Completed' },
 ]
 
-const Field = ({ label, children }: { label: string; children: React.ReactNode }) => (
-  <div className="space-y-1">
-    <label className="block text-sm font-medium text-gray-700">{label}</label>
+const Field = ({
+  label,
+  children
+}: {
+  label: string
+  children: React.ReactNode
+}) => (
+  <div className="space-y-2">
+    <label className="block text-sm font-bold text-gray-900">
+      {label}
+    </label>
     {children}
   </div>
 )
 
 const inputCls = (readOnly?: boolean) =>
-  `w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-green-500 focus:border-green-500 ${
-    readOnly ? 'bg-gray-50' : ''
+  `w-full px-3 py-2 border border-gray-300 rounded-lg 
+   text-sm font-medium focus:ring-2 
+   focus:ring-green-900 focus:border-green-900 ${
+    readOnly ? 'bg-gray-50 text-gray-700' : 'text-gray-900'
   }`
 
 const Toggle = ({
@@ -36,21 +46,28 @@ const Toggle = ({
   onChange: () => void
   disabled?: boolean
 }) => (
-  <div className="flex items-center justify-between py-3 border-b last:border-0">
+  <div className="flex items-center justify-between py-3 border-b 
+                  last:border-0">
     <div>
-      <p className="text-sm font-medium text-gray-700">{label}</p>
-      {description && <p className="text-xs text-gray-500">{description}</p>}
+      <p className="text-sm font-semibold text-gray-900">{label}</p>
+      {description && (
+        <p className="text-xs font-medium text-gray-600">
+          {description}
+        </p>
+      )}
     </div>
     <button
       type="button"
       onClick={onChange}
       disabled={disabled}
-      className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors disabled:opacity-50 ${
-        checked ? 'bg-green-700' : 'bg-gray-300'
+      className={`relative inline-flex h-6 w-11 items-center 
+                   rounded-full transition-colors disabled:opacity-50 ${
+        checked ? 'bg-green-900' : 'bg-gray-300'
       }`}
     >
       <span
-        className={`inline-block h-4 w-4 rounded-full bg-white transition-transform ${
+        className={`inline-block h-4 w-4 rounded-full bg-white 
+                     transition-transform ${
           checked ? 'translate-x-6' : 'translate-x-1'
         }`}
       />
@@ -58,18 +75,26 @@ const Toggle = ({
   </div>
 )
 
+const SectionHeader = ({ label }: { label: string }) => (
+  <p className="text-sm font-bold text-gray-900 mb-3 pb-2 
+               border-b border-gray-300">
+    {label}
+  </p>
+)
+
 const SingleCompetition = () => {
   const { id } = useParams<{ id: string }>()
   const navigate = useNavigate()
-  const { showToast } = useToastStore();
-  const [competition, setCompetition] = useState<CompetitionInterface | null>(null)
+  const { showToast } = useToastStore()
+  const [competition, setCompetition] =
+    useState<CompetitionInterface | null>(null)
   const [draft, setDraft] = useState<CompetitionInterface | null>(null)
   const [isSaving, setIsSaving] = useState(false)
   const [isEditing, setIsEditing] = useState(false)
 
   useEffect(() => {
     if (!id) return
-    
+
     const fetchCompetition = async () => {
       try {
         const response = await getCompetition(Number(id))
@@ -77,7 +102,7 @@ const SingleCompetition = () => {
         setDraft(response?.data || null)
       } catch (err: any) {
         showToast(err || 'Failed to load competition.', false)
-        navigate('/competitions') // Navigate back on error
+        navigate('/competitions')
       }
     }
 
@@ -85,7 +110,7 @@ const SingleCompetition = () => {
   }, [id, navigate, showToast])
 
   if (!competition || !draft) {
-    return null // Don't show anything while loading/redirecting
+    return null
   }
 
   const set = (field: keyof CompetitionInterface, value: any) =>
@@ -101,7 +126,10 @@ const SingleCompetition = () => {
       setIsEditing(false)
       showToast('Changes saved successfully!', true)
     } catch (err: any) {
-      showToast(err || 'Failed to save changes. Please try again.', false)
+      showToast(
+        err || 'Failed to save changes. Please try again.',
+        false
+      )
     } finally {
       setIsSaving(false)
     }
@@ -116,17 +144,22 @@ const SingleCompetition = () => {
 
   return (
     <PageWindow
+      title={`Manage competition - ${draft.name || ''}`}
       headerActionButtons={
         <div className="flex items-center gap-3">
           <button
-            className="bg-gray-100 text-gray-700 text-sm font-semibold 
-            px-4 py-1.5 rounded-lg hover:bg-gray-200 flex items-start gap-2"
+            className="bg-gray-100 text-gray-900 text-sm 
+                       font-semibold px-4 py-1.5 rounded-lg 
+                       hover:bg-gray-200 flex items-start gap-2 
+                       transition-colors"
             onClick={() => navigate('/competitions')}
           >
             <span>←</span> Back
           </button>
           <button
-            className="bg-white text-green-900 text-sm font-semibold px-4 py-1.5 rounded-lg hover:bg-green-50"
+            className="bg-white text-green-900 text-sm font-bold 
+                       px-4 py-1.5 rounded-lg hover:bg-green-50 
+                       border border-green-200 transition-colors"
             onClick={() => {
               setIsEditing(!isEditing)
               setDraft(competition)
@@ -137,7 +170,7 @@ const SingleCompetition = () => {
         </div>
       }
     >
-      {/* Name + Status - Always visible */}
+      {/* Name + Status */}
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <Field label="Competition Name">
           <input
@@ -165,12 +198,12 @@ const SingleCompetition = () => {
         </Field>
       </div>
 
-      {/* Points - Only for types that use points */}
-      {(draft.points_for_win !== undefined || 
-        draft.points_for_draw !== undefined || 
+      {/* Points */}
+      {(draft.points_for_win !== undefined ||
+        draft.points_for_draw !== undefined ||
         draft.points_for_loss !== undefined) && (
         <div>
-          <p className="text-sm font-medium text-gray-700 mb-2 pb-1 border-b">Points</p>
+          <SectionHeader label="Points" />
           <div className="grid grid-cols-3 gap-4">
             {draft.points_for_win !== undefined && (
               <Field label="Win">
@@ -179,8 +212,10 @@ const SingleCompetition = () => {
                   min="0"
                   value={draft.points_for_win}
                   readOnly={ro}
-                  onChange={e => set('points_for_win', parseInt(e.target.value) || 0)}
-                  className={`${inputCls(ro)} text-center font-semibold`}
+                  onChange={e =>
+                    set('points_for_win', parseInt(e.target.value) || 0)
+                  }
+                  className={`${inputCls(ro)} text-center font-bold`}
                 />
               </Field>
             )}
@@ -191,8 +226,10 @@ const SingleCompetition = () => {
                   min="0"
                   value={draft.points_for_draw}
                   readOnly={ro}
-                  onChange={e => set('points_for_draw', parseInt(e.target.value) || 0)}
-                  className={`${inputCls(ro)} text-center font-semibold`}
+                  onChange={e =>
+                    set('points_for_draw', parseInt(e.target.value) || 0)
+                  }
+                  className={`${inputCls(ro)} text-center font-bold`}
                 />
               </Field>
             )}
@@ -203,8 +240,10 @@ const SingleCompetition = () => {
                   min="0"
                   value={draft.points_for_loss}
                   readOnly={ro}
-                  onChange={e => set('points_for_loss', parseInt(e.target.value) || 0)}
-                  className={`${inputCls(ro)} text-center font-semibold`}
+                  onChange={e =>
+                    set('points_for_loss', parseInt(e.target.value) || 0)
+                  }
+                  className={`${inputCls(ro)} text-center font-bold`}
                 />
               </Field>
             )}
@@ -212,18 +251,19 @@ const SingleCompetition = () => {
         </div>
       )}
 
-      {/* Tournament Details - Common fields + type-specific */}
+      {/* Tournament Details */}
       <div>
-        <p className="text-sm font-medium text-gray-700 mb-2 pb-1 border-b">Tournament Details</p>
+        <SectionHeader label="Tournament Details" />
         <div className="grid grid-cols-2 gap-4">
-          {/* Common fields */}
           <Field label="Current Round">
             <input
               type="number"
               min="0"
               value={draft.current_round}
               readOnly={ro}
-              onChange={e => set('current_round', parseInt(e.target.value) || 0)}
+              onChange={e =>
+                set('current_round', parseInt(e.target.value) || 0)
+              }
               className={inputCls(ro)}
             />
           </Field>
@@ -233,12 +273,13 @@ const SingleCompetition = () => {
               min="0"
               value={draft.number_of_teams}
               readOnly={ro}
-              onChange={e => set('number_of_teams', parseInt(e.target.value) || 0)}
+              onChange={e =>
+                set('number_of_teams', parseInt(e.target.value) || 0)
+              }
               className={inputCls(ro)}
             />
           </Field>
 
-          {/* Group stage specific fields */}
           {draft.number_of_groups !== undefined && (
             <Field label="Number of Groups">
               <input
@@ -246,7 +287,9 @@ const SingleCompetition = () => {
                 min="0"
                 value={draft.number_of_groups}
                 readOnly={ro}
-                onChange={e => set('number_of_groups', parseInt(e.target.value) || 0)}
+                onChange={e =>
+                  set('number_of_groups', parseInt(e.target.value) || 0)
+                }
                 className={inputCls(ro)}
               />
             </Field>
@@ -258,7 +301,9 @@ const SingleCompetition = () => {
                 min="0"
                 value={draft.teams_per_group}
                 readOnly={ro}
-                onChange={e => set('teams_per_group', parseInt(e.target.value) || 0)}
+                onChange={e =>
+                  set('teams_per_group', parseInt(e.target.value) || 0)
+                }
                 className={inputCls(ro)}
               />
             </Field>
@@ -266,17 +311,20 @@ const SingleCompetition = () => {
         </div>
       </div>
 
-      {/* Match Settings - Only for types that use these toggles */}
-      {(draft.has_third_place !== undefined || draft.two_legged !== undefined) && (
+      {/* Match Settings */}
+      {(draft.has_third_place !== undefined ||
+        draft.two_legged !== undefined) && (
         <div>
-          <p className="text-sm font-medium text-gray-700 mb-1 pb-1 border-b">Match Settings</p>
+          <SectionHeader label="Match Settings" />
           {draft.has_third_place !== undefined && (
             <Toggle
               label="3rd Place Match"
               description="Enable third place playoff"
               checked={draft.has_third_place}
               disabled={ro}
-              onChange={() => set('has_third_place', !draft.has_third_place)}
+              onChange={() =>
+                set('has_third_place', !draft.has_third_place)
+              }
             />
           )}
           {draft.two_legged !== undefined && (
@@ -292,13 +340,14 @@ const SingleCompetition = () => {
       )}
 
       {/* Action Buttons */}
-      <div className="flex justify-end gap-3">
+      <div className="flex justify-end gap-3 pt-6">
         {isEditing && (
           <button
             onClick={handleCancel}
             disabled={isSaving}
-            className="w-[15%] m-8 bg-gray-100 
-            text-gray-700 font-medium py-2.5 rounded-lg hover:bg-gray-200 transition-colors"
+            className="bg-gray-100 text-gray-900 font-bold py-2.5 
+                       px-8 rounded-lg hover:bg-gray-200 
+                       transition-colors disabled:opacity-50"
           >
             Cancel
           </button>
@@ -306,8 +355,9 @@ const SingleCompetition = () => {
         <button
           onClick={handleSave}
           disabled={isSaving || ro}
-          className="w-[15%] m-8 bg-green-900 
-          text-white font-medium py-2.5 rounded-lg disabled:opacity-50 hover:bg-green-900 transition-colors"
+          className="bg-green-900 text-white font-bold py-2.5 
+                     px-8 rounded-lg disabled:opacity-50 
+                     hover:bg-green-800 transition-colors"
         >
           {isSaving ? 'Saving…' : '💾 Save Changes'}
         </button>

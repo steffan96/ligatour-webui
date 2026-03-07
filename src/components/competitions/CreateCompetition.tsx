@@ -1,6 +1,6 @@
 import React from 'react'
 import Button from '../shared/HeaderButton'
-import CreateModal from './CreateCompetitionModal'
+import CreateModal from './CreateModal'
 import { useState } from 'react'
 
 export default function CreateCompetitionComponent() {
