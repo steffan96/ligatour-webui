@@ -17,11 +17,12 @@ export interface CompetitionInterface {
   two_legged: boolean;
   number_of_groups: number;
   teams_per_group: number;
+  individual: boolean;
 }
 
-export const createCompetition = async (name: string, type: string) => {
+export const createCompetition = async (name: string, type: string, individual: boolean) => {
   try {
-    const payload = { name, type };
+    const payload = { name, type, individual };
     const response = await axiosInstance.post('/api/v1/competitions', payload);
     return response;
   } catch (error: any) {
