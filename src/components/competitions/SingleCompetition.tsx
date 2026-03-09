@@ -4,6 +4,8 @@ import { getCompetition, updateCompetition } from 'api/competitions'
 import { CompetitionInterface } from 'api/competitions'
 import PageWindow from '../shared/PageWindow'
 import { useToastStore } from '../../api/stores/useToastStore'
+import CompetitionPlayers from './CompetitionPlayers'
+import CompetitionTeams from './CompetitionTeams'
 
 const statusOptions = [
   { value: 'pending', label: 'Pending' },
@@ -36,10 +38,7 @@ const Toggle = ({
   onChange: () => void
   disabled?: boolean
 }) => (
-  <div
-    className="flex items-center justify-between py-2.5 border-b 
-                  last:border-0"
-  >
+  <div className="flex items-center justify-between py-2.5 border-b last:border-0">
     <div>
       <p className="text-sm font-semibold text-gray-900">{label}</p>
       {description && <p className="text-xs font-medium text-gray-600">{description}</p>}
@@ -60,10 +59,7 @@ const Toggle = ({
 )
 
 const SectionHeader = ({ label }: { label: string }) => (
-  <p
-    className="text-sm font-bold text-gray-900 mb-2.5 pb-1.5 
-               border-b border-gray-300"
-  >
+  <p className="text-sm font-bold text-gray-900 mb-2.5 pb-1.5 border-b border-gray-300">
     {label}
   </p>
 )
@@ -76,6 +72,7 @@ const SingleCompetition = () => {
   const [draft, setDraft] = useState<CompetitionInterface | null>(null)
   const [isSaving, setIsSaving] = useState(false)
   const [isEditing, setIsEditing] = useState(false)
+  const [showParticipants, setShowParticipants] = useState(false)
 
   useEffect(() => {
     if (!id) return
@@ -96,6 +93,15 @@ const SingleCompetition = () => {
 
   if (!competition || !draft) {
     return null
+  }
+
+  // Show participant management component if requested
+  if (showParticipants) {
+    return draft.individual ? (
+      <CompetitionPlayers />
+    ) : (
+      <CompetitionTeams />
+    )
   }
 
   const set = (field: keyof CompetitionInterface, value: any) =>
@@ -142,7 +148,7 @@ const SingleCompetition = () => {
             className="bg-blue-50 text-blue-900 text-sm font-bold 
                        px-3.5 py-1.5 rounded-md hover:bg-blue-100 
                        border border-blue-200 transition-colors"
-            onClick={() => navigate(`/competition/${id}/teams`)}
+            onClick={() => setShowParticipants(true)}
           >
             {draft.individual ? '👤 Manage Players' : '👥 Manage Teams'}
           </button>
