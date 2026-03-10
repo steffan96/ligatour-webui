@@ -3,7 +3,7 @@ import { useState, useEffect } from 'react'
 import { listCompetitions } from 'api/competitions'
 import CompetitionCard from './CompetitionCard'
 import CreateCompetitionComponent from './CreateCompetition'
-import { CompetitionTypeDisplay } from './interfaces'
+import { CompetitionTypeDisplay } from '../../api/interfaces/competitions'
 import PageWindow from '../shared/PageWindow'
 import { useToastStore } from '../../api/stores/useToastStore';
 

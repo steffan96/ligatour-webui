@@ -2,10 +2,10 @@ import React, { useEffect, useState } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import { getCompetition, updateCompetition } from 'api/competitions'
 import { CompetitionInterface } from 'api/competitions'
+import { CompetitionTypeDisplay } from '../../api/interfaces/competitions'
 import PageWindow from '../shared/PageWindow'
 import { useToastStore } from '../../api/stores/useToastStore'
-import CompetitionPlayers from './CompetitionPlayers'
-import CompetitionTeams from './CompetitionTeams'
+import CustomSelect from '../shared/CustomSelect'
 
 const statusOptions = [
   { value: 'pending', label: 'Pending' },
@@ -72,7 +72,6 @@ const SingleCompetition = () => {
   const [draft, setDraft] = useState<CompetitionInterface | null>(null)
   const [isSaving, setIsSaving] = useState(false)
   const [isEditing, setIsEditing] = useState(false)
-  const [showParticipants, setShowParticipants] = useState(false)
 
   useEffect(() => {
     if (!id) return
@@ -93,15 +92,6 @@ const SingleCompetition = () => {
 
   if (!competition || !draft) {
     return null
-  }
-
-  // Show participant management component if requested
-  if (showParticipants) {
-    return draft.individual ? (
-      <CompetitionPlayers />
-    ) : (
-      <CompetitionTeams />
-    )
   }
 
   const set = (field: keyof CompetitionInterface, value: any) =>
@@ -148,7 +138,7 @@ const SingleCompetition = () => {
             className="bg-blue-50 text-blue-900 text-sm font-bold 
                        px-3.5 py-1.5 rounded-md hover:bg-blue-100 
                        border border-blue-200 transition-colors"
-            onClick={() => setShowParticipants(true)}
+            onClick={() => navigate(`/competition/${id}/participants`)}
           >
             {draft.individual ? '👤 Manage Players' : '👥 Manage Teams'}
           </button>
@@ -191,6 +181,34 @@ const SingleCompetition = () => {
               </option>
             ))}
           </select>
+        </Field>
+      </div>
+
+      {/* Competition Type */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
+        <Field label="Competition Type">
+          <CustomSelect
+            value={draft.type}
+            options={Object.entries(CompetitionTypeDisplay).map(([key, value]) => ({
+              value: key,
+              label: value,
+            }))}
+            onChange={value => set('type', value)}
+            disabled={ro}
+            className={inputCls(ro)}
+          />
+        </Field>
+        <Field label="Individual">
+          <CustomSelect
+            value={draft.individual ? 'true' : 'false'}
+            options={[
+              { value: 'false', label: 'Team Based' },
+              { value: 'true', label: 'Individual' },
+            ]}
+            onChange={value => set('individual', value === 'true')}
+            disabled={ro}
+            className={inputCls(ro)}
+          />
         </Field>
       </div>
 

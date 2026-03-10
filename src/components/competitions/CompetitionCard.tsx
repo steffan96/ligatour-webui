@@ -1,6 +1,6 @@
 import React from 'react'
 import { Link } from 'react-router-dom'
-import { CompetitionTypeDisplay } from './interfaces'
+import { CompetitionTypeDisplay } from '../../api/interfaces/competitions'
 
 interface CompetitionCardProps {
   id: string
