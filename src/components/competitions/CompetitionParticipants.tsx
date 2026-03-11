@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
-import { getCompetition, addParticipantToCompetition } from 'api/competitions'
+import { getCompetition, addTeamToCompetition, addPlayerToCompetition } from 'api/competitions'
 import PageWindow from '../shared/PageWindow'
 import { useToastStore } from '../../api/stores/useToastStore'
 
@@ -17,9 +17,7 @@ const inputCls = (readOnly?: boolean) =>
    focus:ring-green-900 focus:border-green-900 ${readOnly ? 'bg-gray-50 text-gray-700' : 'text-gray-900'}`
 
 const SectionHeader = ({ label }: { label: string }) => (
-  <p className="text-sm font-bold text-gray-900 mb-2.5 pb-1.5 border-b border-gray-300">
-    {label}
-  </p>
+  <p className="text-sm font-bold text-gray-900 mb-2.5 pb-1.5 border-b border-gray-300">{label}</p>
 )
 
 const ParticipantCard = ({
@@ -45,19 +43,14 @@ const ParticipantCard = ({
     <div className="flex items-start justify-between gap-4">
       <div className="flex-1">
         {isIndividual ? (
-          <p className="text-sm font-bold text-gray-900">
-            {participant.firstName} {participant.lastName}
-          </p>
-        ) : (
           <>
-            <p className="text-sm font-bold text-gray-900">{participant.name}</p>
-            {participant.city && <p className="text-xs text-gray-600 mt-1">{participant.city}</p>}
-            {participant.players && participant.players.length > 0 && (
-              <p className="text-xs font-medium text-gray-700 mt-2">
-                {participant.players.length} player{participant.players.length !== 1 ? 's' : ''}
-              </p>
-            )}
+            <p className="text-sm font-bold text-gray-900">
+              {participant.first_name} {participant.last_name}
+            </p>
+            {participant.email && <p className="text-xs text-gray-600 mt-1">{participant.email}</p>}
           </>
+        ) : (
+          <p className="text-sm font-bold text-gray-900">{participant.name}</p>
         )}
       </div>
       <div className="flex gap-2">
@@ -89,14 +82,13 @@ const CompetitionParticipants = () => {
 
   const [competition, setCompetition] = useState<any>(null)
   const [participants, setParticipants] = useState<any[]>([])
-  const [newParticipant, setNewParticipant] = useState({ firstName: '', lastName: '', name: '', city: '' })
+  const [newParticipant, setNewParticipant] = useState({ first_name: '', last_name: '', email: '', name: '' })
   const [isAdding, setIsAdding] = useState(false)
   const [editingId, setEditingId] = useState<number | null>(null)
   const [editingParticipant, setEditingParticipant] = useState<any>(null)
 
   useEffect(() => {
     if (!id) return
-
     const fetchCompetition = async () => {
       try {
         const response = await getCompetition(Number(id))
@@ -106,7 +98,6 @@ const CompetitionParticipants = () => {
         navigate('/competitions')
       }
     }
-
     fetchCompetition()
   }, [id, navigate, showToast])
 
@@ -115,9 +106,14 @@ const CompetitionParticipants = () => {
   const isIndividual = competition.individual
 
   const handleAddParticipant = async () => {
+    if (!id) {
+      showToast('Competition ID is missing', false)
+      return
+    }
+
     if (isIndividual) {
-      if (!newParticipant.firstName.trim() || !newParticipant.lastName.trim()) {
-        showToast('First name and last name are required', false)
+      if (!newParticipant.first_name.trim() || !newParticipant.last_name.trim() || !newParticipant.email.trim()) {
+        showToast('First name, last name and email are required', false)
         return
       }
     } else {
@@ -127,31 +123,21 @@ const CompetitionParticipants = () => {
       }
     }
 
-    if (!id) {
-      showToast('Competition ID is missing', false)
-      return
-    }
-
     try {
-      const participantIndex = participants.length
-      
-      const participantData = isIndividual
-        ? {
-            id: participantIndex,
-            firstName: newParticipant.firstName,
-            lastName: newParticipant.lastName,
-          }
-        : {
-            id: participantIndex,
-            name: newParticipant.name,
-            city: newParticipant.city,
-            players: [],
-          }
+      let response
 
-      await addParticipantToCompetition(id, participantIndex.toString())
+      if (isIndividual) {
+        response = await addPlayerToCompetition(id, {
+          first_name: newParticipant.first_name,
+          last_name: newParticipant.last_name,
+          email: newParticipant.email,
+        })
+      } else {
+        response = await addTeamToCompetition(id, newParticipant.name)
+      }
 
-      setParticipants([...participants, participantData])
-      setNewParticipant({ firstName: '', lastName: '', name: '', city: '' })
+      setParticipants([...participants, response?.data])
+      setNewParticipant({ first_name: '', last_name: '', email: '', name: '' })
       setIsAdding(false)
       showToast(isIndividual ? 'Player added successfully!' : 'Team added successfully!', true)
     } catch (err: any) {
@@ -161,8 +147,12 @@ const CompetitionParticipants = () => {
 
   const handleUpdateParticipant = () => {
     if (isIndividual) {
-      if (!editingParticipant.firstName.trim() || !editingParticipant.lastName.trim()) {
-        showToast('First name and last name are required', false)
+      if (
+        !editingParticipant.first_name.trim() ||
+        !editingParticipant.last_name.trim() ||
+        !editingParticipant.email.trim()
+      ) {
+        showToast('First name, last name and email are required', false)
         return
       }
     } else {
@@ -172,9 +162,7 @@ const CompetitionParticipants = () => {
       }
     }
 
-    if (editingId === null) {
-      return
-    }
+    if (editingId === null) return
 
     const updated = [...participants]
     updated[editingId] = editingParticipant
@@ -198,7 +186,7 @@ const CompetitionParticipants = () => {
     setIsAdding(false)
     setEditingId(null)
     setEditingParticipant(null)
-    setNewParticipant({ firstName: '', lastName: '', name: '', city: '' })
+    setNewParticipant({ first_name: '', last_name: '', email: '', name: '' })
   }
 
   const handleBackClick = () => {
@@ -245,8 +233,8 @@ const CompetitionParticipants = () => {
                 <Field label="First Name">
                   <input
                     type="text"
-                    value={newParticipant.firstName}
-                    onChange={e => setNewParticipant({ ...newParticipant, firstName: e.target.value })}
+                    value={newParticipant.first_name}
+                    onChange={e => setNewParticipant({ ...newParticipant, first_name: e.target.value })}
                     className={inputCls()}
                     placeholder="Enter first name"
                     autoFocus
@@ -255,35 +243,33 @@ const CompetitionParticipants = () => {
                 <Field label="Last Name">
                   <input
                     type="text"
-                    value={newParticipant.lastName}
-                    onChange={e => setNewParticipant({ ...newParticipant, lastName: e.target.value })}
+                    value={newParticipant.last_name}
+                    onChange={e => setNewParticipant({ ...newParticipant, last_name: e.target.value })}
                     className={inputCls()}
                     placeholder="Enter last name"
                   />
                 </Field>
+                <Field label="Email">
+                  <input
+                    type="email"
+                    value={newParticipant.email}
+                    onChange={e => setNewParticipant({ ...newParticipant, email: e.target.value })}
+                    className={inputCls()}
+                    placeholder="Enter email"
+                  />
+                </Field>
               </>
             ) : (
-              <>
-                <Field label="Team Name">
-                  <input
-                    type="text"
-                    value={newParticipant.name}
-                    onChange={e => setNewParticipant({ ...newParticipant, name: e.target.value })}
-                    className={inputCls()}
-                    placeholder="Enter team name"
-                    autoFocus
-                  />
-                </Field>
-                <Field label="City">
-                  <input
-                    type="text"
-                    value={newParticipant.city}
-                    onChange={e => setNewParticipant({ ...newParticipant, city: e.target.value })}
-                    className={inputCls()}
-                    placeholder="Enter city (optional)"
-                  />
-                </Field>
-              </>
+              <Field label="Team Name">
+                <input
+                  type="text"
+                  value={newParticipant.name}
+                  onChange={e => setNewParticipant({ ...newParticipant, name: e.target.value })}
+                  className={inputCls()}
+                  placeholder="Enter team name"
+                  autoFocus
+                />
+              </Field>
             )}
           </div>
           <div className="flex justify-end gap-3 pt-3 mt-3 border-t border-green-200">
@@ -313,7 +299,7 @@ const CompetitionParticipants = () => {
           <SectionHeader
             label={`Edit ${isIndividual ? 'Player' : 'Team'}: ${
               isIndividual
-                ? `${editingParticipant.firstName} ${editingParticipant.lastName}`
+                ? `${editingParticipant.first_name} ${editingParticipant.last_name}`
                 : editingParticipant.name
             }`}
           />
@@ -323,8 +309,8 @@ const CompetitionParticipants = () => {
                 <Field label="First Name">
                   <input
                     type="text"
-                    value={editingParticipant.firstName}
-                    onChange={e => setEditingParticipant({ ...editingParticipant, firstName: e.target.value })}
+                    value={editingParticipant.first_name}
+                    onChange={e => setEditingParticipant({ ...editingParticipant, first_name: e.target.value })}
                     className={inputCls()}
                     placeholder="Enter first name"
                     autoFocus
@@ -333,35 +319,33 @@ const CompetitionParticipants = () => {
                 <Field label="Last Name">
                   <input
                     type="text"
-                    value={editingParticipant.lastName || ''}
-                    onChange={e => setEditingParticipant({ ...editingParticipant, lastName: e.target.value })}
+                    value={editingParticipant.last_name || ''}
+                    onChange={e => setEditingParticipant({ ...editingParticipant, last_name: e.target.value })}
                     className={inputCls()}
                     placeholder="Enter last name"
                   />
                 </Field>
+                <Field label="Email">
+                  <input
+                    type="email"
+                    value={editingParticipant.email || ''}
+                    onChange={e => setEditingParticipant({ ...editingParticipant, email: e.target.value })}
+                    className={inputCls()}
+                    placeholder="Enter email"
+                  />
+                </Field>
               </>
             ) : (
-              <>
-                <Field label="Team Name">
-                  <input
-                    type="text"
-                    value={editingParticipant.name}
-                    onChange={e => setEditingParticipant({ ...editingParticipant, name: e.target.value })}
-                    className={inputCls()}
-                    placeholder="Enter team name"
-                    autoFocus
-                  />
-                </Field>
-                <Field label="City">
-                  <input
-                    type="text"
-                    value={editingParticipant.city || ''}
-                    onChange={e => setEditingParticipant({ ...editingParticipant, city: e.target.value })}
-                    className={inputCls()}
-                    placeholder="Enter city (optional)"
-                  />
-                </Field>
-              </>
+              <Field label="Team Name">
+                <input
+                  type="text"
+                  value={editingParticipant.name}
+                  onChange={e => setEditingParticipant({ ...editingParticipant, name: e.target.value })}
+                  className={inputCls()}
+                  placeholder="Enter team name"
+                  autoFocus
+                />
+              </Field>
             )}
           </div>
           <div className="flex justify-end gap-3 pt-3 mt-3 border-t border-blue-200">
@@ -417,41 +401,6 @@ const CompetitionParticipants = () => {
             ))}
           </div>
         )}
-      </div>
-
-      {/* Summary */}
-      {participants.length > 0 && (
-        <div className="bg-blue-50 border border-blue-200 rounded-md p-4 mt-6">
-          <p className="text-sm font-semibold text-blue-900">
-            📊 Summary: {participants.length} {isIndividual ? 'player' : 'team'}
-            {participants.length !== 1 ? 's' : ''} added
-          </p>
-          {!isIndividual && (
-            <p className="text-xs text-blue-700 mt-2">
-              Total players: {participants.reduce((sum, team) => sum + (team.players?.length || 0), 0)}
-            </p>
-          )}
-        </div>
-      )}
-
-      {/* Save Changes */}
-      <div className="flex justify-end gap-3 pt-5 mt-6 border-t border-gray-300">
-        <button
-          onClick={handleBackClick}
-          className="bg-gray-100 text-gray-900 font-bold py-2 
-                     px-7 rounded-md text-sm hover:bg-gray-200 
-                     transition-colors"
-        >
-          ← Back
-        </button>
-        <button
-          disabled={participants.length === 0}
-          className="bg-green-900 text-white font-bold py-2 
-                     px-7 rounded-md text-sm hover:bg-green-800 
-                     transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-        >
-          💾 Save {isIndividual ? 'Players' : 'Teams'}
-        </button>
       </div>
     </PageWindow>
   )

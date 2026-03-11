@@ -93,18 +93,36 @@ export const getCompetitionTeams = async (competitionId: string) => {
   }
 };
 
-export const addParticipantToCompetition = async (competitionId: string, participantId: string) => {
+export const addTeamToCompetition = async (competitionId: string, name: string) => {
   try {
     const response = await axiosInstance.post(
-      `/api/v1/competitions/${competitionId}/add-participant`,
-      { participant_id: participantId }
+      `/api/v1/competitions/${competitionId}/add-team`,
+      { name }
     );
     return response;
   } catch (error: any) {
     if (error.response?.data?.message) {
       throw error.response.data.message;
     }
-    throw error.message || 'Failed to add participant to competition.';
+    throw error.message || 'Failed to add team to competition.';
+  }
+};
+
+export const addPlayerToCompetition = async (
+  competitionId: string,
+  player: { first_name: string; last_name: string; email?: string }
+) => {
+  try {
+    const response = await axiosInstance.post(
+      `/api/v1/competitions/${competitionId}/add-player`,
+      player
+    );
+    return response;
+  } catch (error: any) {
+    if (error.response?.data?.message) {
+      throw error.response.data.message;
+    }
+    throw error.message || 'Failed to add player to competition.';
   }
 };
 
