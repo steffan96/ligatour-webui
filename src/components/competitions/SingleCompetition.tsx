@@ -7,12 +7,6 @@ import PageWindow from '../shared/PageWindow'
 import { useToastStore } from '../../api/stores/useToastStore'
 import CustomSelect from '../shared/CustomSelect'
 
-const statusOptions = [
-  { value: 'pending', label: 'Pending' },
-  { value: 'active', label: 'Active' },
-  { value: 'completed', label: 'Completed' },
-]
-
 const Field = ({ label, children }: { label: string; children: React.ReactNode }) => (
   <div className="space-y-1.5">
     <label className="block text-sm font-bold text-gray-900">{label}</label>
@@ -64,6 +58,24 @@ const SectionHeader = ({ label }: { label: string }) => (
   </p>
 )
 
+const StatusBadge = ({ status }: { status: string }) => {
+  const styles: Record<string, string> = {
+    inactive: 'bg-yellow-50 text-yellow-800 border-yellow-200',
+    active: 'bg-green-50 text-green-800 border-green-200',
+    completed: 'bg-gray-100 text-gray-700 border-gray-300',
+  }
+  const labels: Record<string, string> = {
+    inactive: '⏳ Inactive',
+    active: '🟢 Active',
+    completed: '✅ Completed',
+  }
+  return (
+    <span className={`text-xs font-bold px-2.5 py-1 rounded-md border ${styles[status] ?? styles.inactive}`}>
+      {labels[status] ?? status}
+    </span>
+  )
+}
+
 const SingleCompetition = () => {
   const { id } = useParams<{ id: string }>()
   const navigate = useNavigate()
@@ -75,7 +87,6 @@ const SingleCompetition = () => {
 
   useEffect(() => {
     if (!id) return
-
     const fetchCompetition = async () => {
       try {
         const response = await getCompetition(Number(id))
@@ -86,22 +97,19 @@ const SingleCompetition = () => {
         navigate('/competitions')
       }
     }
-
     fetchCompetition()
   }, [id, navigate, showToast])
 
-  if (!competition || !draft) {
-    return null
-  }
+  if (!competition || !draft) return null
 
   const set = (field: keyof CompetitionInterface, value: any) =>
     setDraft(prev => (prev ? { ...prev, [field]: value } : prev))
 
-  const handleSave = async () => {
+  const handleSave = async (overrides?: Partial<CompetitionInterface>) => {
     if (!draft || !id) return
     setIsSaving(true)
     try {
-      const response = await updateCompetition(Number(id), draft)
+      const response = await updateCompetition(Number(id), { ...draft, ...overrides })
       setCompetition(response?.data)
       setDraft(response?.data)
       setIsEditing(false)
@@ -119,6 +127,8 @@ const SingleCompetition = () => {
   }
 
   const ro = !isEditing
+  const isActive = competition.status === 'active'
+  const isCompleted = competition.status === 'completed'
 
   return (
     <PageWindow
@@ -169,18 +179,9 @@ const SingleCompetition = () => {
           />
         </Field>
         <Field label="Status">
-          <select
-            value={draft.status}
-            disabled={ro}
-            onChange={e => set('status', e.target.value)}
-            className={inputCls(ro)}
-          >
-            {statusOptions.map(o => (
-              <option key={o.value} value={o.value}>
-                {o.label}
-              </option>
-            ))}
-          </select>
+          <div className="flex items-center h-[34px]">
+            <StatusBadge status={competition.status} />
+          </div>
         </Field>
       </div>
 
@@ -279,11 +280,10 @@ const SingleCompetition = () => {
               min="0"
               value={draft.number_of_teams}
               readOnly={ro}
-              onChange={e => set('number_of_teams', parseInt(e.target.value) || 0)}
+              onChange={e => set('number_of_teams', e.target.value === '' ? null : parseInt(e.target.value))}
               className={inputCls(ro)}
             />
           </Field>
-
           {draft.number_of_groups !== undefined && (
             <Field label="Number of Groups">
               <input
@@ -337,27 +337,39 @@ const SingleCompetition = () => {
       )}
 
       {/* Action Buttons */}
-      <div className="flex justify-end gap-3 pt-5">
-        {isEditing && (
+      <div className="flex justify-between gap-3 pt-5">
+        {!isCompleted && (
           <button
-            onClick={handleCancel}
+            onClick={() => handleSave({ status: isActive ? 'peinactivending' : 'active' })}
             disabled={isSaving}
-            className="bg-gray-100 text-gray-900 font-bold py-2 
-                       px-7 rounded-md text-sm hover:bg-gray-200 
-                       transition-colors disabled:opacity-50"
+            className={`text-sm font-medium underline transition-colors disabled:opacity-50
+              ${isActive ? 'text-red-700 hover:text-red-900' : 'text-green-700 hover:text-green-900'}`}
           >
-            Cancel
+            {isActive ? '⛔ Cancel Competition' : '🚀 Start Competition'}
           </button>
         )}
-        <button
-          onClick={handleSave}
-          disabled={isSaving || ro}
-          className="bg-green-900 text-white font-bold py-2 
-                     px-7 rounded-md text-sm disabled:opacity-50 
-                     hover:bg-green-800 transition-colors"
-        >
-          {isSaving ? 'Saving…' : '💾 Save Changes'}
-        </button>
+        <div className="flex gap-3 ml-auto">
+          {isEditing && (
+            <button
+              onClick={handleCancel}
+              disabled={isSaving}
+              className="bg-gray-100 text-gray-900 font-bold py-2 
+                         px-7 rounded-md text-sm hover:bg-gray-200 
+                         transition-colors disabled:opacity-50"
+            >
+              Cancel
+            </button>
+          )}
+          <button
+            onClick={() => handleSave()}
+            disabled={isSaving || ro}
+            className="bg-green-900 text-white font-bold py-2 
+                       px-7 rounded-md text-sm disabled:opacity-50 
+                       hover:bg-green-800 transition-colors"
+          >
+            {isSaving ? 'Saving…' : '💾 Save Changes'}
+          </button>
+        </div>
       </div>
     </PageWindow>
   )

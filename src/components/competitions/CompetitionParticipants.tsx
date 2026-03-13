@@ -92,7 +92,13 @@ const CompetitionParticipants = () => {
     const fetchCompetition = async () => {
       try {
         const response = await getCompetition(Number(id))
-        setCompetition(response?.data || null)
+        const data = response?.data
+        setCompetition(data || null)
+        if (data?.individual) {
+          setParticipants(data.players || [])
+        } else {
+          setParticipants(data.teams || [])
+        }
       } catch (err: any) {
         showToast(err || 'Failed to load competition.', false)
         navigate('/competitions')
@@ -112,8 +118,8 @@ const CompetitionParticipants = () => {
     }
 
     if (isIndividual) {
-      if (!newParticipant.first_name.trim() || !newParticipant.last_name.trim() || !newParticipant.email.trim()) {
-        showToast('First name, last name and email are required', false)
+      if (!newParticipant.first_name.trim() || !newParticipant.last_name.trim()) {
+        showToast('First name and last name are required', false)
         return
       }
     } else {
@@ -390,7 +396,7 @@ const CompetitionParticipants = () => {
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-3">
             {participants.map((participant, index) => (
               <ParticipantCard
-                key={index}
+                key={participant.id ?? index}
                 participant={participant}
                 index={index}
                 isIndividual={isIndividual}

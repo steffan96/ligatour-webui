@@ -57,7 +57,7 @@ export const getCompetition = async (id: number) => {
   }
 };
 
-export const updateCompetition = async (id: number, updates: { name?: string; type?: string }) => {
+export const updateCompetition = async (id: number, updates: Partial<CompetitionInterface>) => {
   try {
     const response = await axiosInstance.put(`/api/v1/competitions/${id}`, updates);
     return response;

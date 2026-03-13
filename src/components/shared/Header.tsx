@@ -1,23 +1,12 @@
 import React from 'react'
 import HeaderButton from './HeaderButton'
 import { useNavigate } from 'react-router-dom'
-import { logoutUser } from '../../api/auth'
-import { useToastStore } from '../../api/stores/useToastStore'
 import { useState } from 'react'
 
 const Header = () => {
   const navigate = useNavigate()
-  const { showToast } = useToastStore()
-  const isUserLoggedIn = Boolean(
-    localStorage.getItem('token') || 
-    localStorage.getItem('refreshToken')
-  )
+  const isUserLoggedIn = Boolean(localStorage.getItem('token') || localStorage.getItem('refreshToken'))
   const [activeButton, setActiveButton] = useState('home')
-
-  const handleLogout = () => {
-    logoutUser()
-    showToast('Logout successful!', true)
-  }
 
   const buttonStyles = {
     active: `bg-green-900 text-white px-5 py-2 rounded-lg 
@@ -46,11 +35,7 @@ const Header = () => {
           <>
             <HeaderButton
               text="Login"
-              className={
-                activeButton === 'login' 
-                  ? buttonStyles.active 
-                  : buttonStyles.inactive
-              }
+              className={activeButton === 'login' ? buttonStyles.active : buttonStyles.inactive}
               onClick={() => {
                 navigate('login')
                 setActiveButton('login')
@@ -58,11 +43,7 @@ const Header = () => {
             />
             <HeaderButton
               text="Register"
-              className={
-                activeButton === 'register' 
-                  ? buttonStyles.active 
-                  : buttonStyles.inactive
-              }
+              className={activeButton === 'register' ? buttonStyles.active : buttonStyles.inactive}
               onClick={() => {
                 navigate('register')
                 setActiveButton('register')
@@ -74,17 +55,7 @@ const Header = () => {
 
       {/* Right Section - CTA / Logout */}
       <div className="flex items-center gap-4">
-        {isUserLoggedIn ? (
-          <HeaderButton
-            text="Log out"
-            className={buttonStyles.logout}
-            onClick={handleLogout}
-          />
-        ) : (
-          <p className="text-lg font-semibold text-gray-700">
-            Start your own competition.
-          </p>
-        )}
+        <p className="text-lg font-semibold text-gray-700">Start your own competition.</p>
       </div>
     </header>
   )
