@@ -34,7 +34,7 @@ const ResetPasswordComponent = () => {
             navigate('/login')
             showToast('Password reset successful!', true);
         } catch (err: any) {
-            showToast(err?.response?.data?.message || 'Password reset failed.', false);
+            showToast(err?.response?.data?.message?.response?.data?.message || 'Password reset failed.', false);
         } finally {
             setIsLoading(false);
         }

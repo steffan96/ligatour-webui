@@ -53,9 +53,7 @@ const Toggle = ({
 )
 
 const SectionHeader = ({ label }: { label: string }) => (
-  <p className="text-sm font-bold text-gray-900 mb-2.5 pb-1.5 border-b border-gray-300">
-    {label}
-  </p>
+  <p className="text-sm font-bold text-gray-900 mb-2.5 pb-1.5 border-b border-gray-300">{label}</p>
 )
 
 const StatusBadge = ({ status }: { status: string }) => {
@@ -93,7 +91,7 @@ const SingleCompetition = () => {
         setCompetition(response?.data || null)
         setDraft(response?.data || null)
       } catch (err: any) {
-        showToast(err || 'Failed to load competition.', false)
+        showToast(err?.response?.data?.message || 'Failed to load competition.', false)
         navigate('/competitions')
       }
     }
@@ -115,7 +113,7 @@ const SingleCompetition = () => {
       setIsEditing(false)
       showToast('Changes saved successfully!', true)
     } catch (err: any) {
-      showToast(err || 'Failed to save changes. Please try again.', false)
+      showToast(err?.response?.data?.message || 'Failed to save changes. Please try again.', false)
     } finally {
       setIsSaving(false)
     }
@@ -146,9 +144,9 @@ const SingleCompetition = () => {
           </button>
           <button
             className="bg-blue-50 text-blue-900 text-sm font-bold 
-                       px-3.5 py-1.5 rounded-md hover:bg-blue-100 
-                       border border-blue-200 transition-colors"
-            onClick={() => navigate(`/competition/${id}/participants`)}
+             px-3.5 py-1.5 rounded-md hover:bg-blue-100 
+             border border-blue-200 transition-colors"
+            onClick={() => navigate(`/competition/${id}/${draft.individual ? 'players' : 'teams'}`)}
           >
             {draft.individual ? '👤 Manage Players' : '👥 Manage Teams'}
           </button>
@@ -342,7 +340,7 @@ const SingleCompetition = () => {
           <button
             onClick={() => handleSave({ status: isActive ? 'peinactivending' : 'active' })}
             disabled={isSaving}
-            className={`text-sm font-medium underline transition-colors disabled:opacity-50
+            className={`text-sm font-medium transition-colors disabled:opacity-50
               ${isActive ? 'text-red-700 hover:text-red-900' : 'text-green-700 hover:text-green-900'}`}
           >
             {isActive ? '⛔ Cancel Competition' : '🚀 Start Competition'}

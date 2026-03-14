@@ -23,7 +23,7 @@ export default function CreateModal({ isOpen, onClose }: { isOpen?: boolean; onC
       showToast('Competition created successfully!', true)
       navigate(`/competition/${response.data.id}`)
     } catch (err: any) {
-      showToast(err?.response?.data?.message || 'Competition creation failed.', false)
+      showToast(err?.response?.data?.message?.response?.data?.message || 'Competition creation failed.', false)
     } finally {
       setIsLoading(false)
     }

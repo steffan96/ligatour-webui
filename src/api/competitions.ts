@@ -137,5 +137,3 @@ export const removeTeamFromCompetition = async (competitionId: string, teamId: s
     throw error.message || 'Failed to remove team from competition.';
   }
 };
-
-
