@@ -44,9 +44,8 @@ export const addPlayerToTeam = async (
   teamId: string,
   player: { first_name: string; last_name: string; email?: string }
 ) => {
-  const response = await axiosInstance.post(`/api/v1/teams/add-player-to-team`, {
+  const response = await axiosInstance.post(`/api/v1/teams/${teamId}/players`, {
     ...player,
-    team_id: Number(teamId),
   });
   if (response && response.data) {
     return response.data;

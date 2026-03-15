@@ -28,7 +28,7 @@ export default function CompetitionCard({ id, name, type, numberOfTeams }: Compe
               )}
               {numberOfTeams !== undefined && (
                 <span className="text-sm text-gray-600">
-                  {numberOfTeams} team{numberOfTeams !== 1 ? 's' : ''}
+                  {numberOfTeams} participant{numberOfTeams !== 1 ? 's' : ''}
                 </span>
               )}
             </div>

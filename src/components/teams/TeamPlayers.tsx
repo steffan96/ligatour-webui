@@ -43,8 +43,9 @@ const TeamPlayers = () => {
 
   const handleAddPlayer = async (player: PlayerFields) => {
     if (!teamId) return
-    const response = await addPlayerToTeam(teamId, player)
-    setPlayers([...players, response])
+    await addPlayerToTeam(teamId, player)
+    const response = await getTeam(teamId)
+    setPlayers(response?.players || [])
     setIsAdding(false)
   }
 
@@ -78,16 +79,15 @@ const TeamPlayers = () => {
       {isAdding && (
         <AddPlayerForm
           onAdd={handleAddPlayer}
-          onCancel={() => { setIsAdding(false); handleCancel() }}
+          onCancel={() => {
+            setIsAdding(false)
+            handleCancel()
+          }}
         />
       )}
 
       {editingId !== null && editingPlayer && (
-        <EditPlayerForm
-          player={editingPlayer}
-          onUpdate={handleUpdatePlayer}
-          onCancel={handleCancel}
-        />
+        <EditPlayerForm player={editingPlayer} onUpdate={handleUpdatePlayer} onCancel={handleCancel} />
       )}
 
       <div>
