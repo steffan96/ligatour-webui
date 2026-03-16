@@ -1,44 +1,73 @@
-import axiosInstance from './../router/axios'
+import axiosInstance from '../router/axios';
 
-export const createPlayer = async (data: { first_name: string; last_name: string; email: string }) => {
-  const response = await axiosInstance.post('/api/v1/players', data);
-  if (response && response.data) {
+export interface PlayerInterface {
+  id: number;
+  first_name: string;
+  last_name: string;
+  email: string;
+  competition_id: number;
+  team_id: number;
+  position: string;
+  profile_picture: string;
+  created_at: string;
+}
+
+export const createPlayer = async (data: Partial<PlayerInterface>) => {
+  try {
+    const response = await axiosInstance.post('/api/v1/players', data);
     return response.data;
+  } catch (error: any) {
+    if (error.response?.data?.message) {
+      throw error.response.data.message;
+    }
+    throw error.message || 'Failed to create player.';
   }
-  return null;
 };
 
 export const getPlayer = async (playerId: string) => {
-  const response = await axiosInstance.get(`/api/v1/players/${playerId}`);
-  if (response && response.data) {
+  try {
+    const response = await axiosInstance.get(`/api/v1/players/${playerId}`);
     return response.data;
+  } catch (error: any) {
+    if (error.response?.data?.message) {
+      throw error.response.data.message;
+    }
+    throw error.message || 'Failed to fetch player.';
   }
-  return null;
 };
 
 export const listPlayers = async () => {
-  const response = await axiosInstance.get('/api/v1/players')
-  if (response && response.data) {
-    return response.data
+  try {
+    const response = await axiosInstance.get('/api/v1/players');
+    return response.data;
+  } catch (error: any) {
+    if (error.response?.data?.message) {
+      throw error.response.data.message;
+    }
+    throw error.message || 'Failed to fetch players.';
   }
-  return []
-}
+};
 
-export const updatePlayer = async (
-  playerId: string,
-  data: { first_name: string; last_name: string; email: string }
-) => {
-  const response = await axiosInstance.put(`/api/v1/players/${playerId}`, data)
-  if (response && response.data) {
-    return response.data
+export const updatePlayer = async (playerId: string, data: Partial<PlayerInterface>) => {
+  try {
+    const response = await axiosInstance.put(`/api/v1/players/${playerId}`, data);
+    return response.data;
+  } catch (error: any) {
+    if (error.response?.data?.message) {
+      throw error.response.data.message;
+    }
+    throw error.message || 'Failed to update player.';
   }
-  return null
-}
+};
 
 export const deletePlayer = async (playerId: string) => {
-  const response = await axiosInstance.delete(`/api/v1/players/${playerId}`)
-  if (response && response.data) {
-    return response.data
+  try {
+    const response = await axiosInstance.delete(`/api/v1/players/${playerId}`);
+    return response.data;
+  } catch (error: any) {
+    if (error.response?.data?.message) {
+      throw error.response.data.message;
+    }
+    throw error.message || 'Failed to delete player.';
   }
-  return null
-}
+};

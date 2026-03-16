@@ -1,54 +1,84 @@
-import axiosInstance from './../router/axios';
+import axiosInstance from '../router/axios'
+
+export interface TeamInterface {
+  id: number
+  name: string
+}
+
+export interface PlayerInterface {
+  first_name: string
+  last_name: string
+  email?: string
+}
 
 export const createTeam = async (name: string) => {
-  const response = await axiosInstance.post('/api/v1/teams', { name });
-  if (response && response.data) {
-    return response.data;
+  try {
+    const response = await axiosInstance.post('/api/v1/teams', { name })
+    return response
+  } catch (error: any) {
+    if (error.response?.data?.message) {
+      throw error.response.data.message
+    }
+    throw error.message || 'Failed to create team.'
   }
-  return null;
-};
+}
 
 export const getTeam = async (teamId: string) => {
-  const response = await axiosInstance.get(`/api/v1/teams/${teamId}`);
-  if (response && response.data) {
-    return response.data;
+  try {
+    const response = await axiosInstance.get(`/api/v1/teams/${teamId}`)
+    return response
+  } catch (error: any) {
+    if (error.response?.data?.message) {
+      throw error.response.data.message
+    }
+    throw error.message || 'Failed to fetch team.'
   }
-  return null;
-};
+}
 
 export const listTeams = async () => {
-  const response = await axiosInstance.get('/api/v1/teams');
-  if (response && response.data) {
-    return response.data;
+  try {
+    const response = await axiosInstance.get('/api/v1/teams')
+    return response
+  } catch (error: any) {
+    if (error.response?.data?.message) {
+      throw error.response.data.message
+    }
+    throw error.message || 'Failed to fetch teams.'
   }
-  return [];
-};
+}
 
 export const updateTeam = async (teamId: string, name: string) => {
-  const response = await axiosInstance.put(`/api/v1/teams/${teamId}`, { name });
-  if (response && response.data) {
-    return response.data;
+  try {
+    const response = await axiosInstance.put(`/api/v1/teams/${teamId}`, { name })
+    return response
+  } catch (error: any) {
+    if (error.response?.data?.message) {
+      throw error.response.data.message
+    }
+    throw error.message || 'Failed to update team.'
   }
-  return null;
-};
+}
 
 export const deleteTeam = async (teamId: string) => {
-  const response = await axiosInstance.delete(`/api/v1/teams/${teamId}`);
-  if (response && response.data) {
-    return response.data;
+  try {
+    const response = await axiosInstance.delete(`/api/v1/teams/${teamId}`)
+    return response
+  } catch (error: any) {
+    if (error.response?.data?.message) {
+      throw error.response.data.message
+    }
+    throw error.message || 'Failed to delete team.'
   }
-  return null;
-};
+}
 
-export const addPlayerToTeam = async (
-  teamId: string,
-  player: { first_name: string; last_name: string; email?: string }
-) => {
-  const response = await axiosInstance.post(`/api/v1/teams/${teamId}/players`, {
-    ...player,
-  });
-  if (response && response.data) {
-    return response.data;
+export const addPlayerToTeam = async (teamId: string, player: PlayerInterface) => {
+  try {
+    const response = await axiosInstance.post(`/api/v1/teams/${teamId}/players`, player)
+    return response
+  } catch (error: any) {
+    if (error.response?.data?.message) {
+      throw error.response.data.message
+    }
+    throw error.message || 'Failed to add player to team.'
   }
-  return null;
-};
+}

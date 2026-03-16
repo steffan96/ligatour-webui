@@ -12,6 +12,11 @@ import {
   usePlayerList,
 } from '../../components/players/PlayerFormShared'
 
+const extractTeamPlayers = (raw: any[]) =>
+  raw.map(entry => ({
+    ...entry.player,
+  }))
+
 const TeamPlayers = () => {
   const { teamId } = useParams<{ teamId: string }>()
   const navigate = useNavigate()
@@ -29,8 +34,8 @@ const TeamPlayers = () => {
     const fetchTeam = async () => {
       try {
         const response = await getTeam(teamId)
-        setTeam(response || null)
-        setPlayers(response?.players || [])
+        setTeam(response.data || null)
+        setPlayers(extractTeamPlayers(response?.data?.players || []))
       } catch (err: any) {
         showToast(err?.response?.data?.message || 'Failed to load team.', false)
         navigate(-1)
@@ -43,10 +48,14 @@ const TeamPlayers = () => {
 
   const handleAddPlayer = async (player: PlayerFields) => {
     if (!teamId) return
-    await addPlayerToTeam(teamId, player)
-    const response = await getTeam(teamId)
-    setPlayers(response?.players || [])
-    setIsAdding(false)
+    try {
+      await addPlayerToTeam(teamId, player)
+      const response = await getTeam(teamId)
+      setPlayers(extractTeamPlayers(response?.data?.players || []))
+      setIsAdding(false)
+    } catch (err: any) {
+      showToast(err?.response?.data?.message || 'Failed to add a player.', false)
+    }
   }
 
   return (
