@@ -38,7 +38,7 @@ const TeamCard = ({
 }) => (
   <div
     className={`border rounded-md p-4 ${
-      editingId === index ? 'border-blue-300 bg-blue-50' : 'border-gray-300 bg-white hover:border-gray-400'
+      editingId === index ? 'border-blue-300 bg-blue-50' : 'border-gray-300 bg-gray-100 hover:border-gray-400'
     } transition-all`}
   >
     <div className="flex items-start justify-between gap-4">
@@ -188,7 +188,7 @@ const CompetitionTeams = () => {
       {isAdding && (
         <div className="border border-green-300 bg-green-50 rounded-md p-4">
           <SectionHeader label="Add New Team" />
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
+          <div className="flex flex-col gap-3">
             <Field label="Team Name">
               <input
                 type="text"
@@ -276,7 +276,7 @@ const CompetitionTeams = () => {
             )}
           </div>
         ) : (
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-3">
+          <div className="flex flex-col gap-3">
             {participants.map((team, index) => (
               <TeamCard
                 key={team.id ?? index}

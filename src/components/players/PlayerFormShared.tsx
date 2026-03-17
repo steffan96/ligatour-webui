@@ -38,7 +38,7 @@ export const PlayerCard = ({
 }) => (
   <div
     className={`border rounded-md p-4 ${
-      editingId === index ? 'border-blue-300 bg-blue-50' : 'border-gray-300 bg-white hover:border-gray-400'
+      editingId === index ? 'border-blue-300 bg-blue-50' : 'border-gray-300 bg-gray-100 hover:border-gray-400'
     } transition-all`}
   >
     <div className="flex items-start justify-between gap-4">
@@ -74,7 +74,7 @@ export const AddPlayerForm = ({
   onAdd,
   onCancel,
 }: {
-  onAdd: (player: PlayerFields) => Promise<void>
+  onAdd: (player: PlayerFields) => Promise<boolean>
   onCancel: () => void
 }) => {
   const [newPlayer, setNewPlayer] = useState(emptyPlayer)
@@ -89,8 +89,10 @@ export const AddPlayerForm = ({
       showToast('Please enter a valid email address', false)
       return
     }
-    await onAdd(newPlayer)
-    setNewPlayer(emptyPlayer)
+    const added = await onAdd(newPlayer)
+    if (added == true) {
+      setNewPlayer(emptyPlayer)
+    }
   }
 
   return (
@@ -154,7 +156,7 @@ export const EditPlayerForm = ({
   onCancel,
 }: {
   player: any
-  onUpdate: (player: any) => Promise<void>
+  onUpdate: (player: any) => Promise<boolean>
   onCancel: () => void
 }) => {
   const [editingPlayer, setEditingPlayer] = useState(player)
@@ -242,7 +244,7 @@ export const usePlayerList = (
   }
 
   const handleUpdatePlayer = async (updated: any) => {
-    if (editingId === null) return
+    if (editingId === null) return false
     try {
       const result = await updatePlayer(String(updated.id), {
         first_name: updated.first_name,
@@ -255,8 +257,10 @@ export const usePlayerList = (
       setEditingId(null)
       setEditingPlayer(null)
       showToast('Player updated successfully!', true)
+      return true
     } catch (err: any) {
       showToast(err?.response?.data?.message || 'Failed to update player', false)
+      return false
     }
   }
 

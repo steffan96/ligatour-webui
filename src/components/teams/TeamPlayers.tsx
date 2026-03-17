@@ -46,15 +46,17 @@ const TeamPlayers = () => {
 
   if (!team) return null
 
-  const handleAddPlayer = async (player: PlayerFields) => {
-    if (!teamId) return
+  const handleAddPlayer = async (player: PlayerFields): Promise<boolean> => {
+    if (!teamId) return false
     try {
       await addPlayerToTeam(teamId, player)
       const response = await getTeam(teamId)
       setPlayers(extractTeamPlayers(response?.data?.players || []))
       setIsAdding(false)
+      return true
     } catch (err: any) {
-      showToast(err?.response?.data?.message || 'Failed to add a player.', false)
+      showToast(err || 'Failed to add a player.', false)
+      return false
     }
   }
 
@@ -116,7 +118,7 @@ const TeamPlayers = () => {
             )}
           </div>
         ) : (
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-3">
+          <div className="flex flex-col gap-3">
             {players.map((player, index) => (
               <PlayerCard
                 key={player.id ?? index}

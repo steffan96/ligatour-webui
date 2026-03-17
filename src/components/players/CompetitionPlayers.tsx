@@ -28,10 +28,11 @@ const CompetitionPlayers = () => {
   if (!competition) return null
 
   const handleAddPlayer = async (player: PlayerFields) => {
-    if (!id) return
+    if (!id) return false
     const response = await addPlayerToCompetition(id, player)
     setParticipants([...participants, response?.data])
     setIsAdding(false)
+    return true
   }
 
   return (
@@ -93,7 +94,7 @@ const CompetitionPlayers = () => {
             )}
           </div>
         ) : (
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-3">
+          <div className="flex flex-col gap-3">
             {participants.map((player, index) => (
               <PlayerCard
                 key={player.id ?? index}
