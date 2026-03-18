@@ -38,7 +38,7 @@ const LoginComponent = () => {
       showToast('Login successful!', true)
     } catch (err: any) {
       showToast(
-        err?.response?.data?.message?.response?.data?.message || 'Login failed. Please check your credentials.',
+        err?.response?.data?.message || 'Login failed. Please check your credentials.',
         false
       )
     } finally {

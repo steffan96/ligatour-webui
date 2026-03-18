@@ -47,7 +47,7 @@ const RegisterComponent = () => {
       showToast('Registration successful!', true)
     } catch (err: any) {
       // err will be the message string from the response
-      showToast(err?.response?.data?.message || 'Registration failed.', false)
+      showToast(err || 'Registration failed.', false)
     } finally {
       setIsLoading(false)
     }

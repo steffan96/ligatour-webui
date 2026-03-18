@@ -259,7 +259,7 @@ export const usePlayerList = (
       showToast('Player updated successfully!', true)
       return true
     } catch (err: any) {
-      showToast(err?.response?.data?.message || 'Failed to update player', false)
+      showToast(err || 'Failed to update player', false)
       return false
     }
   }
@@ -271,7 +271,7 @@ export const usePlayerList = (
       setPlayers(players.filter((_, i) => i !== index))
       showToast('Player removed', true)
     } catch (err: any) {
-      showToast(err?.response?.data?.message || 'Failed to remove player', false)
+      showToast(err || 'Failed to remove player', false)
     }
   }
 

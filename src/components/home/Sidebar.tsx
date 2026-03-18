@@ -18,6 +18,8 @@ const SidebarComponent = () => {
     showToast('Logout successful!', true)
   }
 
+  const isUserLoggedIn = Boolean(localStorage.getItem('token') || localStorage.getItem('refreshToken'))
+
   return (
     <div className="w-[13%] border-r p-4 flex flex-col justify-between h-full">
       <div>
@@ -45,8 +47,12 @@ const SidebarComponent = () => {
         onClick={handleLogout}
         className="w-full flex items-center gap-3 px-3 py-1.5 text-sm rounded text-red-600 hover:bg-red-50"
       >
-        <span className="text-base">🚪</span>
-        <span>Log out</span>
+        {isUserLoggedIn && (
+          <>
+            <span className="text-base">🚪</span>
+            <span>Log out</span>
+          </>
+        )}
       </button>
     </div>
   )

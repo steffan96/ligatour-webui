@@ -37,7 +37,7 @@ const TeamPlayers = () => {
         setTeam(response.data || null)
         setPlayers(extractTeamPlayers(response?.data?.players || []))
       } catch (err: any) {
-        showToast(err?.response?.data?.message || 'Failed to load team.', false)
+        showToast(err || 'Failed to load team.', false)
         navigate(-1)
       }
     }

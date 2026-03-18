@@ -34,7 +34,7 @@ export default function DashboardComponent() {
       setCompetitions(data)
       setFilteredCompetitions(data)
     } catch (err: any) {
-      showToast(err?.response?.data?.message || 'Failed to load competitions.', false)
+      showToast(err || 'Failed to load competitions.', false)
       setCompetitions([])
       setFilteredCompetitions([])
     } finally {

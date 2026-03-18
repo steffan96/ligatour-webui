@@ -120,7 +120,7 @@ const CompetitionTeams = () => {
       setIsAdding(false)
       showToast('Team added successfully!', true)
     } catch (err: any) {
-      showToast(err?.response?.data?.message || 'Failed to add team', false)
+      showToast(err || 'Failed to add team', false)
     }
   }
 
@@ -141,7 +141,7 @@ const CompetitionTeams = () => {
       setEditingParticipant(null)
       showToast('Team updated successfully!', true)
     } catch (err: any) {
-      showToast(err?.response?.data?.message || 'Failed to update team', false)
+      showToast(err || 'Failed to update team', false)
     }
   }
 
@@ -153,7 +153,7 @@ const CompetitionTeams = () => {
       setParticipants(participants.filter((_, i) => i !== index))
       showToast('Team removed', true)
     } catch (err: any) {
-      showToast(err?.response?.data?.message || 'Failed to remove team', false)
+      showToast(err || 'Failed to remove team', false)
     }
   }
 

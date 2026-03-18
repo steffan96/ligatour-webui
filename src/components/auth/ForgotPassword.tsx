@@ -25,7 +25,7 @@ const ForgotPasswordComponent = () => {
                 await requestPasswordReset(email);
                 setSuccess(true);
             } catch (err: any) {
-                setErrors({ api: err?.response?.data?.message || 'Failed to send reset email.' });
+                setErrors({ api: err || 'Failed to send reset email.' });
             } finally {
                 setIsLoading(false);
             }

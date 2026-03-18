@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
-import { getCompetition, updateCompetition } from 'api/competitions'
+import { getCompetition, updateCompetition, startCompetition } from 'api/competitions'
 import { CompetitionInterface } from 'api/competitions'
 import { CompetitionTypeDisplay } from '../../api/interfaces/competitions'
 import PageWindow from '../shared/PageWindow'
@@ -91,7 +91,7 @@ const SingleCompetition = () => {
         setCompetition(response?.data || null)
         setDraft(response?.data || null)
       } catch (err: any) {
-        showToast(err?.response?.data?.message || 'Failed to load competition.', false)
+        showToast(err || 'Failed to load competition.', false)
         navigate('/competitions')
       }
     }
@@ -113,7 +113,7 @@ const SingleCompetition = () => {
       setIsEditing(false)
       showToast('Changes saved successfully!', true)
     } catch (err: any) {
-      showToast(err?.response?.data?.message || 'Failed to save changes. Please try again.', false)
+      showToast(err || 'Failed to save changes. Please try again.', false)
     } finally {
       setIsSaving(false)
     }
@@ -123,6 +123,15 @@ const SingleCompetition = () => {
     setDraft(competition)
     setIsEditing(false)
   }
+
+  const handleStartCompetition = async () => {
+    try {
+      const response = await startCompetition(competition.id)
+      showToast('Competition started!', true)
+      setCompetition(response?.data)
+    } catch (err: any) {
+      showToast(err || 'Failed to activate competition. Please try again or contact support.', false)
+  }}
 
   const ro = !isEditing
   const isActive = competition.status === 'active'
@@ -336,14 +345,13 @@ const SingleCompetition = () => {
 
       {/* Action Buttons */}
       <div className="flex justify-between gap-3 pt-5">
-        {!isCompleted && (
+        {!isCompleted && !isActive && (
           <button
-            onClick={() => handleSave({ status: isActive ? 'peinactivending' : 'active' })}
+            onClick={() => handleStartCompetition()}
             disabled={isSaving}
-            className={`text-sm font-medium transition-colors disabled:opacity-50
-              ${isActive ? 'text-red-700 hover:text-red-900' : 'text-green-700 hover:text-green-900'}`}
+            className='text-sm font-medium transition-colors disabled:opacity-50 text-green-700 hover:text-green-900'
           >
-            {isActive ? '⛔ Cancel Competition' : '🚀 Start Competition'}
+            {'🚀 Start Competition'}
           </button>
         )}
         <div className="flex gap-3 ml-auto">

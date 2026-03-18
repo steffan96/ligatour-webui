@@ -27,7 +27,7 @@ export const useCompetitionParticipants = () => {
           setParticipants(data.teams || [])
         }
       } catch (err: any) {
-        showToast(err?.response?.data?.message || 'Failed to load competition.', false)
+        showToast(err || 'Failed to load competition.', false)
         navigate('/competitions')
       }
     }
