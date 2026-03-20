@@ -131,11 +131,17 @@ const SingleCompetition = () => {
       setCompetition(response?.data)
     } catch (err: any) {
       showToast(err || 'Failed to activate competition. Please try again or contact support.', false)
-  }}
+    }
+  }
 
   const ro = !isEditing
   const isActive = competition.status === 'active'
   const isCompleted = competition.status === 'completed'
+
+  const copyToClipboard = (text: string) => {
+    navigator.clipboard.writeText(text)
+    showToast('Public link copied to clipboard!', true)
+  }
 
   return (
     <PageWindow
@@ -191,6 +197,26 @@ const SingleCompetition = () => {
           </div>
         </Field>
       </div>
+
+      {/* Public Link */}
+      {competition.public_link && (
+        <div className="grid grid-cols-1 gap-3.5">
+          <Field label="Public Link">
+            <div className="flex items-center gap-2">
+              <input
+                type="text"
+                value={competition.public_link}
+                readOnly
+                className={`${inputCls(true)} flex-1 cursor-pointer`}
+                onClick={() => copyToClipboard(competition.public_link)}
+              />
+            </div>
+            <p className="text-xs text-gray-500 mt-1">
+              Share this link with participants to view competition standings and results
+            </p>
+          </Field>
+        </div>
+      )}
 
       {/* Competition Type */}
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
@@ -349,7 +375,7 @@ const SingleCompetition = () => {
           <button
             onClick={() => handleStartCompetition()}
             disabled={isSaving}
-            className='text-sm font-medium transition-colors disabled:opacity-50 text-green-700 hover:text-green-900'
+            className="text-sm font-medium transition-colors disabled:opacity-50 text-green-700 hover:text-green-900"
           >
             {'🚀 Start Competition'}
           </button>

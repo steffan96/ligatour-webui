@@ -18,6 +18,7 @@ export interface CompetitionInterface {
   number_of_groups: number;
   teams_per_group: number;
   individual: boolean;
+  public_link: string,
 }
 
 export const createCompetition = async (name: string, type: string, individual: boolean) => {
@@ -147,5 +148,17 @@ export const startCompetition = async (competitionId: number) => {
       throw error.response.data.message;
     }
     throw error.message || 'Failed to update competition.';
+  }
+};
+
+export const getPublicCompetition = async (competitionSlug: string) => {
+  try {
+    const response = await axiosInstance.post(`/api/v1/competitions/${competitionSlug}/get-public-competition`);
+    return response;
+  } catch (error: any) {
+    if (error.response?.data?.message) {
+      throw error.response.data.message;
+    }
+    throw error.message || 'Failed to load';
   }
 };

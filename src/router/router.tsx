@@ -11,6 +11,7 @@ import CompetitionPlayers from '../components/players/CompetitionPlayers';
 import CompetitionTeams from '../components/teams/CompetitionTeams';
 import TeamPlayers from '../components/teams/TeamPlayers';
 import ProfileComponent from '../components/auth/Profile';
+import PublicCompetition from '../components/competitions/PublicCompetition';
 
 export const router = createBrowserRouter([
 	{
@@ -39,6 +40,12 @@ export const router = createBrowserRouter([
 				path: '/competition/:id/teams',
 				element: <CompetitionTeams />,
 			},
+			{
+				path: '/public/:slug/',
+				element: <PublicCompetition />,
+			},
+
+			// Team routes
 			{
 				path: '/team/:teamId/players',
 				element: <TeamPlayers />,
