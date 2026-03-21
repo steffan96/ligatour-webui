@@ -19,6 +19,16 @@ const inputCls = (readOnly?: boolean) =>
    text-sm font-medium focus:ring-2 
    focus:ring-green-900 focus:border-green-900 ${readOnly ? 'bg-gray-50 text-gray-700' : 'text-gray-900'}`
 
+// Special styling for public link field
+const publicLinkInputCls = () =>
+  `w-full px-3 py-2 border-2 border-dashed border-indigo-300 
+   rounded-lg text-sm font-mono font-medium 
+   bg-gradient-to-r from-indigo-50 to-purple-50 
+   text-indigo-900 cursor-pointer hover:from-indigo-100 
+   hover:to-purple-100 transition-all duration-200 
+   focus:outline-none focus:ring-2 focus:ring-indigo-500 
+   focus:border-transparent`
+
 const Toggle = ({
   label,
   description,
@@ -198,26 +208,6 @@ const SingleCompetition = () => {
         </Field>
       </div>
 
-      {/* Public Link */}
-      {competition.public_link && (
-        <div className="grid grid-cols-1 gap-3.5">
-          <Field label="Public Link">
-            <div className="flex items-center gap-2">
-              <input
-                type="text"
-                value={competition.public_link}
-                readOnly
-                className={`${inputCls(true)} flex-1 cursor-pointer`}
-                onClick={() => copyToClipboard(competition.public_link)}
-              />
-            </div>
-            <p className="text-xs text-gray-500 mt-1">
-              Share this link with participants to view competition standings and results
-            </p>
-          </Field>
-        </div>
-      )}
-
       {/* Competition Type */}
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
         <Field label="Competition Type">
@@ -366,6 +356,42 @@ const SingleCompetition = () => {
               onChange={() => set('two_legged', !draft.two_legged)}
             />
           )}
+        </div>
+      )}
+
+      {/* Public Link - Moved to Bottom */}
+      {competition.public_link && (
+        <div className="mt-6">
+          <div className="bg-gradient-to-r from-indigo-50 
+          via-purple-50 to-pink-50 rounded-xl p-4 border border-indigo-200 shadow-sm">
+            <div className="flex items-center justify-between mb-2">
+              <label className="text-sm font-bold text-indigo-900 flex items-center gap-2">
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" 
+                  strokeLinejoin="round" strokeWidth={2} 
+                  d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656
+                   5.656l1.102-1.102m3.172-5.656l1.102-1.102a4 4 0 00-5.656-5.656l-4 4a4 4 0 001.414 6.276" />
+                </svg>
+                Public Sharing Link
+              </label>
+            </div>
+            <div className="flex items-center gap-2">
+              <input
+                type="text"
+                value={competition.public_link}
+                readOnly
+                className={publicLinkInputCls()}
+                onClick={() => copyToClipboard(competition.public_link)}
+              />
+            </div>
+            <p className="text-xs text-indigo-600 mt-2 flex items-center gap-1">
+              <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" 
+                strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+              Share this link with participants to view competition standings and results
+            </p>
+          </div>
         </div>
       )}
 

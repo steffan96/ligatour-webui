@@ -1,17 +1,26 @@
-// PublicCompetition.tsx
 import React, { useEffect, useState } from 'react'
 import { useParams } from 'react-router-dom'
 import { getPublicCompetition, CompetitionInterface } from 'api/competitions'
-import { CompetitionTypeDisplay } from '../../api/interfaces/competitions'
 
-// Loading Spinner Component
+// Types for standings
+interface Standing {
+  id: number
+  rank: number
+  team_name?: string
+  player_name?: string
+  matches_played: number
+  wins: number
+  draws: number
+  losses: number
+  points: number
+}
+
 const LoadingSpinner = () => (
   <div className="flex justify-center items-center min-h-[400px]">
     <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-green-900"></div>
   </div>
 )
 
-// Error Component
 const ErrorDisplay = ({ message, onRetry }: { message: string; onRetry?: () => void }) => (
   <div className="flex flex-col items-center justify-center min-h-[400px] text-center">
     <div className="text-red-600 text-6xl mb-4">⚠️</div>
@@ -48,16 +57,14 @@ const StatusBadge = ({ status }: { status: string }) => {
 }
 
 // Standings Table Component
-const StandingsTable = ({ standings, competition }: { standings: any[]; competition: CompetitionInterface }) => {
+const StandingsTable = ({ standings, isIndividual }: { standings: Standing[]; isIndividual: boolean }) => {
   if (!standings || standings.length === 0) {
     return (
       <div className="text-center py-8 text-gray-500">
-        No standings available yet.
+        No standings data available yet.
       </div>
     )
   }
-
-  const isIndividual = competition.individual
 
   return (
     <div className="overflow-x-auto">
@@ -92,11 +99,6 @@ const StandingsTable = ({ standings, competition }: { standings: any[]; competit
               <td className="px-4 py-3 text-sm text-center text-gray-700">{standing.wins}</td>
               <td className="px-4 py-3 text-sm text-center text-gray-700">{standing.draws}</td>
               <td className="px-4 py-3 text-sm text-center text-gray-700">{standing.losses}</td>
-              <td className="px-4 py-3 text-sm text-center text-gray-700">{standing.goals_for}</td>
-              <td className="px-4 py-3 text-sm text-center text-gray-700">{standing.goals_against}</td>
-              <td className="px-4 py-3 text-sm text-center font-medium text-gray-900">
-                {standing.goal_difference}
-              </td>
               <td className="px-4 py-3 text-sm text-center font-bold text-green-900">
                 {standing.points}
               </td>
@@ -108,48 +110,11 @@ const StandingsTable = ({ standings, competition }: { standings: any[]; competit
   )
 }
 
-// Points System Component
-const PointsSystem = ({ competition }: { competition: CompetitionInterface }) => (
-  <div className="bg-gray-50 rounded-lg p-4">
-    <h3 className="text-sm font-bold text-gray-900 mb-2">Points System</h3>
-    <div className="flex gap-6 text-sm">
-      <div>
-        <span className="text-gray-600">Win:</span>
-        <span className="ml-1 font-bold text-green-900">{competition.points_for_win}</span>
-      </div>
-      {competition.points_for_draw !== undefined && (
-        <div>
-          <span className="text-gray-600">Draw:</span>
-          <span className="ml-1 font-bold text-green-900">{competition.points_for_draw}</span>
-        </div>
-      )}
-      {competition.points_for_loss !== undefined && (
-        <div>
-          <span className="text-gray-600">Loss:</span>
-          <span className="ml-1 font-bold text-green-900">{competition.points_for_loss}</span>
-        </div>
-      )}
-    </div>
-  </div>
-)
-
 // Tournament Info Component
 const TournamentInfo = ({ competition }: { competition: CompetitionInterface }) => (
   <div className="bg-gray-50 rounded-lg p-4">
     <h3 className="text-sm font-bold text-gray-900 mb-2">Tournament Info</h3>
     <div className="grid grid-cols-2 gap-4 text-sm">
-      <div>
-        <span className="text-gray-600">Format:</span>
-        <span className="ml-1 font-medium text-gray-900">
-          {competition.individual ? 'Individual' : 'Team Based'}
-        </span>
-      </div>
-      <div>
-        <span className="text-gray-600">Type:</span>
-        <span className="ml-1 font-medium text-gray-900">
-          {CompetitionTypeDisplay[competition.type as keyof typeof CompetitionTypeDisplay] || competition.type}
-        </span>
-      </div>
       {competition.number_of_teams > 0 && (
         <div>
           <span className="text-gray-600">Participants:</span>
@@ -162,16 +127,26 @@ const TournamentInfo = ({ competition }: { competition: CompetitionInterface }) 
           <span className="ml-1 font-medium text-gray-900">{competition.current_round}</span>
         </div>
       )}
-      {competition.has_third_place && (
+      {competition.number_of_groups > 0 && (
         <div>
-          <span className="text-gray-600">3rd Place Match:</span>
-          <span className="ml-1 font-medium text-green-900">✓ Enabled</span>
+          <span className="text-gray-600">Groups:</span>
+          <span className="ml-1 font-medium text-gray-900">{competition.number_of_groups}</span>
         </div>
       )}
-      {competition.two_legged && (
+      {competition.teams_per_group > 0 && (
         <div>
-          <span className="text-gray-600">Two-Legged:</span>
-          <span className="ml-1 font-medium text-green-900">✓ Enabled</span>
+          <span className="text-gray-600">Teams per Group:</span>
+          <span className="ml-1 font-medium text-gray-900">{competition.teams_per_group}</span>
+        </div>
+      )}
+      {(competition.points_for_win !== undefined || competition.points_for_draw !== undefined) && (
+        <div className="col-span-2">
+          <span className="text-gray-600">Points System:</span>
+          <span className="ml-1 font-medium text-gray-900">
+            Win: {competition.points_for_win || 3}, 
+            Draw: {competition.points_for_draw || 1}, 
+            Loss: {competition.points_for_loss || 0}
+          </span>
         </div>
       )}
     </div>
@@ -182,8 +157,10 @@ const TournamentInfo = ({ competition }: { competition: CompetitionInterface }) 
 const PublicCompetition = () => {
   const { slug } = useParams<{ slug: string }>()
   const [competition, setCompetition] = useState<CompetitionInterface | null>(null)
+  const [standings, setStandings] = useState<Standing[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
+  const [lastUpdated, setLastUpdated] = useState<Date>(new Date())
 
   const fetchData = async () => {
     if (!slug) {
@@ -204,6 +181,16 @@ const PublicCompetition = () => {
       }
       
       setCompetition(competitionData)
+      
+      // Extract standings from the competition data
+      // Assuming the backend returns standings as part of the competition object
+      if (competitionData.standings && Array.isArray(competitionData.standings)) {
+        setStandings(competitionData.standings)
+      } else {
+        setStandings([])
+      }
+      
+      setLastUpdated(new Date())
     } catch (err: any) {
       console.error('Failed to load competition:', err)
       setError(err?.message || 'Failed to load competition. The link may be invalid or expired.')
@@ -227,7 +214,7 @@ const PublicCompetition = () => {
     }
   }, [competition?.status])
 
-  if (loading) {
+  if (loading && !competition) {
     return (
       <div className="min-h-screen bg-gray-50">
         <LoadingSpinner />
@@ -274,7 +261,7 @@ const PublicCompetition = () => {
         {/* Info Cards */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
           <TournamentInfo competition={competition} />
-          <PointsSystem competition={competition} />
+          
         </div>
 
         {/* Standings Section */}
@@ -285,19 +272,24 @@ const PublicCompetition = () => {
             </h2>
             {competition.status === 'active' && (
               <p className="text-sm text-gray-600 mt-1">
-                Last updated: {new Date().toLocaleString()}
+                Last updated: {lastUpdated.toLocaleString()}
               </p>
             )}
           </div>
           <div className="p-6">
-            {/* <StandingsTable standings={competition.standings || []} competition={competition} /> */}
+            <StandingsTable 
+              standings={standings} 
+              isIndividual={competition.individual || false} 
+            />
           </div>
         </div>
 
         {/* Footer */}
         <div className="mt-8 text-center text-sm text-gray-500">
           <p>© {new Date().getFullYear()} - Competition results and standings</p>
-          <p className="mt-1">Data updates automatically every 30 seconds</p>
+          {competition.status === 'active' && (
+            <p className="mt-1">Data updates automatically every 30 seconds</p>
+          )}
         </div>
       </div>
     </div>
