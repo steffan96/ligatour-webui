@@ -163,11 +163,11 @@ export const EditPlayerForm = ({
   const { showToast } = useToastStore()
 
   const handleSubmit = async () => {
-    if (!editingPlayer.first_name.trim() || !editingPlayer.last_name.trim() || !editingPlayer.email.trim()) {
+    if (!editingPlayer.first_name.trim() || !editingPlayer.last_name.trim()) {
       showToast('First name, last name and email are required', false)
       return
     }
-    if (!isValidEmail(editingPlayer.email)) {
+    if (editingPlayer.email && !isValidEmail(editingPlayer.email)) {
       showToast('Please enter a valid email address', false)
       return
     }
