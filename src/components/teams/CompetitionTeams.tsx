@@ -195,7 +195,7 @@ const CompetitionTeams = () => {
                 value={newTeam.name}
                 onChange={e => setNewTeam({ name: e.target.value })}
                 className={inputCls()}
-                placeholder="Enter team name"
+                placeholder={`Enter ${competition.individual ? 'player' : 'team'} name`}
                 autoFocus
               />
             </Field>
@@ -271,7 +271,7 @@ const CompetitionTeams = () => {
                            px-4 py-1.5 rounded-md bg-blue-50 border border-blue-200
                            hover:bg-blue-100 transition-colors"
               >
-                ➕ Add First Team
+                ➕ Add First {competition.individual ? 'Player' : 'Team'}
               </button>
             )}
           </div>

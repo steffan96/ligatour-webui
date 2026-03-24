@@ -171,7 +171,7 @@ const SingleCompetition = () => {
             className="bg-blue-50 text-blue-900 text-sm font-bold 
              px-3.5 py-1.5 rounded-md hover:bg-blue-100 
              border border-blue-200 transition-colors"
-            onClick={() => navigate(`/competition/${id}/${draft.individual ? 'players' : 'teams'}`)}
+            onClick={() => navigate(`/competition/${id}/teams`)}
           >
             {draft.individual ? '👤 Manage Players' : '👥 Manage Teams'}
           </button>

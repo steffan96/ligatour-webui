@@ -109,24 +109,6 @@ export const addTeamToCompetition = async (competitionId: string, name: string) 
   }
 };
 
-export const addPlayerToCompetition = async (
-  competitionId: string,
-  player: { first_name: string; last_name: string; email?: string }
-) => {
-  try {
-    const response = await axiosInstance.post(
-      `/api/v1/competitions/${competitionId}/add-player`,
-      player
-    );
-    return response;
-  } catch (error: any) {
-    if (error.response?.data?.message) {
-      throw error.response.data.message;
-    }
-    throw error.message || 'Failed to add player to competition.';
-  }
-};
-
 export const removeTeamFromCompetition = async (competitionId: string, teamId: string) => {
   try {
     const response = await axiosInstance.delete(`/api/v1/competitions/${competitionId}/teams/${teamId}`);
