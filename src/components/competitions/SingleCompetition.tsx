@@ -1,11 +1,13 @@
 import React, { useEffect, useState } from 'react'
-import { useParams, useNavigate } from 'react-router-dom'
+import { useParams, useNavigate, Outlet, useLocation } from 'react-router-dom'
 import { getCompetition, updateCompetition, startCompetition } from 'api/competitions'
 import { CompetitionInterface } from 'api/competitions'
 import { CompetitionTypeDisplay } from '../../api/interfaces/competitions'
 import PageWindow from '../shared/PageWindow'
 import { useToastStore } from '../../api/stores/useToastStore'
 import CustomSelect from '../shared/CustomSelect'
+
+export type SingleCompetitionContext = { competition: CompetitionInterface }
 
 const Field = ({ label, children }: { label: string; children: React.ReactNode }) => (
   <div className="space-y-1.5">
@@ -19,7 +21,6 @@ const inputCls = (readOnly?: boolean) =>
    text-sm font-medium focus:ring-2 
    focus:ring-green-900 focus:border-green-900 ${readOnly ? 'bg-gray-50 text-gray-700' : 'text-gray-900'}`
 
-// Special styling for public link field
 const publicLinkInputCls = () =>
   `w-full px-3 py-2 border-2 border-dashed border-indigo-300 
    rounded-lg text-sm font-mono font-medium 
@@ -87,6 +88,7 @@ const StatusBadge = ({ status }: { status: string }) => {
 const SingleCompetition = () => {
   const { id } = useParams<{ id: string }>()
   const navigate = useNavigate()
+  const location = useLocation()
   const { showToast } = useToastStore()
   const [competition, setCompetition] = useState<CompetitionInterface | null>(null)
   const [draft, setDraft] = useState<CompetitionInterface | null>(null)
@@ -101,7 +103,7 @@ const SingleCompetition = () => {
         setCompetition(response?.data || null)
         setDraft(response?.data || null)
       } catch (err: any) {
-        showToast(err || 'Failed to load competition.', false)
+        showToast(err|| 'Failed to load competition.', false)
         navigate('/competitions')
       }
     }
@@ -109,6 +111,12 @@ const SingleCompetition = () => {
   }, [id, navigate, showToast])
 
   if (!competition || !draft) return null
+
+  // If we're on a child route (e.g. /matches), render it with competition context
+  const isChildRoute = location.pathname !== `/competition/${id}`
+  if (isChildRoute) {
+    return <Outlet context={{ competition } satisfies SingleCompetitionContext} />
+  }
 
   const set = (field: keyof CompetitionInterface, value: any) =>
     setDraft(prev => (prev ? { ...prev, [field]: value } : prev))
@@ -123,7 +131,7 @@ const SingleCompetition = () => {
       setIsEditing(false)
       showToast('Changes saved successfully!', true)
     } catch (err: any) {
-      showToast(err || 'Failed to save changes. Please try again.', false)
+      showToast(err|| 'Failed to save changes. Please try again.', false)
     } finally {
       setIsSaving(false)
     }
@@ -140,7 +148,7 @@ const SingleCompetition = () => {
       showToast('Competition started!', true)
       setCompetition(response?.data)
     } catch (err: any) {
-      showToast(err || 'Failed to activate competition. Please try again or contact support.', false)
+      showToast(err|| 'Failed to activate competition. Please try again or contact support.', false)
     }
   }
 
@@ -174,6 +182,16 @@ const SingleCompetition = () => {
             onClick={() => navigate(`/competition/${id}/teams`)}
           >
             {draft.individual ? '👤 Manage Players' : '👥 Manage Teams'}
+          </button>
+          <button
+            className="bg-orange-50 text-orange-900 text-sm font-bold 
+                       px-3.5 py-1.5 rounded-md hover:bg-orange-100 
+                       border border-orange-200 transition-colors"
+            onClick={() =>
+              navigate(`/competition/${id}/matches?round=${competition.current_round ?? 1}`)
+            }
+          >
+            🔀 Matches
           </button>
           <button
             className="bg-white text-green-900 text-sm font-bold 
@@ -359,7 +377,7 @@ const SingleCompetition = () => {
         </div>
       )}
 
-      {/* Public Link - Moved to Bottom */}
+      {/* Public Link */}
       {competition.public_link && (
         <div className="mt-6">
           <div className="bg-gradient-to-r from-indigo-50 
@@ -367,8 +385,8 @@ const SingleCompetition = () => {
             <div className="flex items-center justify-between mb-2">
               <label className="text-sm font-bold text-indigo-900 flex items-center gap-2">
                 <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" 
-                  strokeLinejoin="round" strokeWidth={2} 
+                  <path strokeLinecap="round"
+                  strokeLinejoin="round" strokeWidth={2}
                   d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656
                    5.656l1.102-1.102m3.172-5.656l1.102-1.102a4 4 0 00-5.656-5.656l-4 4a4 4 0 001.414 6.276" />
                 </svg>
@@ -386,7 +404,7 @@ const SingleCompetition = () => {
             </div>
             <p className="text-xs text-indigo-600 mt-2 flex items-center gap-1">
               <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" 
+                <path strokeLinecap="round" strokeLinejoin="round"
                 strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
               </svg>
               Share this link with participants to view competition standings and results

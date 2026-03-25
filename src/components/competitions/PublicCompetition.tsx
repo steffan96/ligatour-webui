@@ -193,7 +193,7 @@ const PublicCompetition = () => {
       setLastUpdated(new Date())
     } catch (err: any) {
       console.error('Failed to load competition:', err)
-      setError(err?.message || 'Failed to load competition. The link may be invalid or expired.')
+      setError(err|| 'Failed to load competition. The link may be invalid or expired.')
     } finally {
       setLoading(false)
     }
