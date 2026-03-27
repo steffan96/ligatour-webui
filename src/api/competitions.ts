@@ -90,7 +90,7 @@ export const getCompetitionTeams = async (competitionId: string) => {
     if (error.response?.data?.message) {
       throw error.response.data.message;
     }
-    throw error.message || 'Failed to fetch competition teams.';
+    throw error.message || 'Failed to fetch competition participants.';
   }
 };
 
@@ -105,7 +105,7 @@ export const addTeamToCompetition = async (competitionId: string, name: string) 
     if (error.response?.data?.message) {
       throw error.response.data.message;
     }
-    throw error.message || 'Failed to add team to competition.';
+    throw error.message || 'Failed to add participant to competition.';
   }
 };
 
@@ -117,7 +117,7 @@ export const removeTeamFromCompetition = async (competitionId: string, teamId: s
     if (error.response?.data?.message) {
       throw error.response.data.message;
     }
-    throw error.message || 'Failed to remove team from competition.';
+    throw error.message || 'Failed to remove participant from competition.';
   }
 };
 

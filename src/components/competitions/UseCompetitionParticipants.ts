@@ -21,11 +21,7 @@ export const useCompetitionParticipants = () => {
         const response = await getCompetition(Number(id))
         const data = response?.data
         setCompetition(data || null)
-        if (data?.individual) {
-          setParticipants(data.players || [])
-        } else {
-          setParticipants(data.teams || [])
-        }
+        setParticipants(data.teams || [])
       } catch (err: any) {
         showToast(err || 'Failed to load competition.', false)
         navigate('/competitions')

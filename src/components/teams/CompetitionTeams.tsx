@@ -109,7 +109,7 @@ const CompetitionTeams = () => {
     }
 
     if (!newTeam.name.trim()) {
-      showToast('Team name is required', false)
+      showToast(`${competition.individual ? 'Player' : 'Team'} name is required`, false)
       return
     }
 
@@ -118,30 +118,30 @@ const CompetitionTeams = () => {
       setParticipants([...participants, response?.data])
       resetNew()
       setIsAdding(false)
-      showToast('Team added successfully!', true)
+      showToast(`${competition.individual ? 'Player' : 'Team'} added successfully!`, true)
     } catch (err: any) {
-      showToast(err || 'Failed to add team', false)
+      showToast(err || 'Failed to add participant', false)
     }
   }
 
   const handleUpdateTeam = async () => {
-    if (!editingParticipant.name.trim()) {
-      showToast('Team name is required', false)
+    if (!(editingParticipant?.name ?? '').trim()) {
+      showToast(`${competition.individual ? 'Player' : 'Team'} name is required`, false)
       return
     }
 
     if (editingId === null) return
 
     try {
-      const updated = await updateTeam(String(editingParticipant.id), editingParticipant.name)
+      await updateTeam(String(editingParticipant.id), editingParticipant.name)
       const updatedList = [...participants]
-      updatedList[editingId] = updated
+      updatedList[editingId] = { ...participants[editingId], name: editingParticipant.name }
       setParticipants(updatedList)
       setEditingId(null)
       setEditingParticipant(null)
-      showToast('Team updated successfully!', true)
+      showToast(`${competition.individual ? 'Player' : 'Team'} updated successfully!`, true)
     } catch (err: any) {
-      showToast(err || 'Failed to update team', false)
+      showToast(err || 'Failed to update participant', false)
     }
   }
 
@@ -151,15 +151,15 @@ const CompetitionTeams = () => {
     try {
       await deleteTeam(String(team.id))
       setParticipants(participants.filter((_, i) => i !== index))
-      showToast('Team removed', true)
+      showToast(`${competition.individual ? 'Player' : 'Team'} removed`, true)
     } catch (err: any) {
-      showToast(err || 'Failed to remove team', false)
+      showToast(err || 'Failed to remove participant', false)
     }
   }
 
   return (
     <PageWindow
-      title={`Manage Teams - ${competition.name}`}
+      title={`Manage ${competition.individual ? 'Players' : 'Teams'} - ${competition.name}`}
       headerActionButtons={
         <div className="flex items-center gap-3">
           <button
@@ -178,7 +178,7 @@ const CompetitionTeams = () => {
                          transition-colors"
               onClick={() => setIsAdding(true)}
             >
-              ➕ Add Team
+              ➕ Add {competition.individual ? 'Player' : 'Team'}
             </button>
           )}
         </div>
@@ -189,7 +189,7 @@ const CompetitionTeams = () => {
         <div className="border border-green-300 bg-green-50 rounded-md p-4">
           <SectionHeader label="Add New Team" />
           <div className="flex flex-col gap-3">
-            <Field label="Team Name">
+            <Field label={`${competition.individual ? 'Player' : 'Team'} Name`}>
               <input
                 type="text"
                 value={newTeam.name}
@@ -197,6 +197,7 @@ const CompetitionTeams = () => {
                 className={inputCls()}
                 placeholder={`Enter ${competition.individual ? 'player' : 'team'} name`}
                 autoFocus
+                required
               />
             </Field>
           </div>
@@ -215,7 +216,7 @@ const CompetitionTeams = () => {
                          px-6 rounded-md text-sm hover:bg-green-800 
                          transition-colors"
             >
-              ✓ Add Team
+              ✓ Add {competition.individual ? 'Player' : 'Team'}
             </button>
           </div>
         </div>
@@ -224,16 +225,17 @@ const CompetitionTeams = () => {
       {/* Edit Team Form */}
       {editingId !== null && editingParticipant && (
         <div className="border border-blue-300 bg-blue-50 rounded-md p-4">
-          <SectionHeader label={`Edit Team: ${editingParticipant.name}`} />
+          <SectionHeader label={`Edit ${competition.individual ? 'Player' : 'Team'}: ${editingParticipant.name}`} />
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
-            <Field label="Team Name">
+            <Field label={`${competition.individual ? 'Player' : 'Team'} Name`}>
               <input
                 type="text"
-                value={editingParticipant.name}
+                value={editingParticipant.name ?? ''}
                 onChange={e => setEditingParticipant({ ...editingParticipant, name: e.target.value })}
                 className={inputCls()}
-                placeholder="Enter team name"
+                placeholder="Enter participant name"
                 autoFocus
+                required
               />
             </Field>
           </div>
@@ -252,7 +254,7 @@ const CompetitionTeams = () => {
                          px-6 rounded-md text-sm hover:bg-blue-800 
                          transition-colors"
             >
-              ✓ Update Team
+              ✓ Update {competition.individual ? 'Player' : 'Team'}
             </button>
           </div>
         </div>
@@ -260,10 +262,10 @@ const CompetitionTeams = () => {
 
       {/* Teams List */}
       <div>
-        <SectionHeader label={`Teams (${participants.length})`} />
+        <SectionHeader label={`Participants (${participants.length})`} />
         {participants.length === 0 ? (
           <div className="text-center py-8 border border-gray-200 rounded-md bg-gray-50">
-            <p className="text-sm text-gray-600">No teams added yet</p>
+            <p className="text-sm text-gray-600">No participants added yet</p>
             {!isAdding && editingId === null && (
               <button
                 onClick={() => setIsAdding(true)}

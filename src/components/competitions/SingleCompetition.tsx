@@ -19,6 +19,46 @@ const TABS: Tab[] = [
   { id: 'settings', label: 'Settings', icon: '⚙️' },
 ]
 
+const ConfirmModal = ({
+  title,
+  description,
+  confirmLabel,
+  onConfirm,
+  onCancel,
+}: {
+  title: string
+  description: string
+  confirmLabel: string
+  onConfirm: () => void
+  onCancel: () => void
+}) => (
+  <div className="fixed inset-0 z-50 flex items-center justify-center">
+    <div className="absolute inset-0 bg-black/40" onClick={onCancel} />
+    <div className="relative bg-white rounded-xl shadow-xl border border-gray-200 w-full max-w-sm mx-4 p-6">
+      <div className="mb-4">
+        <p className="text-base font-bold text-gray-900">{title}</p>
+        <p className="text-sm text-gray-500 mt-1">{description}</p>
+      </div>
+      <div className="flex justify-end gap-3">
+        <button
+          onClick={onCancel}
+          className="bg-gray-100 text-gray-900 font-bold py-2 px-5
+                     rounded-md text-sm hover:bg-gray-200 transition-colors"
+        >
+          Cancel
+        </button>
+        <button
+          onClick={onConfirm}
+          className="bg-green-900 text-white font-bold py-2 px-5
+                     rounded-md text-sm hover:bg-green-800 transition-colors"
+        >
+          {confirmLabel}
+        </button>
+      </div>
+    </div>
+  </div>
+)
+
 const TabBar = ({
   activeTab,
   onTabChange,
@@ -102,13 +142,27 @@ const CompetitionOverview = ({
       )}
 
       {!isActive && !isCompleted && (
-        <div className="pt-2 border-t border-gray-200">
-          <button
-            onClick={onStart}
-            className="text-sm font-medium text-green-700 hover:text-green-900 transition-colors"
-          >
-            🚀 Start Competition
-          </button>
+        <div className="pt-4 border-t border-gray-200">
+          <div className="rounded-xl border border-green-200 bg-gradient-to-br from-green-50 to-emerald-50 p-5">
+            <div className="flex items-center justify-between gap-4">
+              <div>
+                <p className="text-sm font-bold text-green-900">Ready to begin?</p>
+                <p className="text-xs text-green-700 mt-0.5">
+                  Starting the competition will lock its settings and begin match generation.
+                </p>
+              </div>
+              <button
+                onClick={onStart}
+                className="shrink-0 flex items-center gap-2 bg-green-900 hover:bg-green-800
+                           active:scale-95 text-white text-sm font-bold
+                           px-5 py-2.5 rounded-lg shadow-sm
+                           transition-all duration-150"
+              >
+                <span className="text-base">🚀</span>
+                Start Competition
+              </button>
+            </div>
+          </div>
         </div>
       )}
     </div>
@@ -122,6 +176,7 @@ const SingleCompetition = () => {
   const { showToast } = useToastStore()
   const [competition, setCompetition] = useState<CompetitionInterface | null>(null)
   const [activeTab, setActiveTab] = useState<string>('overview')
+  const [showStartModal, setShowStartModal] = useState(false)
 
   useEffect(() => {
     if (!id) return
@@ -145,6 +200,7 @@ const SingleCompetition = () => {
   }
 
   const handleStartCompetition = async () => {
+    setShowStartModal(false)
     try {
       const response = await startCompetition(competition.id)
       setCompetition(response?.data)
@@ -167,6 +223,17 @@ const SingleCompetition = () => {
         </button>
       }
     >
+      {showStartModal && (
+        <ConfirmModal
+          title="Start Competition?"
+          description="This will lock the competition 
+          settings and begin match generation. This action cannot be undone."
+          confirmLabel="🚀 Start"
+          onConfirm={handleStartCompetition}
+          onCancel={() => setShowStartModal(false)}
+        />
+      )}
+
       <TabBar
         activeTab={activeTab}
         onTabChange={setActiveTab}
@@ -197,7 +264,7 @@ const SingleCompetition = () => {
             navigator.clipboard.writeText(text)
             showToast('Public link copied to clipboard!', true)
           }}
-          onStart={handleStartCompetition}
+          onStart={() => setShowStartModal(true)}
         />
       )}
 

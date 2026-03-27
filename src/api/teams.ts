@@ -19,7 +19,7 @@ export const createTeam = async (name: string) => {
     if (error.response?.data?.message) {
       throw error.response.data.message
     }
-    throw error.message || 'Failed to create team.'
+    throw error.message || 'Failed to create participant.'
   }
 }
 
@@ -31,7 +31,7 @@ export const getTeam = async (teamId: string) => {
     if (error.response?.data?.message) {
       throw error.response.data.message
     }
-    throw error.message || 'Failed to fetch team.'
+    throw error.message || 'Failed to fetch participant.'
   }
 }
 
@@ -43,7 +43,7 @@ export const listTeams = async () => {
     if (error.response?.data?.message) {
       throw error.response.data.message
     }
-    throw error.message || 'Failed to fetch teams.'
+    throw error.message || 'Failed to fetch participants.'
   }
 }
 
@@ -55,7 +55,7 @@ export const updateTeam = async (teamId: string, name: string) => {
     if (error.response?.data?.message) {
       throw error.response.data.message
     }
-    throw error.message || 'Failed to update team.'
+    throw error.message || `Failed to update participant.`
   }
 }
 
@@ -67,7 +67,7 @@ export const deleteTeam = async (teamId: string) => {
     if (error.response?.data?.message) {
       throw error.response.data.message
     }
-    throw error.message || 'Failed to delete team.'
+    throw error.message || 'Failed to delete participant.'
   }
 }
 

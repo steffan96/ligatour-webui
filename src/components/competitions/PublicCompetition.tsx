@@ -135,7 +135,7 @@ const TournamentInfo = ({ competition }: { competition: CompetitionInterface }) 
       )}
       {competition.teams_per_group > 0 && (
         <div>
-          <span className="text-gray-600">Teams per Group:</span>
+          <span className="text-gray-600">Participants per Group:</span>
           <span className="ml-1 font-medium text-gray-900">{competition.teams_per_group}</span>
         </div>
       )}

@@ -107,6 +107,7 @@ export const AddPlayerForm = ({
             className={inputCls()}
             placeholder="Enter first name"
             autoFocus
+            required
           />
         </Field>
         <Field label="Last Name">
@@ -116,6 +117,7 @@ export const AddPlayerForm = ({
             onChange={e => setNewPlayer({ ...newPlayer, last_name: e.target.value })}
             className={inputCls()}
             placeholder="Enter last name"
+            required
           />
         </Field>
         <Field label="Email (optional)">
@@ -163,7 +165,7 @@ export const EditPlayerForm = ({
   const { showToast } = useToastStore()
 
   const handleSubmit = async () => {
-    if (!editingPlayer.first_name.trim() || !editingPlayer.last_name.trim()) {
+    if (!(editingPlayer.first_name ?? '').trim() || !(editingPlayer.last_name ?? '').trim()) {
       showToast('First name, last name and email are required', false)
       return
     }
@@ -181,26 +183,28 @@ export const EditPlayerForm = ({
         <Field label="First Name">
           <input
             type="text"
-            value={editingPlayer.first_name}
+            value={editingPlayer.first_name ?? ''}
             onChange={e => setEditingPlayer({ ...editingPlayer, first_name: e.target.value })}
             className={inputCls()}
             placeholder="Enter first name"
             autoFocus
+            required
           />
         </Field>
         <Field label="Last Name">
           <input
             type="text"
-            value={editingPlayer.last_name || ''}
+            value={editingPlayer.last_name ?? ''}
             onChange={e => setEditingPlayer({ ...editingPlayer, last_name: e.target.value })}
             className={inputCls()}
             placeholder="Enter last name"
+            required
           />
         </Field>
         <Field label="Email">
           <input
             type="email"
-            value={editingPlayer.email || ''}
+            value={editingPlayer.email ?? ''}
             onChange={e => setEditingPlayer({ ...editingPlayer, email: e.target.value })}
             className={inputCls()}
             placeholder="Enter email"
