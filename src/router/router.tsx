@@ -1,6 +1,7 @@
 import { createBrowserRouter } from 'react-router-dom'
 import React from 'react'
 import RootLayout from '../components/home/RootLayout'
+import PublicLayout from '../components/home/PublicLayout'
 import DashboardComponent from '../components/competitions/Dashboard'
 import RegisterComponent from '../components/auth/Register'
 import LoginComponent from '../components/auth/Login'
@@ -15,10 +16,19 @@ import Matches from '../components/matches/Matches'
 
 export const router = createBrowserRouter([
   {
+    path: '/public',
+    element: <PublicLayout />,
+    children: [
+      {
+        path: '/public/:slug',
+        element: <PublicCompetition />,
+      },
+    ],
+  },
+  {
     path: '/',
     element: <RootLayout />,
     children: [
-      // Competitions routes
       {
         path: '/',
         index: true,
@@ -43,17 +53,9 @@ export const router = createBrowserRouter([
         element: <CompetitionTeams />,
       },
       {
-        path: '/public/:slug/',
-        element: <PublicCompetition />,
-      },
-
-      // Team routes
-      {
         path: '/team/:teamId/players',
         element: <TeamPlayers />,
       },
-
-      // Auth routes
       {
         path: '/register',
         element: <RegisterComponent />,

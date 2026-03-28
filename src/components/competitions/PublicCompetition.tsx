@@ -2,165 +2,245 @@ import React, { useEffect, useState } from 'react'
 import { useParams } from 'react-router-dom'
 import { getPublicCompetition, CompetitionInterface } from 'api/competitions'
 
-// Types for standings
+interface Team {
+  id: number
+  name: string
+  logo: string
+  competition_id: number
+  created_at: string
+  players: null | any[]
+}
+
 interface Standing {
   id: number
-  rank: number
-  team_name?: string
-  player_name?: string
-  matches_played: number
+  competition_id: number
+  team_id: number
+  played: number
   wins: number
   draws: number
   losses: number
+  goals_for: number
+  goals_against: number
+  goal_diff: number
   points: number
+  buchholz_score: number
+  sonneborn_berger_score: number
+  updated_at: string
+  created_at: string
+  team: Team
+  player_name?: string
 }
 
 const LoadingSpinner = () => (
-  <div className="flex justify-center items-center min-h-[400px]">
-    <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-green-900"></div>
+  <div className="flex flex-col justify-center items-center min-h-[400px] gap-4">
+    <div className="relative h-14 w-14">
+      <div className="absolute inset-0 rounded-full border-4 border-gray-200"></div>
+      <div className="absolute inset-0 rounded-full border-4 border-t-green-900 animate-spin"></div>
+    </div>
+    <p className="text-sm text-gray-400 font-medium tracking-wide">Loading competition…</p>
   </div>
 )
 
 const ErrorDisplay = ({ message, onRetry }: { message: string; onRetry?: () => void }) => (
-  <div className="flex flex-col items-center justify-center min-h-[400px] text-center">
-    <div className="text-red-600 text-6xl mb-4">⚠️</div>
-    <h3 className="text-lg font-bold text-gray-900 mb-2">Unable to Load Competition</h3>
-    <p className="text-gray-600 mb-4">{message}</p>
+  <div className="flex flex-col items-center justify-center min-h-[400px] text-center px-6">
+    <div className="w-16 h-16 bg-red-50 rounded-full flex items-center justify-center mb-4">
+      <svg className="w-8 h-8 text-red-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          strokeWidth={1.5}
+          d={
+            'M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 ' +
+            '2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 ' +
+            '0L2.697 16.126zM12 15.75h.007v.008H12v-.008z'
+          }
+        />
+      </svg>
+    </div>
+    <h3 className="text-base font-semibold text-gray-900 mb-1">Unable to Load Competition</h3>
+    <p className="text-sm text-gray-500 mb-5 max-w-xs">{message}</p>
     {onRetry && (
       <button
         onClick={onRetry}
-        className="bg-green-900 text-white px-6 py-2 rounded-md hover:bg-green-800 transition-colors"
+        className={
+          'inline-flex items-center gap-2 bg-green-900 text-white text-sm font-medium ' +
+          'px-5 py-2 rounded-lg hover:bg-green-800 active:scale-95 transition-all duration-150'
+        }
       >
+        <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            strokeWidth={2}
+            d={
+              'M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581' +
+              'm0 0a8.003 8.003 0 01-15.357-2m15.357 2H15'
+            }
+          />
+        </svg>
         Try Again
       </button>
     )}
   </div>
 )
 
-// Status Badge Component
-const StatusBadge = ({ status }: { status: string }) => {
-  const styles: Record<string, string> = {
-    inactive: 'bg-yellow-50 text-yellow-800 border-yellow-200',
-    active: 'bg-green-50 text-green-800 border-green-200',
-    completed: 'bg-gray-100 text-gray-700 border-gray-300',
-  }
-  const labels: Record<string, string> = {
-    inactive: '⏳ Not Started',
-    active: '🟢 In Progress',
-    completed: '✅ Completed',
-  }
+const badgeBase = 'inline-flex items-center justify-center w-7 h-7 rounded-full text-xs font-bold shadow-sm'
+
+const RankBadge = ({ rank }: { rank: number }) => {
+  if (rank === 1) return <span className={`${badgeBase} bg-yellow-400 text-yellow-900`}>1</span>
+  if (rank === 2) return <span className={`${badgeBase} bg-gray-300 text-gray-700`}>2</span>
+  if (rank === 3) return <span className={`${badgeBase} bg-orange-300 text-orange-800`}>3</span>
   return (
-    <span className={`inline-flex items-center text-xs font-bold px-2.5 py-1 rounded-md border ${styles[status] ?? styles.inactive}`}>
-      {labels[status] ?? status}
-    </span>
+    <span className="inline-flex items-center justify-center w-7 h-7 text-xs font-semibold text-gray-500">{rank}</span>
   )
 }
 
-// Standings Table Component
+const StatCell = ({ value }: { value: number | string }) => (
+  <td className="px-4 py-3.5 text-sm text-center tabular-nums text-gray-600">{value}</td>
+)
+
 const StandingsTable = ({ standings, isIndividual }: { standings: Standing[]; isIndividual: boolean }) => {
   if (!standings || standings.length === 0) {
     return (
-      <div className="text-center py-8 text-gray-500">
-        No standings data available yet.
+      <div className="flex flex-col items-center justify-center py-16 text-center">
+        <div className="w-14 h-14 bg-gray-100 rounded-full flex items-center justify-center mb-3">
+          <svg className="w-6 h-6 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={1.5}
+              d={
+                'M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586' +
+                'a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z'
+              }
+            />
+          </svg>
+        </div>
+        <p className="text-sm font-medium text-gray-500">No standings data available yet</p>
+        <p className="text-xs text-gray-400 mt-1">Check back once matches have been played</p>
       </div>
     )
   }
 
+  const headers = [
+    { label: '#', align: 'left', title: 'Rank' },
+    { label: isIndividual ? 'Player' : 'Team', align: 'left', title: isIndividual ? 'Player' : 'Team' },
+    { label: 'MP', align: 'center', title: 'Matches Played' },
+    { label: 'W', align: 'center', title: 'Wins' },
+    { label: 'D', align: 'center', title: 'Draws' },
+    { label: 'L', align: 'center', title: 'Losses' },
+    { label: 'GF', align: 'center', title: 'Goals For' },
+    { label: 'GA', align: 'center', title: 'Goals Against' },
+    { label: 'GD', align: 'center', title: 'Goal Difference' },
+    { label: 'Pts', align: 'center', title: 'Points' },
+  ]
+
   return (
     <div className="overflow-x-auto">
-      <table className="min-w-full bg-white rounded-lg overflow-hidden shadow-sm">
-        <thead className="bg-gray-50">
-          <tr>
-            <th className="px-4 py-3 text-left text-xs font-bold text-gray-600 uppercase tracking-wider">Rank</th>
-            <th className="px-4 py-3 text-left text-xs font-bold text-gray-600 uppercase tracking-wider">
-              {isIndividual ? 'Player' : 'Team'}
-            </th>
-            <th className="px-4 py-3 text-center text-xs font-bold text-gray-600 uppercase tracking-wider">MP</th>
-            <th className="px-4 py-3 text-center text-xs font-bold text-gray-600 uppercase tracking-wider">W</th>
-            <th className="px-4 py-3 text-center text-xs font-bold text-gray-600 uppercase tracking-wider">D</th>
-            <th className="px-4 py-3 text-center text-xs font-bold text-gray-600 uppercase tracking-wider">L</th>
-            <th className="px-4 py-3 text-center text-xs font-bold text-gray-600 uppercase tracking-wider">GF</th>
-            <th className="px-4 py-3 text-center text-xs font-bold text-gray-600 uppercase tracking-wider">GA</th>
-            <th className="px-4 py-3 text-center text-xs font-bold text-gray-600 uppercase tracking-wider">GD</th>
-            <th className="px-4 py-3 text-center text-xs font-bold text-gray-600 uppercase tracking-wider">Pts</th>
+      <table className="min-w-full bg-white">
+        <thead>
+          <tr className="bg-gray-50 border-b border-gray-200">
+            {headers.map(h => (
+              <th
+                key={h.label}
+                title={h.title}
+                className={[
+                  'px-4 py-3 text-xs font-bold text-gray-500 uppercase tracking-widest',
+                  'cursor-default select-none',
+                  h.align === 'center' ? 'text-center' : 'text-left',
+                ].join(' ')}
+              >
+                {h.label}
+              </th>
+            ))}
           </tr>
         </thead>
-        <tbody className="divide-y divide-gray-200">
-          {standings.map((standing, index) => (
-            <tr key={standing.id} className="hover:bg-gray-50 transition-colors">
-              <td className="px-4 py-3 text-sm font-bold text-gray-900">
-                {index + 1}
-                {index === 0 && <span className="ml-2">🏆</span>}
-              </td>
-              <td className="px-4 py-3 text-sm font-medium text-gray-900">
-                {isIndividual ? standing.player_name : standing.team_name}
-              </td>
-              <td className="px-4 py-3 text-sm text-center text-gray-700">{standing.matches_played}</td>
-              <td className="px-4 py-3 text-sm text-center text-gray-700">{standing.wins}</td>
-              <td className="px-4 py-3 text-sm text-center text-gray-700">{standing.draws}</td>
-              <td className="px-4 py-3 text-sm text-center text-gray-700">{standing.losses}</td>
-              <td className="px-4 py-3 text-sm text-center font-bold text-green-900">
-                {standing.points}
-              </td>
-            </tr>
-          ))}
+        <tbody className="divide-y divide-gray-100">
+          {standings.map((standing, index) => {
+            const rank = index + 1
+            const isTop3 = rank <= 3
+            return (
+              <tr
+                key={standing.id}
+                className={`transition-colors duration-100 ${
+                  isTop3 ? 'bg-green-50/40 hover:bg-green-50' : 'hover:bg-gray-50/60'
+                }`}
+              >
+                <td className="px-4 py-3.5">
+                  <RankBadge rank={rank} />
+                </td>
+                <td className="px-4 py-3.5">
+                  <span className={`text-sm font-semibold ${isTop3 ? 'text-green-900' : 'text-gray-800'}`}>
+                    {isIndividual ? standing.player_name : standing.team?.name}
+                  </span>
+                </td>
+                <StatCell value={standing.played} />
+                <StatCell value={standing.wins} />
+                <StatCell value={standing.draws} />
+                <StatCell value={standing.losses} />
+                <StatCell value={standing.goals_for} />
+                <StatCell value={standing.goals_against} />
+                <td className="px-4 py-3.5 text-sm text-center tabular-nums">
+                  <span
+                    className={`font-medium ${
+                      standing.goal_diff > 0
+                        ? 'text-green-700'
+                        : standing.goal_diff < 0
+                        ? 'text-red-500'
+                        : 'text-gray-500'
+                    }`}
+                  >
+                    {standing.goal_diff > 0 ? '+' : ''}
+                    {standing.goal_diff}
+                  </span>
+                </td>
+                <td className="px-4 py-3.5 text-center">
+                  <span
+                    className={
+                      'inline-flex items-center justify-center min-w-[2rem] px-2 py-0.5 ' +
+                      'rounded-md bg-green-900 text-white text-sm font-bold tabular-nums shadow-sm'
+                    }
+                  >
+                    {standing.points}
+                  </span>
+                </td>
+              </tr>
+            )
+          })}
         </tbody>
       </table>
     </div>
   )
 }
 
-// Tournament Info Component
-const TournamentInfo = ({ competition }: { competition: CompetitionInterface }) => (
-  <div className="bg-gray-50 rounded-lg p-4">
-    <h3 className="text-sm font-bold text-gray-900 mb-2">Tournament Info</h3>
-    <div className="grid grid-cols-2 gap-4 text-sm">
-      {competition.number_of_teams > 0 && (
-        <div>
-          <span className="text-gray-600">Participants:</span>
-          <span className="ml-1 font-medium text-gray-900">{competition.number_of_teams}</span>
-        </div>
-      )}
-      {competition.current_round > 0 && (
-        <div>
-          <span className="text-gray-600">Current Round:</span>
-          <span className="ml-1 font-medium text-gray-900">{competition.current_round}</span>
-        </div>
-      )}
-      {competition.number_of_groups > 0 && (
-        <div>
-          <span className="text-gray-600">Groups:</span>
-          <span className="ml-1 font-medium text-gray-900">{competition.number_of_groups}</span>
-        </div>
-      )}
-      {competition.teams_per_group > 0 && (
-        <div>
-          <span className="text-gray-600">Participants per Group:</span>
-          <span className="ml-1 font-medium text-gray-900">{competition.teams_per_group}</span>
-        </div>
-      )}
-      {(competition.points_for_win !== undefined || competition.points_for_draw !== undefined) && (
-        <div className="col-span-2">
-          <span className="text-gray-600">Points System:</span>
-          <span className="ml-1 font-medium text-gray-900">
-            Win: {competition.points_for_win || 3}, 
-            Draw: {competition.points_for_draw || 1}, 
-            Loss: {competition.points_for_loss || 0}
-          </span>
-        </div>
-      )}
-    </div>
-  </div>
-)
+const StatusBadge = ({ status }: { status?: string }) => {
+  if (!status) return null
+  const map: Record<string, { label: string; classes: string; dot: string }> = {
+    active: {
+      label: 'Live',
+      classes: 'bg-green-100 text-green-800 border-green-200',
+      dot: 'bg-green-500 animate-pulse',
+    },
+    completed: { label: 'Completed', classes: 'bg-gray-100 text-gray-600 border-gray-200', dot: 'bg-gray-400' },
+    pending: { label: 'Upcoming', classes: 'bg-yellow-50 text-yellow-700 border-yellow-200', dot: 'bg-yellow-400' },
+  }
+  const cfg = map[status] ?? { label: status, classes: 'bg-gray-100 text-gray-600 border-gray-200', dot: 'bg-gray-400' }
+  return (
+    <span
+      className={`inline-flex items-center gap-1.5 text-xs font-semibold px-2.5 py-1 rounded-full border ${cfg.classes}`}
+    >
+      <span className={`w-1.5 h-1.5 rounded-full ${cfg.dot}`}></span>
+      {cfg.label}
+    </span>
+  )
+}
 
-// Main Component
 const PublicCompetition = () => {
   const { slug } = useParams<{ slug: string }>()
   const [competition, setCompetition] = useState<CompetitionInterface | null>(null)
   const [standings, setStandings] = useState<Standing[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
-  const [lastUpdated, setLastUpdated] = useState<Date>(new Date())
 
   const fetchData = async () => {
     if (!slug) {
@@ -168,32 +248,17 @@ const PublicCompetition = () => {
       setLoading(false)
       return
     }
-
     setLoading(true)
     setError(null)
-
     try {
       const response = await getPublicCompetition(slug)
-      const competitionData = response?.data
-      
-      if (!competitionData) {
-        throw new Error('Competition not found')
-      }
-      
+      const { competition: competitionData, standings: standingsData } = response.data
+      if (!competitionData) throw new Error('Competition not found')
       setCompetition(competitionData)
-      
-      // Extract standings from the competition data
-      // Assuming the backend returns standings as part of the competition object
-      if (competitionData.standings && Array.isArray(competitionData.standings)) {
-        setStandings(competitionData.standings)
-      } else {
-        setStandings([])
-      }
-      
-      setLastUpdated(new Date())
+      setStandings(Array.isArray(standingsData) ? standingsData : [])
     } catch (err: any) {
       console.error('Failed to load competition:', err)
-      setError(err|| 'Failed to load competition. The link may be invalid or expired.')
+      setError(err || 'Failed to load competition. The link may be invalid or expired.')
     } finally {
       setLoading(false)
     }
@@ -203,20 +268,18 @@ const PublicCompetition = () => {
     fetchData()
   }, [slug])
 
-  // Auto-refresh every 30 seconds if competition is active
   useEffect(() => {
     if (competition?.status === 'active') {
       const interval = setInterval(() => {
         fetchData()
-      }, 30000) // 30 seconds
-      
+      }, 30000)
       return () => clearInterval(interval)
     }
   }, [competition?.status])
 
   if (loading && !competition) {
     return (
-      <div className="min-h-screen bg-gray-50">
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <LoadingSpinner />
       </div>
     )
@@ -224,72 +287,56 @@ const PublicCompetition = () => {
 
   if (error || !competition) {
     return (
-      <div className="min-h-screen bg-gray-50">
-        <ErrorDisplay message={error || 'Competition not found'} onRetry={fetchData} />
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="bg-white rounded-xl shadow-sm border border-gray-200 max-w-md w-full mx-4">
+          <ErrorDisplay message={error || 'Competition not found'} onRetry={fetchData} />
+        </div>
       </div>
     )
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      {/* Header */}
-      <div className="bg-white border-b border-gray-200">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
-          <div className="flex justify-between items-start">
-            <div>
-              <h1 className="text-3xl font-bold text-gray-900 mb-2">
-                {competition.name}
-              </h1>
-              <div className="flex items-center gap-3">
-                <StatusBadge status={competition.status} />
-                <span className="text-sm text-gray-500">
-                  {competition.individual ? 'Individual Competition' : 'Team Competition'}
-                </span>
+    <div className="min-h-screen bg-gray-50 flex flex-col">
+      <div className="bg-white border-b border-gray-200 shadow-sm">
+        <div className="w-full px-4 sm:px-6 lg:px-8 py-5">
+          <div className="flex items-center justify-between gap-4 flex-wrap">
+            <div className="flex items-center gap-3">
+              <div
+                className={
+                  'flex-shrink-0 w-10 h-10 bg-green-900 rounded-lg ' + 'flex items-center justify-center shadow-sm'
+                }
+              >
+                <svg className="w-5 h-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={1.8}
+                    d="M16 8v8m-4-5v5m-4-2v2m-2 4h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"
+                  />
+                </svg>
+              </div>
+              <div>
+                <h1 className="text-xl font-bold text-gray-900 leading-tight">{competition.name}</h1>
+                {competition.type && (
+                  <p className="text-xs text-gray-400 mt-0.5 font-medium uppercase tracking-wide">{competition.type}</p>
+                )}
               </div>
             </div>
-            {competition.status === 'active' && (
-              <div className="text-sm text-green-700 bg-green-50 px-3 py-1 rounded-full">
-                Live Updates
-              </div>
-            )}
+            <div className="flex items-center gap-3">
+              <StatusBadge status={competition.status} />
+            </div>
           </div>
         </div>
       </div>
 
-      {/* Main Content */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {/* Info Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
-          <TournamentInfo competition={competition} />
-          
-        </div>
-
-        {/* Standings Section */}
-        <div className="bg-white rounded-lg shadow-sm overflow-hidden">
-          <div className="px-6 py-4 border-b border-gray-200">
-            <h2 className="text-xl font-bold text-gray-900">
-              {competition.status === 'completed' ? 'Final Standings' : 'Current Standings'}
-            </h2>
-            {competition.status === 'active' && (
-              <p className="text-sm text-gray-600 mt-1">
-                Last updated: {lastUpdated.toLocaleString()}
-              </p>
-            )}
+      <div className="flex-1 flex flex-col w-full px-4 sm:px-6 lg:px-8 py-6">
+        <div className="flex-1 bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden flex flex-col">
+          <div className="px-5 py-4 border-b border-gray-100">
+            <h2 className="text-sm font-bold text-gray-700 uppercase tracking-widest">Standings</h2>
           </div>
-          <div className="p-6">
-            <StandingsTable 
-              standings={standings} 
-              isIndividual={competition.individual || false} 
-            />
+          <div className="flex-1 overflow-auto">
+            <StandingsTable standings={standings} isIndividual={competition.individual || false} />
           </div>
-        </div>
-
-        {/* Footer */}
-        <div className="mt-8 text-center text-sm text-gray-500">
-          <p>© {new Date().getFullYear()} - Competition results and standings</p>
-          {competition.status === 'active' && (
-            <p className="mt-1">Data updates automatically every 30 seconds</p>
-          )}
         </div>
       </div>
     </div>
