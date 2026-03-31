@@ -249,9 +249,9 @@ const SingleCompetition = () => {
             <button
               className="bg-orange-50 text-orange-900 text-sm font-bold px-3.5 py-1.5
                          rounded-md hover:bg-orange-100 border border-orange-200 transition-colors"
-              onClick={() => navigate(`/competition/${id}/matches?round=${competition.current_round ?? 1}`)}
+             onClick={() => navigate(`/competition/${id}/rounds`)}
             >
-              🔀 Matches
+              🔀 Rounds
             </button>
           </>
         }

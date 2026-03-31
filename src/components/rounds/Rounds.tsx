@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from 'react'
-import { useParams, useNavigate, useSearchParams, useOutletContext } from 'react-router-dom'
+import { useParams, useNavigate, useOutletContext } from 'react-router-dom'
 import PageWindow from '../shared/PageWindow'
 import { useToastStore } from '../../api/stores/useToastStore'
-import { listMatches } from '../../api/matches'
+import { listRounds } from '../../api/rounds'
 import { SingleCompetitionContext } from '../competitions/SingleCompetition'
 
 interface Pairing {
@@ -152,31 +152,28 @@ const EmptyState = ({ round }: { round: number }) => (
   </div>
 )
 
-const Matches = () => {
+const Rounds = () => {
   const { competition } = useOutletContext<SingleCompetitionContext>()
-  const { id } = useParams<{ id: string }>()
+  const { id, roundId } = useParams<{ id: string; roundId: string }>()
   const navigate = useNavigate()
-  const [searchParams, setSearchParams] = useSearchParams()
   const { showToast } = useToastStore()
 
   const currentRound = competition.current_round ?? 1
+  const activeRound = roundId ? Number(roundId) : currentRound
 
-  const [matches, setMatches] = useState<Pairing[]>([])
+  const [pairings, setPairings] = useState<Pairing[]>([])
   const [isLoading, setIsLoading] = useState(true)
-  const [activeRound, setActiveRound] = useState<number>(
-    searchParams.get('round') ? Number(searchParams.get('round')) : currentRound,
-  )
 
   useEffect(() => {
     if (!id) return
     const load = async () => {
       setIsLoading(true)
       try {
-        const response = await listMatches(Number(id), activeRound)
-        setMatches(response.data ?? response)
+        const response = await listRounds(Number(id))
+        setPairings(response.data ?? response)
       } catch (err: any) {
-        showToast(err|| 'Failed to load matches.', false)
-        setMatches([])
+        showToast(err || 'Failed to load matches.', false)
+        setPairings([])
       } finally {
         setIsLoading(false)
       }
@@ -185,11 +182,10 @@ const Matches = () => {
   }, [id, activeRound])
 
   const handleRoundChange = (round: number) => {
-    setActiveRound(round)
-    setSearchParams({ round: String(round) })
+    navigate(`/competition/${id}/${round}/rounds`)
   }
 
-  const rounds = Array.from({ length: currentRound }, (_, i) => i + 1)
+  const roundNumbers = Array.from({ length: currentRound }, (_, i) => i + 1)
 
   return (
     <PageWindow
@@ -212,13 +208,13 @@ const Matches = () => {
         </div>
       }
     >
-      {rounds.length > 1 && (
+      {roundNumbers.length > 1 && (
         <div>
           <p className="text-xs font-bold text-gray-500 uppercase tracking-wider mb-2">
             Select Round
           </p>
           <div className="flex flex-wrap gap-2">
-            {rounds.map(r => (
+            {roundNumbers.map(r => (
               <RoundTab
                 key={r}
                 round={r}
@@ -243,7 +239,7 @@ const Matches = () => {
             )}
           </h2>
           <p className="text-xs text-gray-500 font-medium mt-0.5">
-            {matches.length} match{matches.length !== 1 ? 'es' : ''}
+            {pairings.length} match{pairings.length !== 1 ? 'es' : ''}
           </p>
         </div>
       </div>
@@ -254,12 +250,12 @@ const Matches = () => {
             <div key={i} className="h-16 bg-gray-100 rounded-lg animate-pulse" />
           ))}
         </div>
-      ) : matches.length === 0 ? (
+      ) : pairings.length === 0 ? (
         <EmptyState round={activeRound} />
       ) : (
         <div className="flex flex-col gap-2.5">
-          {matches.map(match => (
-            <MatchCard key={match.id} pairing={match} />
+          {pairings.map(pairing => (
+            <MatchCard key={pairing.id} pairing={pairing} />
           ))}
         </div>
       )}
@@ -267,4 +263,4 @@ const Matches = () => {
   )
 }
 
-export default Matches
+export default Rounds

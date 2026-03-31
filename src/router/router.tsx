@@ -12,7 +12,7 @@ import CompetitionTeams from '../components/teams/CompetitionTeams'
 import TeamPlayers from '../components/teams/TeamPlayers'
 import ProfileComponent from '../components/auth/Profile'
 import PublicCompetition from '../components/competitions/PublicCompetition'
-import Matches from '../components/matches/Matches'
+import Rounds from '../components/rounds/Rounds'
 
 export const router = createBrowserRouter([
   {
@@ -43,8 +43,8 @@ export const router = createBrowserRouter([
         element: <SingleCompetition />,
         children: [
           {
-            path: 'matches',
-            element: <Matches />,
+            path: 'rounds',
+            element: <Rounds />,
           },
         ],
       },
