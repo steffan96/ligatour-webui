@@ -231,11 +231,11 @@ const CompetitionSettings = ({ competition, onCompetitionChange }: CompetitionSe
         </div>
       )}
 
-      {/* Tournament Details */}
+      {/* Tournament Details
       <div>
         <SectionHeader label="Tournament Details" />
         <div className="grid grid-cols-2 gap-3.5">
-          {/* <Field label="Current Round">
+          <Field label="Current Round">
             <input
               type="number"
               min="0"
@@ -244,7 +244,7 @@ const CompetitionSettings = ({ competition, onCompetitionChange }: CompetitionSe
               onChange={e => set('current_round', parseInt(e.target.value) || 0)}
               className={inputCls(ro)}
             />
-          </Field> */}
+          </Field>
           <Field label="Number of Teams">
             <input
               type="number"
@@ -282,7 +282,7 @@ const CompetitionSettings = ({ competition, onCompetitionChange }: CompetitionSe
             </Field>
           )}
         </div>
-      </div>
+      </div> */}
 
       {/* Match Settings */}
       {(draft.has_third_place !== undefined || draft.two_legged !== undefined) && (
