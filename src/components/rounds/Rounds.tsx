@@ -142,10 +142,10 @@ const MatchCard = ({ pairing }: { pairing: Pairing }) => {
   )
 }
 
-const EmptyState = ({ round }: { round: number }) => (
+const EmptyState = () => (
   <div className="flex flex-col items-center justify-center py-16 text-center">
     <div className="text-4xl mb-3">📋</div>
-    <p className="text-sm font-bold text-gray-700">No matches for Round {round}</p>
+    <p className="text-sm font-bold text-gray-700">No matches found</p>
     <p className="text-xs text-gray-500 mt-1 font-medium">
       Matches will appear here once they are generated.
     </p>
@@ -251,7 +251,7 @@ const Rounds = () => {
           ))}
         </div>
       ) : pairings.length === 0 ? (
-        <EmptyState round={activeRound} />
+        <EmptyState/>
       ) : (
         <div className="flex flex-col gap-2.5">
           {pairings.map(pairing => (

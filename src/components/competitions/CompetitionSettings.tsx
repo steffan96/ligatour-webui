@@ -3,9 +3,7 @@ import { updateCompetition } from 'api/competitions'
 import { CompetitionInterface } from 'api/competitions'
 import { CompetitionTypeDisplay } from '../../api/interfaces/competitions'
 import { useToastStore } from '../../api/stores/useToastStore'
-import CustomSelect from '../shared/CustomSelect'
-
-// ─── Sub-components ────────────────────────────────────────────────────────────
+// import CustomSelect from '../shared/CustomSelect'
 
 const Field = ({ label, children }: { label: string; children: React.ReactNode }) => (
   <div className="space-y-1.5">
@@ -18,7 +16,6 @@ const inputCls = (readOnly?: boolean) =>
   `w-full px-2.5 py-1.5 border border-gray-300 rounded-md 
    text-sm font-medium focus:ring-2 
    focus:ring-green-900 focus:border-green-900 ${readOnly ? 'bg-gray-50 text-gray-700' : 'text-gray-900'}`
-
 
 const Toggle = ({
   label,
@@ -92,8 +89,7 @@ const CompetitionSettings = ({ competition, onCompetitionChange }: CompetitionSe
 
   const ro = !isEditing
 
-  const set = (field: keyof CompetitionInterface, value: any) =>
-    setDraft(prev => ({ ...prev, [field]: value }))
+  const set = (field: keyof CompetitionInterface, value: any) => setDraft(prev => ({ ...prev, [field]: value }))
 
   const handleSave = async (overrides?: Partial<CompetitionInterface>) => {
     setIsSaving(true)
@@ -115,7 +111,6 @@ const CompetitionSettings = ({ competition, onCompetitionChange }: CompetitionSe
     setDraft(competition)
     setIsEditing(false)
   }
-
 
   return (
     <div className="space-y-5">
@@ -156,35 +151,15 @@ const CompetitionSettings = ({ competition, onCompetitionChange }: CompetitionSe
         </Field>
       </div>
 
-      {/* Competition Type */}
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
         <Field label="Competition Type">
-          <CustomSelect
-            value={draft.type}
-            options={Object.entries(CompetitionTypeDisplay).map(([key, value]) => ({
-              value: key,
-              label: value,
-            }))}
-            onChange={value => set('type', value)}
-            disabled={ro}
-            className={inputCls(ro)}
-          />
-        </Field>
-        <Field label="Individual">
-          <CustomSelect
-            value={draft.individual ? 'true' : 'false'}
-            options={[
-              { value: 'false', label: 'Team Based' },
-              { value: 'true', label: 'Individual' },
-            ]}
-            onChange={value => set('individual', value === 'true')}
-            disabled={ro}
-            className={inputCls(ro)}
-          />
+          <div className={inputCls(true)}>
+            {CompetitionTypeDisplay[draft.type as keyof typeof CompetitionTypeDisplay] ?? '—'}
+          </div>
         </Field>
       </div>
 
-      {/* Points */}
+      {/* Points
       {(draft.points_for_win !== undefined ||
         draft.points_for_draw !== undefined ||
         draft.points_for_loss !== undefined) && (
@@ -229,7 +204,7 @@ const CompetitionSettings = ({ competition, onCompetitionChange }: CompetitionSe
             )}
           </div>
         </div>
-      )}
+      )} */}
 
       {/* Tournament Details
       <div>

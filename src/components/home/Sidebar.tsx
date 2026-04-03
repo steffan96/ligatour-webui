@@ -49,7 +49,6 @@ const SidebarComponent = () => {
       >
         {isUserLoggedIn && (
           <>
-            <span className="text-base">🚪</span>
             <span>Log out</span>
           </>
         )}
