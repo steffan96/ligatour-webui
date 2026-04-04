@@ -2,8 +2,9 @@ import React, { useEffect, useState } from 'react'
 import { useParams, useNavigate, useOutletContext } from 'react-router-dom'
 import PageWindow from '../shared/PageWindow'
 import { useToastStore } from '../../api/stores/useToastStore'
-import { listRounds } from '../../api/rounds'
+import { listRounds, startRound } from '../../api/rounds'
 import { SingleCompetitionContext } from '../competitions/SingleCompetition'
+import ConfirmModal from '../common/ConfirmModal'
 
 interface Pairing {
   id: number
@@ -37,9 +38,7 @@ const RoundTab = ({
       }`}
   >
     Round {round}
-    {isCurrent && !isActive && (
-      <span className="absolute -top-1 -right-1 w-2 h-2 bg-green-500 rounded-full" />
-    )}
+    {isCurrent && !isActive && <span className="absolute -top-1 -right-1 w-2 h-2 bg-green-500 rounded-full" />}
   </button>
 )
 
@@ -50,9 +49,7 @@ const MatchStatusBadge = ({ status }: { status: Pairing['status'] }) => {
     completed: { label: '✅ Final', cls: 'bg-green-50 text-green-800 border-green-200' },
   }
   const { label, cls } = map[status] ?? map.scheduled
-  return (
-    <span className={`text-xs font-bold px-2 py-0.5 rounded border ${cls}`}>{label}</span>
-  )
+  return <span className={`text-xs font-bold px-2 py-0.5 rounded border ${cls}`}>{label}</span>
 }
 
 const ScoreDisplay = ({
@@ -79,11 +76,19 @@ const ScoreDisplay = ({
 
   return (
     <div className="flex items-center gap-2">
-      <span className={`text-xl font-black tabular-nums ${homeWins ? 'text-green-800' : awayWins ? 'text-gray-400' : 'text-gray-700'}`}>
+      <span
+        className={`text-xl font-black tabular-nums ${
+          homeWins ? 'text-green-800' : awayWins ? 'text-gray-400' : 'text-gray-700'
+        }`}
+      >
         {homeScore}
       </span>
       <span className="text-xs font-bold text-gray-400">:</span>
-      <span className={`text-xl font-black tabular-nums ${awayWins ? 'text-green-800' : homeWins ? 'text-gray-400' : 'text-gray-700'}`}>
+      <span
+        className={`text-xl font-black tabular-nums ${
+          awayWins ? 'text-green-800' : homeWins ? 'text-gray-400' : 'text-gray-700'
+        }`}
+      >
         {awayScore}
       </span>
     </div>
@@ -117,11 +122,7 @@ const MatchCard = ({ pairing }: { pairing: Pairing }) => {
         </div>
 
         <div className="flex flex-col items-center gap-1 shrink-0">
-          <ScoreDisplay
-            homeScore={pairing.home_score}
-            awayScore={pairing.away_score}
-            status={pairing.status}
-          />
+          <ScoreDisplay homeScore={pairing.home_score} awayScore={pairing.away_score} status={pairing.status} />
           <MatchStatusBadge status={pairing.status} />
         </div>
 
@@ -146,9 +147,7 @@ const EmptyState = () => (
   <div className="flex flex-col items-center justify-center py-16 text-center">
     <div className="text-4xl mb-3">📋</div>
     <p className="text-sm font-bold text-gray-700">No matches found</p>
-    <p className="text-xs text-gray-500 mt-1 font-medium">
-      Matches will appear here once they are generated.
-    </p>
+    <p className="text-xs text-gray-500 mt-1 font-medium">Matches will appear here once they are generated.</p>
   </div>
 )
 
@@ -163,6 +162,7 @@ const Rounds = () => {
 
   const [pairings, setPairings] = useState<Pairing[]>([])
   const [isLoading, setIsLoading] = useState(true)
+  const [showStartRoundModal, setShowStartRoundModal] = useState(false)
 
   useEffect(() => {
     if (!id) return
@@ -185,6 +185,18 @@ const Rounds = () => {
     navigate(`/competition/${id}/${round}/rounds`)
   }
 
+  const handleStartRound = async (competitionId: number) => {
+    try {
+      const response = await startRound(competitionId)
+      setPairings(response.data ?? response)
+      showToast('Round started successfully!', true)
+    } catch (err: any) {
+      showToast(err || 'Failed to start round.', false)
+    } finally {
+      setShowStartRoundModal(false)
+    }
+  }
+
   const roundNumbers = Array.from({ length: currentRound }, (_, i) => i + 1)
 
   return (
@@ -193,8 +205,9 @@ const Rounds = () => {
       headerActionButtons={
         <div className="flex items-center gap-3">
           <button
-            className="bg-green-700 text-white 
-            text-sm font-semibold px-3.5 py-1.5 rounded-md hover:bg-green-800 flex items-center gap-2 transition-colors"
+            className="bg-green-700 text-white text-sm font-semibold px-3.5 py-1.5 
+            rounded-md hover:bg-green-800 flex items-center gap-2 transition-colors"
+            onClick={() => setShowStartRoundModal(true)}
           >
             <span>▶</span> Start Round
           </button>
@@ -210,9 +223,7 @@ const Rounds = () => {
     >
       {roundNumbers.length > 1 && (
         <div>
-          <p className="text-xs font-bold text-gray-500 uppercase tracking-wider mb-2">
-            Select Round
-          </p>
+          <p className="text-xs font-bold text-gray-500 uppercase tracking-wider mb-2">Select Round</p>
           <div className="flex flex-wrap gap-2">
             {roundNumbers.map(r => (
               <RoundTab
@@ -232,8 +243,10 @@ const Rounds = () => {
           <h2 className="text-base font-bold text-gray-900">
             Round {activeRound}
             {activeRound === currentRound && (
-              <span className="ml-2 text-xs 
-              font-semibold text-green-700 bg-green-50 border border-green-200 px-2 py-0.5 rounded-md">
+              <span
+                className="ml-2 text-xs 
+              font-semibold text-green-700 bg-green-50 border border-green-200 px-2 py-0.5 rounded-md"
+              >
                 Current
               </span>
             )}
@@ -251,7 +264,7 @@ const Rounds = () => {
           ))}
         </div>
       ) : pairings.length === 0 ? (
-        <EmptyState/>
+        <EmptyState />
       ) : (
         <div className="flex flex-col gap-2.5">
           {pairings.map(pairing => (
@@ -259,6 +272,15 @@ const Rounds = () => {
           ))}
         </div>
       )}
+      {showStartRoundModal && (
+  <ConfirmModal
+    title="Start Round?"
+    description="This will generate matches for the next round. This action cannot be undone."
+    confirmLabel="▶ Start"
+    onConfirm={() => handleStartRound(competition.id)}
+    onCancel={() => setShowStartRoundModal(false)}
+  />
+)}
     </PageWindow>
   )
 }
