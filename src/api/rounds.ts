@@ -12,9 +12,9 @@ export const startRound = async (competitionId: number) => {
   }
 }
 
-export const getRound = async (competitionId: number) => {
+export const getRound = async (competitionId: number, roundId: number) => {
   try {
-    const response = await axiosInstance.get(`/api/v1/rounds/${competitionId}`)
+    const response = await axiosInstance.get(`/api/v1/rounds/${competitionId}/${roundId}`)
     return response
   } catch (error: any) {
     if (error.response?.data?.message) {
@@ -36,9 +36,14 @@ export const listRounds = async (competitionId: number) => {
   }
 }
 
+interface UpdateRoundPayload {
+  status?: 'scheduled' | 'in_progress' | 'completed'
+  stage?: string
+}
+
 export const updateRound = async (
   competitionId: number,
-  data: { round_number: number; name?: string }
+  roundId: number, data: UpdateRoundPayload
 ) => {
   try {
     const response = await axiosInstance.put(`/api/v1/rounds/${competitionId}`, data)
@@ -51,9 +56,9 @@ export const updateRound = async (
   }
 }
 
-export const deleteRound = async (competitionId: number) => {
+export const deleteRound = async (competitionId: number, roundId: number) => {
   try {
-    const response = await axiosInstance.delete(`/api/v1/rounds/${competitionId}`)
+    const response = await axiosInstance.delete(`/api/v1/rounds/${competitionId}/${roundId}`)
     return response
   } catch (error: any) {
     if (error.response?.data?.message) {
