@@ -169,7 +169,7 @@ const CompetitionTeams = () => {
                        transition-colors"
             onClick={() => handleBackClick(resetNew)}
           >
-            <span>←</span> Back to Competition
+            <span>←</span> Back to settings
           </button>
           {!isAdding && editingId === null && (
             <button

@@ -189,7 +189,7 @@ const SingleCompetition = () => {
           title="Start Competition?"
           description="This will lock the competition 
           settings and begin match generation. This action cannot be undone."
-          confirmLabel="🚀 Start"
+          confirmLabel="Start"
           onConfirm={handleStartCompetition}
           onCancel={() => setShowStartModal(false)}
         />

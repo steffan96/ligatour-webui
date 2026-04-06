@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import PageWindow from '../shared/PageWindow'
 import { useToastStore } from '../../api/stores/useToastStore'
-import { getRound, updateRound, deleteRound } from '../../api/rounds'
+import { getRound, updateRound, deleteRound, startRound } from '../../api/rounds'
 import ConfirmModal from '../common/ConfirmModal'
 
 interface Match {
@@ -65,19 +65,11 @@ const ScoreDisplay = ({
   const awayWins = awayScore > homeScore
   return (
     <div className="flex items-center gap-2">
-      <span
-        className={`text-xl font-black tabular-nums ${
-          homeWins ? 'text-green-800' : awayWins ? 'text-gray-400' : 'text-gray-700'
-        }`}
-      >
+      <span className={`text-xl font-black tabular-nums ${homeWins ? 'text-green-800' : awayWins ? 'text-gray-400' : 'text-gray-700'}`}>
         {homeScore}
       </span>
       <span className="text-xs font-bold text-gray-400">:</span>
-      <span
-        className={`text-xl font-black tabular-nums ${
-          awayWins ? 'text-green-800' : homeWins ? 'text-gray-400' : 'text-gray-700'
-        }`}
-      >
+      <span className={`text-xl font-black tabular-nums ${awayWins ? 'text-green-800' : homeWins ? 'text-gray-400' : 'text-gray-700'}`}>
         {awayScore}
       </span>
     </div>
@@ -100,13 +92,7 @@ const MatchCard = ({ match }: { match: Match }) => {
   return (
     <div
       className={`bg-white rounded-lg border transition-shadow hover:shadow-md
-      ${
-        match.status === 'in_progress'
-          ? 'border-red-200 shadow-sm'
-          : isBye
-          ? 'border-blue-100 bg-blue-50/30'
-          : 'border-gray-200'
-      }`}
+        ${match.status === 'in_progress' ? 'border-red-200 shadow-sm' : isBye ? 'border-blue-100 bg-blue-50/30' : 'border-gray-200'}`}
     >
       <div className="px-4 py-3 flex items-center justify-between gap-4">
         <div className="flex-1 flex items-center justify-end gap-2 min-w-0">
@@ -121,11 +107,7 @@ const MatchCard = ({ match }: { match: Match }) => {
         </div>
         <div className="flex-1 flex items-center gap-2 min-w-0">
           {awayWins && <span className="text-xs">🏆</span>}
-          <span
-            className={`text-sm font-bold truncate ${
-              isBye ? 'text-gray-400 italic' : awayWins ? 'text-green-800' : 'text-gray-800'
-            }`}
-          >
+          <span className={`text-sm font-bold truncate ${isBye ? 'text-gray-400 italic' : awayWins ? 'text-green-800' : 'text-gray-800'}`}>
             {isBye ? 'Bye' : match.away_team_name}
           </span>
         </div>
@@ -143,7 +125,9 @@ const SingleRound = () => {
   const [isLoading, setIsLoading] = useState(true)
   const [isEditing, setIsEditing] = useState(false)
   const [isSaving, setIsSaving] = useState(false)
+  const [isStarting, setIsStarting] = useState(false)
   const [showDeleteModal, setShowDeleteModal] = useState(false)
+  const [showStartRoundModal, setShowStartRoundModal] = useState(false)
 
   const [editStage, setEditStage] = useState('')
   const [editStatus, setEditStatus] = useState<Round['status']>('scheduled')
@@ -199,6 +183,23 @@ const SingleRound = () => {
     }
   }
 
+  const handleStartRound = async () => {
+    if (!id) return
+    setIsStarting(true)
+    try {
+      const response = await startRound(Number(id))
+      const newRound: Round = response.data ?? response
+      showToast('Round started successfully!', true)
+      // Navigate to the newly created round
+      navigate(`/competition/${id}/rounds/${newRound.id}`)
+    } catch (err: any) {
+      showToast(err || 'Failed to start round.', false)
+    } finally {
+      setIsStarting(false)
+      setShowStartRoundModal(false)
+    }
+  }
+
   const handleCancelEdit = () => {
     if (round) {
       setEditStage(round.stage)
@@ -217,14 +218,14 @@ const SingleRound = () => {
               <button
                 onClick={handleSave}
                 disabled={isSaving}
-                className="bg-green-700 text-white text-sm font-semibold px-3.5 py-1.5 
+                className="bg-green-700 text-white text-sm font-semibold px-3.5 py-1.5
                   rounded-md hover:bg-green-800 flex items-center gap-2 transition-colors disabled:opacity-50"
               >
                 {isSaving ? 'Saving…' : '✓ Save'}
               </button>
               <button
                 onClick={handleCancelEdit}
-                className="bg-gray-100 text-gray-900 text-sm font-semibold px-3.5 py-1.5 
+                className="bg-gray-100 text-gray-900 text-sm font-semibold px-3.5 py-1.5
                   rounded-md hover:bg-gray-200 transition-colors"
               >
                 Cancel
@@ -233,15 +234,23 @@ const SingleRound = () => {
           ) : (
             <>
               <button
+                onClick={() => setShowStartRoundModal(true)}
+                disabled={isStarting}
+                className="bg-green-700 text-white text-sm font-semibold px-3.5 py-1.5
+                  rounded-md hover:bg-green-800 flex items-center gap-2 transition-colors disabled:opacity-50"
+              >
+                <span>▶</span> Start Round
+              </button>
+              <button
                 onClick={() => setIsEditing(true)}
-                className="bg-gray-100 text-gray-900 text-sm font-semibold px-3.5 py-1.5 
+                className="bg-gray-100 text-gray-900 text-sm font-semibold px-3.5 py-1.5
                   rounded-md hover:bg-gray-200 flex items-center gap-2 transition-colors"
               >
                 ✎ Edit
               </button>
               <button
                 onClick={() => setShowDeleteModal(true)}
-                className="bg-red-50 text-red-700 border border-red-200 text-sm font-semibold px-3.5 py-1.5 
+                className="bg-red-50 text-red-700 border border-red-200 text-sm font-semibold px-3.5 py-1.5
                   rounded-md hover:bg-red-100 flex items-center gap-2 transition-colors"
               >
                 🗑 Delete
@@ -250,7 +259,7 @@ const SingleRound = () => {
           )}
           <button
             onClick={() => navigate(`/competition/${id}/rounds`)}
-            className="bg-gray-100 text-gray-900 text-sm font-semibold px-3.5 py-1.5 
+            className="bg-gray-100 text-gray-900 text-sm font-semibold px-3.5 py-1.5
               rounded-md hover:bg-gray-200 flex items-center gap-2 transition-colors"
           >
             ← Back to rounds
@@ -271,7 +280,6 @@ const SingleRound = () => {
         </div>
       ) : (
         <div className="flex flex-col gap-6">
-          {/* Round info card */}
           <div className="bg-white border border-gray-200 rounded-lg p-4 flex flex-col gap-4">
             <div className="grid grid-cols-2 gap-4">
               <div className="flex flex-col gap-1">
@@ -280,9 +288,8 @@ const SingleRound = () => {
                   <select
                     value={editStage}
                     onChange={e => setEditStage(e.target.value)}
-                    className="text-sm border 
-                    border-gray-300 rounded-md px-2 py-1.5 
-                    text-gray-900 focus:outline-none focus:ring-2 focus:ring-green-500"
+                    className="text-sm border border-gray-300 rounded-md px-2 py-1.5
+                      text-gray-900 focus:outline-none focus:ring-2 focus:ring-green-500"
                   >
                     {STAGES.map(s => (
                       <option key={s} value={s}>
@@ -303,8 +310,8 @@ const SingleRound = () => {
                   <select
                     value={editStatus}
                     onChange={e => setEditStatus(e.target.value as Round['status'])}
-                    className="text-sm border border-gray-300 
-                    rounded-md px-2 py-1.5 text-gray-900 focus:outline-none focus:ring-2 focus:ring-green-500"
+                    className="text-sm border border-gray-300 rounded-md px-2 py-1.5
+                      text-gray-900 focus:outline-none focus:ring-2 focus:ring-green-500"
                   >
                     {STATUSES.map(s => (
                       <option key={s} value={s}>
@@ -329,7 +336,6 @@ const SingleRound = () => {
             </div>
           </div>
 
-          {/* Matches */}
           <div className="flex flex-col gap-2.5">
             <p className="text-xs font-bold text-gray-500 uppercase tracking-wider">
               {round.matches.length} Match{round.matches.length !== 1 ? 'es' : ''}
@@ -353,6 +359,16 @@ const SingleRound = () => {
           confirmLabel="🗑 Delete"
           onConfirm={handleDelete}
           onCancel={() => setShowDeleteModal(false)}
+        />
+      )}
+
+      {showStartRoundModal && (
+        <ConfirmModal
+          title="Start Next Round?"
+          description="This will generate matches for the next round. This action cannot be undone."
+          confirmLabel="▶ Start"
+          onConfirm={handleStartRound}
+          onCancel={() => setShowStartRoundModal(false)}
         />
       )}
     </PageWindow>

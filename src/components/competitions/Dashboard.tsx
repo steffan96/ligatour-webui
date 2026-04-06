@@ -5,10 +5,11 @@ import CompetitionCard from './CompetitionCard'
 import CreateCompetitionComponent from './CreateCompetition'
 import { CompetitionTypeDisplay } from '../../api/interfaces/competitions'
 import PageWindow from '../shared/PageWindow'
-import { useToastStore } from '../../api/stores/useToastStore';
+import { useToastStore } from '../../api/stores/useToastStore'
+import Pagination from '../common/Pagination'
 
 export default function DashboardComponent() {
-  const { showToast } = useToastStore();
+  const { showToast } = useToastStore()
   const [competitions, setCompetitions] = useState<
     { id: string; name: string; type?: string; number_of_teams?: number }[]
   >([])
@@ -19,12 +20,8 @@ export default function DashboardComponent() {
   >([])
   const [isLoading, setIsLoading] = useState(true)
 
-  // Pagination states
   const [currentPage, setCurrentPage] = useState(1)
-  const [itemsPerPage] = useState(4)
-  const [paginatedCompetitions, setPaginatedCompetitions] = useState<
-    { id: string; name: string; type?: string; number_of_teams?: number }[]
-  >([])
+  const itemsPerPage = 4
 
   const fetchCompetitions = async () => {
     setIsLoading(true)
@@ -51,36 +48,16 @@ export default function DashboardComponent() {
       filtered = filtered.filter(comp => comp.type === selectedType)
     }
     setFilteredCompetitions(filtered)
-    // Reset to first page when filters change
     setCurrentPage(1)
   }, [searchTerm, selectedType, competitions])
 
-  // Update paginated data when filtered competitions or current page changes
-  useEffect(() => {
-    const startIndex = (currentPage - 1) * itemsPerPage
-    const endIndex = startIndex + itemsPerPage
-    setPaginatedCompetitions(filteredCompetitions.slice(startIndex, endIndex))
-  }, [filteredCompetitions, currentPage, itemsPerPage])
-
   useEffect(() => {
     fetchCompetitions()
-  }, []) // Removed showToast from dependencies to avoid infinite loops
+  }, [])
 
-  // Calculate total pages
   const totalPages = Math.ceil(filteredCompetitions.length / itemsPerPage)
-
-  // Pagination handlers
-  const goToPage = (page: number) => {
-    setCurrentPage(Math.max(1, Math.min(page, totalPages)))
-  }
-
-  const goToPreviousPage = () => {
-    setCurrentPage(prev => Math.max(1, prev - 1))
-  }
-
-  const goToNextPage = () => {
-    setCurrentPage(prev => Math.min(totalPages, prev + 1))
-  }
+  const startIndex = (currentPage - 1) * itemsPerPage
+  const paginatedCompetitions = filteredCompetitions.slice(startIndex, startIndex + itemsPerPage)
 
   return (
     <PageWindow title='Main Dashboard'>
@@ -131,53 +108,14 @@ export default function DashboardComponent() {
         )}
       </div>
 
-      {/* Pagination Controls */}
-      {!isLoading && totalPages > 1 && (
-        <div className="flex items-center justify-between mt-4 px-2">
-          <div className="text-sm text-gray-700">Number of total competitions: {filteredCompetitions.length}</div>
-          <div className="flex items-center gap-2">
-            <button
-              onClick={goToPreviousPage}
-              disabled={currentPage === 1}
-              className={`px-3 py-1 rounded border ${
-                currentPage === 1
-                  ? 'bg-gray-100 text-gray-400 cursor-not-allowed border-gray-200'
-                  : 'bg-white text-gray-700 hover:bg-gray-50 border-gray-300'
-              }`}
-            >
-              Previous
-            </button>
-
-            {/* Page Numbers */}
-            <div className="flex items-center gap-1">
-              {Array.from({ length: totalPages }, (_, i) => i + 1).map(page => (
-                <button
-                  key={page}
-                  onClick={() => goToPage(page)}
-                  className={`w-8 h-8 rounded border ${
-                    currentPage === page
-                      ? 'bg-green-500 text-white border-green-500'
-                      : 'bg-white text-gray-700 hover:bg-gray-50 border-gray-300'
-                  }`}
-                >
-                  {page}
-                </button>
-              ))}
-            </div>
-
-            <button
-              onClick={goToNextPage}
-              disabled={currentPage === totalPages}
-              className={`px-3 py-1 rounded border ${
-                currentPage === totalPages
-                  ? 'bg-gray-100 text-gray-400 cursor-not-allowed border-gray-200'
-                  : 'bg-white text-gray-700 hover:bg-gray-50 border-gray-300'
-              }`}
-            >
-              Next
-            </button>
-          </div>
-        </div>
+      {!isLoading && (
+        <Pagination
+          currentPage={currentPage}
+          totalPages={totalPages}
+          totalItems={filteredCompetitions.length}
+          itemLabel="competitions"
+          onPageChange={setCurrentPage}
+        />
       )}
     </PageWindow>
   )

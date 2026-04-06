@@ -4,7 +4,7 @@ import PageWindow from '../shared/PageWindow'
 import { useToastStore } from '../../api/stores/useToastStore'
 import { listRounds, startRound } from '../../api/rounds'
 import { SingleCompetitionContext } from '../competitions/SingleCompetition'
-import ConfirmModal from '../common/ConfirmModal'
+import Pagination from '../common/Pagination'
 
 interface Match {
   id: number
@@ -78,13 +78,11 @@ const ScoreDisplay = ({
 
 const MatchCard = ({ match }: { match: Match }) => {
   const isBye = match.status === 'bye'
-
   const homeWins =
     match.status === 'completed' &&
     match.home_score !== null &&
     match.away_score !== null &&
     match.home_score > match.away_score
-
   const awayWins =
     match.status === 'completed' &&
     match.home_score !== null &&
@@ -103,12 +101,10 @@ const MatchCard = ({ match }: { match: Match }) => {
           </span>
           {homeWins && <span className="text-xs">🏆</span>}
         </div>
-
         <div className="flex flex-col items-center gap-1 shrink-0">
           <ScoreDisplay homeScore={match.home_score} awayScore={match.away_score} status={match.status} />
           <MatchStatusBadge status={match.status} />
         </div>
-
         <div className="flex-1 flex items-center gap-2 min-w-0">
           {awayWins && <span className="text-xs">🏆</span>}
           <span className={`text-sm font-bold truncate ${isBye ? 'text-gray-400 italic' : awayWins ? 'text-green-800' : 'text-gray-800'}`}>
@@ -144,13 +140,25 @@ const RoundSection = ({ round, onSelect }: { round: Round; onSelect: () => void 
   </div>
 )
 
-const EmptyState = () => (
-  <div className="flex flex-col items-center justify-center py-16 text-center">
-    <div className="text-4xl mb-3">📋</div>
-    <p className="text-sm font-bold text-gray-700">No matches found</p>
-    <p className="text-xs text-gray-500 mt-1 font-medium">Matches will appear here once they are generated.</p>
+const NoRoundsState = ({ onStart, isStarting }: { onStart: () => void; isStarting: boolean }) => (
+  <div className="flex flex-col items-center justify-center py-16 text-center gap-4">
+    <div className="text-4xl">🏁</div>
+    <div>
+      <p className="text-sm font-bold text-gray-700">No rounds yet</p>
+      <p className="text-xs text-gray-500 mt-1 font-medium">Generate the first round of matches to get started.</p>
+    </div>
+    <button
+      onClick={onStart}
+      disabled={isStarting}
+      className="bg-green-700 text-white text-sm font-semibold px-4 py-2 rounded-md
+        hover:bg-green-800 flex items-center gap-2 transition-colors disabled:opacity-50"
+    >
+      {isStarting ? 'Starting…' : '▶ Start First Round'}
+    </button>
   </div>
 )
+
+const ROUNDS_PER_PAGE = 5
 
 const Rounds = () => {
   const { competition } = useOutletContext<SingleCompetitionContext>()
@@ -160,7 +168,8 @@ const Rounds = () => {
 
   const [rounds, setRounds] = useState<Round[]>([])
   const [isLoading, setIsLoading] = useState(true)
-  const [showStartRoundModal, setShowStartRoundModal] = useState(false)
+  const [isStarting, setIsStarting] = useState(false)
+  const [currentPage, setCurrentPage] = useState(1)
 
   useEffect(() => {
     if (!id) return
@@ -180,41 +189,39 @@ const Rounds = () => {
     load()
   }, [id])
 
-  const handleStartRound = async (competitionId: number) => {
+  const handleStartFirstRound = async () => {
+    setIsStarting(true)
     try {
-      const response = await startRound(competitionId)
+      const response = await startRound(competition.id)
       const data: Round[] = response.data ?? response
       setRounds(data)
-      showToast('Round started successfully!', true)
+      showToast('First round started!', true)
     } catch (err: any) {
       showToast(err || 'Failed to start round.', false)
     } finally {
-      setShowStartRoundModal(false)
+      setIsStarting(false)
     }
   }
 
-  const hasMatches = rounds.some(r => r.matches.length > 0)
+  const visibleRounds = rounds
+    .filter(r => r.matches.length > 0)
+    .sort((a, b) => a.round_number - b.round_number)
+
+  const totalPages = Math.ceil(visibleRounds.length / ROUNDS_PER_PAGE)
+  const startIndex = (currentPage - 1) * ROUNDS_PER_PAGE
+  const paginatedRounds = visibleRounds.slice(startIndex, startIndex + ROUNDS_PER_PAGE)
 
   return (
     <PageWindow
       title={`Matches — ${competition.name}`}
       headerActionButtons={
-        <div className="flex items-center gap-3">
-          <button
-            className="bg-green-700 text-white text-sm font-semibold px-3.5 py-1.5 
-            rounded-md hover:bg-green-800 flex items-center gap-2 transition-colors"
-            onClick={() => setShowStartRoundModal(true)}
-          >
-            <span>▶</span> Start Round
-          </button>
-          <button
-            className="bg-gray-100 text-gray-900 
-            text-sm font-semibold px-3.5 py-1.5 rounded-md hover:bg-gray-200 flex items-start gap-2 transition-colors"
-            onClick={() => navigate(`/competition/${id}`)}
-          >
-            <span>←</span> Back to competition
-          </button>
-        </div>
+        <button
+          className="bg-gray-100 text-gray-900 text-sm font-semibold px-3.5 py-1.5
+            rounded-md hover:bg-gray-200 flex items-center gap-2 transition-colors"
+          onClick={() => navigate(`/competition/${id}`)}
+        >
+          <span>←</span> Back to settings
+        </button>
       }
     >
       {isLoading ? (
@@ -223,31 +230,30 @@ const Rounds = () => {
             <div key={i} className="h-16 bg-gray-100 rounded-lg animate-pulse" />
           ))}
         </div>
-      ) : !hasMatches ? (
-        <EmptyState />
+      ) : rounds.length === 0 ? (
+        <NoRoundsState onStart={handleStartFirstRound} isStarting={isStarting} />
       ) : (
-        <div className="flex flex-col gap-6">
-          {rounds
-            .filter(r => r.matches.length > 0)
-            .sort((a, b) => a.round_number - b.round_number)
-            .map(round => (
+        <>
+          <div className="flex flex-col gap-6">
+            {paginatedRounds.map(round => (
               <RoundSection
                 key={round.id}
                 round={round}
                 onSelect={() => navigate(`/competition/${id}/rounds/${round.id}`)}
               />
             ))}
-        </div>
-      )}
-
-      {showStartRoundModal && (
-        <ConfirmModal
-          title="Start Round?"
-          description="This will generate matches for the next round. This action cannot be undone."
-          confirmLabel="▶ Start"
-          onConfirm={() => handleStartRound(competition.id)}
-          onCancel={() => setShowStartRoundModal(false)}
-        />
+          </div>
+          <Pagination
+            currentPage={currentPage}
+            totalPages={totalPages}
+            totalItems={visibleRounds.length}
+            itemLabel="rounds"
+            onPageChange={page => {
+              setCurrentPage(page)
+              window.scrollTo({ top: 0, behavior: 'smooth' })
+            }}
+          />
+        </>
       )}
     </PageWindow>
   )

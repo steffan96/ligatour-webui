@@ -10,7 +10,7 @@ const SidebarComponent = () => {
 
   const menuItems = [
     { icon: '▦', label: 'Dashboard', onClick: () => navigate('/competitions') },
-    { icon: '👥', label: 'Profile', onClick: () => navigate('profile') },
+    // { icon: '👥', label: 'Profile', onClick: () => navigate('profile') },
   ]
 
   const handleLogout = () => {
