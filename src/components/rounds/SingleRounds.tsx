@@ -29,7 +29,6 @@ interface Round {
   matches: Match[]
 }
 
-const STAGES = ['group_stage', 'round_of_16', 'quarter_final', 'semi_final', 'final']
 const STATUSES = ['scheduled', 'in_progress', 'completed'] as const
 
 const MatchStatusBadge = ({ status }: { status: Match['status'] }) => {
@@ -129,7 +128,6 @@ const SingleRound = () => {
   const [showDeleteModal, setShowDeleteModal] = useState(false)
   const [showStartRoundModal, setShowStartRoundModal] = useState(false)
 
-  const [editStage, setEditStage] = useState('')
   const [editStatus, setEditStatus] = useState<Round['status']>('scheduled')
 
   useEffect(() => {
@@ -140,7 +138,6 @@ const SingleRound = () => {
         const response = await getRound(Number(id), Number(roundId))
         const data: Round = response.data ?? response
         setRound(data)
-        setEditStage(data.stage)
         setEditStatus(data.status)
       } catch (err: any) {
         showToast(err || 'Failed to load round.', false)
@@ -156,7 +153,6 @@ const SingleRound = () => {
     setIsSaving(true)
     try {
       const response = await updateRound(Number(id), Number(roundId), {
-        stage: editStage,
         status: editStatus,
       })
       const data: Round = response.data ?? response
@@ -184,13 +180,12 @@ const SingleRound = () => {
   }
 
   const handleStartRound = async () => {
-    if (!id) return
+    if (!id || !roundId) return
     setIsStarting(true)
     try {
       const response = await startRound(Number(id))
       const newRound: Round = response.data ?? response
       showToast('Round started successfully!', true)
-      // Navigate to the newly created round
       navigate(`/competition/${id}/rounds/${newRound.id}`)
     } catch (err: any) {
       showToast(err || 'Failed to start round.', false)
@@ -202,7 +197,6 @@ const SingleRound = () => {
 
   const handleCancelEdit = () => {
     if (round) {
-      setEditStage(round.stage)
       setEditStatus(round.status)
     }
     setIsEditing(false)
@@ -284,24 +278,9 @@ const SingleRound = () => {
             <div className="grid grid-cols-2 gap-4">
               <div className="flex flex-col gap-1">
                 <span className="text-xs font-bold text-gray-500 uppercase tracking-wider">Stage</span>
-                {isEditing ? (
-                  <select
-                    value={editStage}
-                    onChange={e => setEditStage(e.target.value)}
-                    className="text-sm border border-gray-300 rounded-md px-2 py-1.5
-                      text-gray-900 focus:outline-none focus:ring-2 focus:ring-green-500"
-                  >
-                    {STAGES.map(s => (
-                      <option key={s} value={s}>
-                        {s.replace(/_/g, ' ')}
-                      </option>
-                    ))}
-                  </select>
-                ) : (
-                  <span className="text-sm font-semibold text-gray-800 capitalize">
-                    {round.stage.replace(/_/g, ' ')}
-                  </span>
-                )}
+                <span className="text-sm font-semibold text-gray-800 capitalize">
+                  {round.stage.replace(/_/g, ' ')}
+                </span>
               </div>
 
               <div className="flex flex-col gap-1">

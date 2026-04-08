@@ -46,7 +46,7 @@ export const updateRound = async (
   roundId: number, data: UpdateRoundPayload
 ) => {
   try {
-    const response = await axiosInstance.put(`/api/v1/rounds/${competitionId}`, data)
+    const response = await axiosInstance.put(`/api/v1/rounds/${competitionId}/${roundId}`, data)
     return response
   } catch (error: any) {
     if (error.response?.data?.message) {
