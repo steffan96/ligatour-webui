@@ -233,7 +233,7 @@ const SingleRound = () => {
                 className="bg-green-700 text-white text-sm font-semibold px-3.5 py-1.5
                   rounded-md hover:bg-green-800 flex items-center gap-2 transition-colors disabled:opacity-50"
               >
-                <span>▶</span> Start Round
+                <span>▶</span> Next Round
               </button>
               <button
                 onClick={() => setIsEditing(true)}
@@ -244,8 +244,8 @@ const SingleRound = () => {
               </button>
               <button
                 onClick={() => setShowDeleteModal(true)}
-                className="bg-red-50 text-red-700 border border-red-200 text-sm font-semibold px-3.5 py-1.5
-                  rounded-md hover:bg-red-100 flex items-center gap-2 transition-colors"
+                className="text-red-600 hover:text-red-800 text-sm font-semibold px-2 py-1.5
+                  rounded-md hover:bg-red-50 transition-colors"
               >
                 🗑 Delete
               </button>
