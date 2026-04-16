@@ -5,6 +5,7 @@ import { useToastStore } from "../../api/stores/useToastStore";
 import { listRounds, startRound } from "../../api/rounds";
 import { SingleCompetitionContext } from "../competitions/SingleCompetition";
 import Pagination from "../common/Pagination";
+import ConfirmModal from "../common/ConfirmModal";
 
 interface Match {
   id: number;
@@ -113,6 +114,7 @@ const Rounds = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [isStarting, setIsStarting] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
+  const [showStartRoundModal, setShowStartRoundModal] = useState(false);
 
   useEffect(() => {
     if (!id) return;
@@ -143,6 +145,25 @@ const Rounds = () => {
       showToast(err || "Failed to start round.", false);
     } finally {
       setIsStarting(false);
+    }
+  };
+
+  const handleStartRound = async (roundId?: number) => {
+    if (!id) return;
+    setIsStarting(true);
+    try {
+      const response = await startRound(Number(id));
+      const data: Round[] = response.data ?? response;
+      setRounds(data);
+      showToast("Next round generated.", true);
+      if (roundId) {
+        navigate(`/competition/${id}/rounds/${roundId + 1}`);
+      }
+    } catch (err: any) {
+      showToast(err || "Failed to start round.", false);
+    } finally {
+      setIsStarting(false);
+      setShowStartRoundModal(false);
     }
   };
 
@@ -197,6 +218,18 @@ const Rounds = () => {
               />
             ))}
           </div>
+          {visibleRounds.length > 0 && (
+            <div className="mt-6 pt-4 border-t border-gray-200">
+              <button
+                onClick={() => setShowStartRoundModal(true)}
+                disabled={isStarting}
+                className="bg-green-700 text-white text-sm font-semibold px-4 py-2
+                  rounded-md hover:bg-green-800 flex items-center gap-2 transition-colors disabled:opacity-50"
+              >
+                <span>▶</span> Start Next Round
+              </button>
+            </div>
+          )}
           <Pagination
             currentPage={currentPage}
             totalPages={totalPages}
@@ -208,6 +241,16 @@ const Rounds = () => {
             }}
           />
         </>
+      )}
+
+      {showStartRoundModal && (
+        <ConfirmModal
+          title="Start Next Round?"
+          description="This will generate matches for the next round. This action cannot be undone."
+          confirmLabel="▶ Start"
+          onConfirm={() => handleStartRound()}
+          onCancel={() => setShowStartRoundModal(false)}
+        />
       )}
     </PageWindow>
   );
