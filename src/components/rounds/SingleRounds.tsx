@@ -163,15 +163,6 @@ const SingleRound = () => {
   const [round, setRound] = useState<Round | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
-  const canCompleteRound = (r: Round) => {
-    if (!r.matches || r.matches.length === 0) return false;
-    return r.matches.every(
-      (m) =>
-        m.status === "bye" ||
-        (m.winner_team_id !== null && m.winner_team_id !== undefined),
-    );
-  };
-
   const loadRound = async () => {
     if (!id || !roundId) return;
     setIsLoading(true);
@@ -234,11 +225,6 @@ const SingleRound = () => {
             <div className="font-bold capitalize">
               {round.status.replace(/_/g, " ")}
             </div>
-            {!canCompleteRound(round) && (
-              <p className="text-[10px] text-amber-600 mt-1">
-                Set winners for all matches to complete the round
-              </p>
-            )}
           </div>
           <div className="flex flex-col gap-2.5">
             {round.matches?.map((m) => (
