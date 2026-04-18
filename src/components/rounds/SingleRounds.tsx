@@ -131,7 +131,7 @@ const MatchCard = ({
             }
             className="text-sm border rounded px-2 py-1"
           >
-            <option value="">None / Tie</option>
+            <option value="">Draw</option>
             <option value={match.home_team_id}>{match.home_team_name}</option>
             <option value={match.away_team_id}>{match.away_team_name}</option>
           </select>

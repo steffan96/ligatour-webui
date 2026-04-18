@@ -86,11 +86,9 @@ const CompetitionOverview = ({
             >
               <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M8 16H6a2 2 0 01-2-2V6a2 
-                2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"
+                  strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
+                  d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 
+                     2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"
                 />
               </svg>
               Copy
@@ -116,8 +114,7 @@ const CompetitionOverview = ({
                 onClick={onStart}
                 className="shrink-0 flex items-center gap-2 bg-green-900 hover:bg-green-800
                            active:scale-95 text-white text-sm font-bold
-                           px-5 py-2.5 rounded-lg shadow-sm
-                           transition-all duration-150"
+                           px-5 py-2.5 rounded-lg shadow-sm transition-all duration-150"
               >
                 <span className="text-base">🚀</span>
                 Start Competition
@@ -167,7 +164,7 @@ const SingleCompetition = () => {
       setCompetition(response?.data)
       showToast('Competition started!', true)
     } catch (err: any) {
-      showToast(err || 'Failed to activate competition. Please try again or contact support.', false)
+      showToast(err || 'Failed to activate competition.', false)
     }
   }
 
@@ -187,8 +184,7 @@ const SingleCompetition = () => {
       {showStartModal && (
         <ConfirmModal
           title="Start Competition?"
-          description="This will lock the competition 
-          settings and begin match generation. This action cannot be undone."
+          description="This will lock settings and begin match generation. This action cannot be undone."
           confirmLabel="Start"
           onConfirm={handleStartCompetition}
           onCancel={() => setShowStartModal(false)}
@@ -210,7 +206,7 @@ const SingleCompetition = () => {
             <button
               className="bg-orange-50 text-orange-900 text-sm font-bold px-3.5 py-1.5
                          rounded-md hover:bg-orange-100 border border-orange-200 transition-colors"
-             onClick={() => navigate(`/competition/${id}/rounds`)}
+              onClick={() => navigate(`/competition/${id}/rounds`)}
             >
               🔀 Rounds
             </button>
