@@ -113,7 +113,7 @@ const MatchCard = ({
             {isBye ? "Bye" : match.away_team_name}
           </span>
         </div>
-        {!isBye && !isEditing && (
+        {!isEditing && (
           <button
             onClick={() => setIsEditing(true)}
             className="text-xs bg-gray-100 px-2 py-1 rounded"
@@ -194,7 +194,6 @@ const SingleRound = () => {
       showToast("Match updated!", true);
     } catch (err: any) {
       showToast(err || "Match update failed.", false);
-      throw err;
     }
   };
 
