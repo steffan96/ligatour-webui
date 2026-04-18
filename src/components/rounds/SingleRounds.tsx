@@ -30,8 +30,6 @@ interface Round {
   matches: Match[];
 }
 
-// const STATUSES = ["scheduled", "in_progress", "completed"] as const;
-
 const MatchStatusBadge = ({ status }: { status: Match["status"] }) => {
   const map: Record<Match["status"], { label: string; cls: string }> = {
     scheduled: {
@@ -164,9 +162,6 @@ const SingleRound = () => {
   const { showToast } = useToastStore();
   const [round, setRound] = useState<Round | null>(null);
   const [isLoading, setIsLoading] = useState(true);
-  // const [isEditing, setIsEditing] = useState(false);
-  // const [isSaving, setIsSaving] = useState(false);
-  // const [editStatus, setEditStatus] = useState<Round["status"]>("scheduled");
 
   const canCompleteRound = (r: Round) => {
     if (!r.matches || r.matches.length === 0) return false;
@@ -184,7 +179,6 @@ const SingleRound = () => {
       const response = await getRound(Number(id), Number(roundId));
       const data: Round = response.data ?? response;
       setRound(data);
-      // setEditStatus(data.status);
     } catch (err: any) {
       showToast(err || "Failed to load round.", false);
     } finally {
@@ -195,23 +189,6 @@ const SingleRound = () => {
   useEffect(() => {
     loadRound();
   }, [id, roundId]);
-
-  // const handleSaveRound = async () => {
-  //   if (!id || !roundId) return;
-  //   setIsSaving(true);
-  //   try {
-  //     const response = await updateRound(Number(id), Number(roundId), {
-  //       status: editStatus,
-  //     });
-  //     setRound(response.data ?? response);
-  //     setIsEditing(false);
-  //     showToast("Round updated!", true);
-  //   } catch (err: any) {
-  //     showToast(err || "Update failed.", false);
-  //   } finally {
-  //     setIsSaving(false);
-  //   }
-  // };
 
   const handleUpdateMatch = async (mId: number, wId: number | null) => {
     if (!id || !roundId) return;
@@ -235,15 +212,6 @@ const SingleRound = () => {
       title={round ? `Round ${round.round_number}` : "Round"}
       headerActionButtons={
         <div className="flex gap-2">
-          {/* Edit Round Status logic commented out */}
-          {/* {isEditing ? (
-            <button onClick={handleSaveRound} disabled={isSaving} className="bg-green-700 text-white px-3 py-1 rounded">
-              {isSaving ? "Saving..." : "Save"}
-            </button>
-          ) : (
-            <button onClick={() => setIsEditing(true)} className="bg-gray-100 px-3 py-1 rounded">Edit Status</button>
-          )} 
-          */}
           <button
             onClick={() => navigate(`/competition/${id}/rounds`)}
             className="bg-gray-100 px-3 py-1 rounded"
@@ -263,24 +231,9 @@ const SingleRound = () => {
             <span className="text-xs font-bold text-gray-500 uppercase">
               Status
             </span>
-            {/* Status Editing logic commented out */}
-            {/* {isEditing ? (
-              <select
-                value={editStatus}
-                onChange={(e) => setEditStatus(e.target.value as Round["status"])}
-                className="text-sm border rounded w-full mt-1 p-1"
-              >
-                {STATUSES.filter((s) => s !== "completed" || canCompleteRound(round)).map((s) => (
-                  <option key={s} value={s}>{s.replace(/_/g, " ")}</option>
-                ))}
-              </select>
-            ) : <div className="font-bold capitalize">{round.status}</div>}
-            */}
             <div className="font-bold capitalize">
               {round.status.replace(/_/g, " ")}
             </div>
-
-            {/* {!canCompleteRound(round) && isEditing && ( */}
             {!canCompleteRound(round) && (
               <p className="text-[10px] text-amber-600 mt-1">
                 Set winners for all matches to complete the round
