@@ -11,7 +11,7 @@ import SingleCompetition from '../components/competitions/SingleCompetition'
 import CompetitionTeams from '../components/teams/CompetitionTeams'
 import TeamPlayers from '../components/teams/TeamPlayers'
 import ProfileComponent from '../components/auth/Profile'
-import PublicCompetition from '../components/competitions/PublicCompetition'
+import PublicRoundRobin from '../components/competitions/PublicRoundRobin'
 import Rounds from '../components/rounds/Rounds'
 import SingleRound from '../components/rounds/SingleRounds'
 
@@ -22,7 +22,7 @@ export const router = createBrowserRouter([
     children: [
       {
         path: '/public/:slug',
-        element: <PublicCompetition />,
+        element: <PublicRoundRobin />,
       },
     ],
   },

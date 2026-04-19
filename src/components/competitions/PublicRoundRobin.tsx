@@ -235,7 +235,7 @@ const StatusBadge = ({ status }: { status?: string }) => {
   )
 }
 
-const PublicCompetition = () => {
+const PublicRoundRobin = () => {
   const { slug } = useParams<{ slug: string }>()
   const [competition, setCompetition] = useState<CompetitionInterface | null>(null)
   const [standings, setStandings] = useState<Standing[]>([])
@@ -343,4 +343,4 @@ const PublicCompetition = () => {
   )
 }
 
-export default PublicCompetition
+export default PublicRoundRobin
