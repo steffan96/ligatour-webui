@@ -88,17 +88,16 @@ const NoRoundsState = ({
     <div>
       <p className="text-sm font-bold text-gray-700">No rounds yet</p>
       <p className="text-xs text-gray-500 mt-1 font-medium">
-        Generate the first round of matches to get started.
       </p>
     </div>
-    <button
+    {/* <button
       onClick={onStart}
       disabled={isStarting}
       className="bg-green-700 text-white text-sm font-semibold px-4 py-2 rounded-md
         hover:bg-green-800 flex items-center gap-2 transition-colors disabled:opacity-50"
     >
-      {isStarting ? "Starting…" : "▶ Start Rounds"}
-    </button>
+      Start Competition
+    </button> */}
   </div>
 );
 

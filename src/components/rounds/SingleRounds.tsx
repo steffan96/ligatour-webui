@@ -18,6 +18,7 @@ interface Match {
   status: "scheduled" | "in_progress" | "completed" | "bye";
   winner_team_id: number | null;
   created_at: string;
+  draw: boolean;
 }
 
 interface Round {
@@ -64,7 +65,7 @@ const MatchCard = ({
   const isBye = match.status === "bye";
   const homeWins = match.winner_team_id === match.home_team_id;
   const awayWins = match.winner_team_id === match.away_team_id;
-  const isDraw = match.winner_team_id === 0;
+  const isDraw = match.draw === true;
 
   const [isEditing, setIsEditing] = useState(false);
   const [winnerId, setWinnerId] = useState<number | "">(
@@ -210,7 +211,7 @@ const SingleRound = () => {
             onClick={() => navigate(`/competition/${id}/rounds`)}
             className="bg-gray-100 px-3 py-1 rounded"
           >
-            Back
+             <span>←</span> Back to rounds
           </button>
         </div>
       }
