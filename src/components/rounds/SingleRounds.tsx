@@ -37,11 +37,11 @@ const MatchStatusBadge = ({ status }: { status: Match["status"] }) => {
       cls: "bg-gray-100 text-gray-600 border-gray-200",
     },
     in_progress: {
-      label: "🔴 Live",
+      label: "live",
       cls: "bg-red-50 text-red-700 border-red-200 animate-pulse",
     },
     completed: {
-      label: "✅ Final",
+      label: "completed",
       cls: "bg-green-50 text-green-800 border-green-200",
     },
     bye: { label: "⏭ Bye", cls: "bg-blue-50 text-blue-700 border-blue-200" },
@@ -64,6 +64,7 @@ const MatchCard = ({
   const isBye = match.status === "bye";
   const homeWins = match.winner_team_id === match.home_team_id;
   const awayWins = match.winner_team_id === match.away_team_id;
+  const isDraw = match.winner_team_id === 0;
 
   const [isEditing, setIsEditing] = useState(false);
   const [winnerId, setWinnerId] = useState<number | "">(
@@ -102,7 +103,9 @@ const MatchCard = ({
           {homeWins && <span>🏆</span>}
         </div>
         <div className="flex flex-col items-center gap-1">
-          <div className="text-xs font-bold text-gray-400">VS</div>
+          <div className="text-xs font-bold text-gray-400">
+            {isDraw ? <span className="text-orange-600">DRAW</span> : "VS"}
+          </div>
           <MatchStatusBadge status={match.status} />
         </div>
         <div className="flex-1 flex items-center gap-3 min-w-0">
@@ -131,7 +134,8 @@ const MatchCard = ({
             }
             className="text-sm border rounded px-2 py-1"
           >
-            <option value="">Draw</option>
+            <option value="">Pending</option>
+            <option value={0}>Draw</option>
             <option value={match.home_team_id}>{match.home_team_name}</option>
             <option value={match.away_team_id}>{match.away_team_name}</option>
           </select>

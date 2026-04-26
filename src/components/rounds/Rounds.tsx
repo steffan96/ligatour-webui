@@ -97,7 +97,7 @@ const NoRoundsState = ({
       className="bg-green-700 text-white text-sm font-semibold px-4 py-2 rounded-md
         hover:bg-green-800 flex items-center gap-2 transition-colors disabled:opacity-50"
     >
-      {isStarting ? "Starting…" : "▶ Start First Round"}
+      {isStarting ? "Starting…" : "▶ Start Rounds"}
     </button>
   </div>
 );
