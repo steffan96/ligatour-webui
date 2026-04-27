@@ -107,7 +107,7 @@ const CompetitionOverview = ({
               <div>
                 <p className="text-sm font-bold text-green-900">Ready to begin?</p>
                 <p className="text-xs text-green-700 mt-0.5">
-                  Starting the competition will lock its settings and begin match generation.
+                  Starting the competition will lock its settings and generate matches and rounds.
                 </p>
               </div>
               <button

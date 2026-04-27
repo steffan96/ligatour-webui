@@ -87,6 +87,8 @@ const NoRoundsState = ({
     <div className="text-4xl">🏁</div>
     <div>
       <p className="text-sm font-bold text-gray-700">No rounds yet</p>
+      <br />
+      <p className="text-sm font-bold text-gray-700">Start competition to generate rounds</p>
       <p className="text-xs text-gray-500 mt-1 font-medium">
       </p>
     </div>
