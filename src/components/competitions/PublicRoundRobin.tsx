@@ -129,9 +129,9 @@ const StandingsTable = ({ standings, isIndividual }: { standings: Standing[]; is
     { label: 'W', align: 'center', title: 'Wins' },
     { label: 'D', align: 'center', title: 'Draws' },
     { label: 'L', align: 'center', title: 'Losses' },
-    { label: 'GF', align: 'center', title: 'Goals For' },
-    { label: 'GA', align: 'center', title: 'Goals Against' },
-    { label: 'GD', align: 'center', title: 'Goal Difference' },
+    // { label: 'GF', align: 'center', title: 'Goals For' },
+    // { label: 'GA', align: 'center', title: 'Goals Against' },
+    // { label: 'GD', align: 'center', title: 'Goal Difference' },
     { label: 'Pts', align: 'center', title: 'Points' },
   ]
 

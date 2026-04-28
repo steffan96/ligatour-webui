@@ -1,13 +1,13 @@
 import React, { useEffect, useState } from 'react'
-import { useParams, useNavigate, Outlet, useLocation } from 'react-router-dom'
+import { useParams, useNavigate } from 'react-router-dom'
 import { getCompetition, startCompetition } from 'api/competitions'
 import { CompetitionInterface } from 'api/competitions'
 import PageWindow from '../shared/PageWindow'
 import { useToastStore } from '../../api/stores/useToastStore'
 import CompetitionSettings from './CompetitionSettings'
+import Teams from '../teams/Teams'
+import Rounds from '../rounds/Rounds'
 import ConfirmModal from '../common/ConfirmModal'
-
-export type SingleCompetitionContext = { competition: CompetitionInterface }
 
 type Tab = {
   id: string
@@ -18,37 +18,44 @@ type Tab = {
 const TABS: Tab[] = [
   { id: 'overview', label: 'Overview', icon: '🏆' },
   { id: 'settings', label: 'Settings', icon: '⚙️' },
+  { id: 'teams', label: 'Teams', icon: '👥' },
+  { id: 'rounds', label: 'Rounds', icon: '🔀' },
 ]
 
 const TabBar = ({
   activeTab,
   onTabChange,
-  actions,
+  isIndividual,
 }: {
   activeTab: string
   onTabChange: (id: string) => void
-  actions?: React.ReactNode
+  isIndividual?: boolean
 }) => (
   <div className="flex items-center justify-between border-b border-gray-200 mb-5">
     <div className="flex gap-1">
-      {TABS.map(tab => (
-        <button
-          key={tab.id}
-          onClick={() => onTabChange(tab.id)}
-          className={`flex items-center gap-1.5 px-4 py-2.5 text-sm font-semibold
-                      border-b-2 transition-colors -mb-px
-                      ${
-                        activeTab === tab.id
-                          ? 'border-green-900 text-green-900'
-                          : 'border-transparent text-gray-500 hover:text-gray-800 hover:border-gray-300'
-                      }`}
-        >
-          <span>{tab.icon}</span>
-          {tab.label}
-        </button>
-      ))}
+      {TABS.map(tab => {
+        const label =
+          tab.id === 'teams' && isIndividual ? 'Players' : tab.label
+        const icon =
+          tab.id === 'teams' && isIndividual ? '👤' : tab.icon
+        return (
+          <button
+            key={tab.id}
+            onClick={() => onTabChange(tab.id)}
+            className={`flex items-center gap-1.5 px-4 py-2.5 text-sm font-semibold
+                        border-b-2 transition-colors -mb-px
+                        ${
+                          activeTab === tab.id
+                            ? 'border-green-900 text-green-900'
+                            : 'border-transparent text-gray-500 hover:text-gray-800 hover:border-gray-300'
+                        }`}
+          >
+            <span>{icon}</span>
+            {label}
+          </button>
+        )
+      })}
     </div>
-    {actions && <div className="flex items-center gap-2 pb-1">{actions}</div>}
   </div>
 )
 
@@ -130,7 +137,6 @@ const CompetitionOverview = ({
 const SingleCompetition = () => {
   const { id } = useParams<{ id: string }>()
   const navigate = useNavigate()
-  const location = useLocation()
   const { showToast } = useToastStore()
   const [competition, setCompetition] = useState<CompetitionInterface | null>(null)
   const [activeTab, setActiveTab] = useState<string>('overview')
@@ -151,11 +157,6 @@ const SingleCompetition = () => {
   }, [id, navigate, showToast])
 
   if (!competition) return null
-
-  const isChildRoute = location.pathname !== `/competition/${id}`
-  if (isChildRoute) {
-    return <Outlet context={{ competition } satisfies SingleCompetitionContext} />
-  }
 
   const handleStartCompetition = async () => {
     setShowStartModal(false)
@@ -194,24 +195,7 @@ const SingleCompetition = () => {
       <TabBar
         activeTab={activeTab}
         onTabChange={setActiveTab}
-        actions={
-          <>
-            <button
-              className="bg-blue-50 text-blue-900 text-sm font-bold px-3.5 py-1.5
-                         rounded-md hover:bg-blue-100 border border-blue-200 transition-colors"
-              onClick={() => navigate(`/competition/${id}/teams`)}
-            >
-              {competition.individual ? '👤 Manage Players' : '👥 Manage Teams'}
-            </button>
-            <button
-              className="bg-orange-50 text-orange-900 text-sm font-bold px-3.5 py-1.5
-                         rounded-md hover:bg-orange-100 border border-orange-200 transition-colors"
-              onClick={() => navigate(`/competition/${id}/rounds`)}
-            >
-              🔀 Rounds
-            </button>
-          </>
-        }
+        isIndividual={competition.individual}
       />
 
       {activeTab === 'overview' && (
@@ -223,6 +207,14 @@ const SingleCompetition = () => {
           }}
           onStart={() => setShowStartModal(true)}
         />
+      )}
+
+      {activeTab === 'teams' && (
+        <Teams competition={competition} />
+      )}
+
+      {activeTab === 'rounds' && (
+        <Rounds competition={competition} />
       )}
 
       {activeTab === 'settings' && (

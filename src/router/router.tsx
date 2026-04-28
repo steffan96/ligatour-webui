@@ -8,11 +8,9 @@ import LoginComponent from '../components/auth/Login'
 import ResetPasswordComponent from '../components/auth/ResetPassword'
 import ForgotPasswordComponent from '../components/auth/ForgotPassword'
 import SingleCompetition from '../components/competitions/SingleCompetition'
-import CompetitionTeams from '../components/teams/CompetitionTeams'
 import TeamPlayers from '../components/teams/TeamPlayers'
 import ProfileComponent from '../components/auth/Profile'
 import PublicRoundRobin from '../components/competitions/PublicRoundRobin'
-import Rounds from '../components/rounds/Rounds'
 import SingleRound from '../components/rounds/SingleRounds'
 
 export const router = createBrowserRouter([
@@ -42,20 +40,10 @@ export const router = createBrowserRouter([
       {
         path: '/competition/:id',
         element: <SingleCompetition />,
-        children: [
-          {
-            path: 'rounds',
-            element: <Rounds />,
-          },
-        ],
       },
       {
         path: '/competition/:id/rounds/:roundId',
         element: <SingleRound />,
-      },
-      {
-        path: '/competition/:id/teams',
-        element: <CompetitionTeams />,
       },
       {
         path: '/team/:teamId/players',
