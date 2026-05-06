@@ -1,25 +1,23 @@
 import React, { useEffect, useState } from 'react'
-import { useParams, useNavigate } from 'react-router-dom'
 import { addPlayerToTeam, getTeam } from 'api/teams'
-import PageWindow from '../shared/PageWindow'
 import { useToastStore } from '../../api/stores/useToastStore'
 import {
   AddPlayerForm,
   EditPlayerForm,
   PlayerCard,
   PlayerFields,
-  SectionHeader,
   usePlayerList,
 } from '../../components/players/PlayerFormShared'
 
 const extractTeamPlayers = (raw: any[]) =>
-  raw.map(entry => ({
-    ...entry.player,
-  }))
+  raw.map(entry => ({ ...entry.player }))
 
-const TeamPlayers = () => {
-  const { teamId } = useParams<{ teamId: string }>()
-  const navigate = useNavigate()
+interface TeamPlayersProps {
+  teamId: string
+  onBack: () => void
+}
+
+const TeamPlayers = ({ teamId, onBack }: TeamPlayersProps) => {
   const { showToast } = useToastStore()
 
   const [team, setTeam] = useState<any>(null)
@@ -30,7 +28,6 @@ const TeamPlayers = () => {
     usePlayerList(players, setPlayers)
 
   useEffect(() => {
-    if (!teamId) return
     const fetchTeam = async () => {
       try {
         const response = await getTeam(teamId)
@@ -38,16 +35,13 @@ const TeamPlayers = () => {
         setPlayers(extractTeamPlayers(response?.data?.players || []))
       } catch (err: any) {
         showToast(err || 'Failed to load team.', false)
-        navigate(-1)
+        onBack()
       }
     }
     fetchTeam()
-  }, [teamId, navigate, showToast])
-
-  if (!team) return null
+  }, [teamId])
 
   const handleAddPlayer = async (player: PlayerFields): Promise<boolean> => {
-    if (!teamId) return false
     try {
       await addPlayerToTeam(teamId, player)
       const response = await getTeam(teamId)
@@ -60,33 +54,31 @@ const TeamPlayers = () => {
     }
   }
 
+  if (!team) return null
+
+  const isIdle = !isAdding && editingId === null
+
   return (
-    <PageWindow
-      title={`Manage Players - ${team.name}`}
-      headerActionButtons={
+    <div className="space-y-5">
+      <div className="flex items-center justify-between pb-3 border-b border-gray-200">
         <div className="flex items-center gap-3">
-          <button
-            className="bg-gray-100 text-gray-900 text-sm 
-                       font-semibold px-3.5 py-1.5 rounded-md 
-                       hover:bg-gray-200 flex items-start gap-2 
-                       transition-colors"
-            onClick={() => navigate(-1)}
-          >
-            <span>←</span> Back to Teams
-          </button>
-          {!isAdding && editingId === null && (
+          <p className="text-xs text-gray-500 font-medium">
+            {team.name} &middot; {players.length} player{players.length !== 1 ? 's' : ''}
+          </p>
+          {isIdle && (
             <button
-              className="bg-green-900 text-white text-sm font-bold 
-                         px-3.5 py-1.5 rounded-md hover:bg-green-800 
-                         transition-colors"
               onClick={() => setIsAdding(true)}
+              className="bg-white text-green-900 text-sm font-bold
+                         px-3.5 py-1.5 rounded-md hover:bg-green-50
+                         border border-green-200 transition-colors"
             >
-              ➕ Add Player
+              + Add Player
             </button>
           )}
         </div>
-      }
-    >
+      </div>
+
+      {/* Add form */}
       {isAdding && (
         <AddPlayerForm
           onAdd={handleAddPlayer}
@@ -102,18 +94,21 @@ const TeamPlayers = () => {
       )}
 
       <div>
-        <SectionHeader label={`Players (${players.length})`} />
         {players.length === 0 ? (
-          <div className="text-center py-8 border border-gray-200 rounded-md bg-gray-50">
-            <p className="text-sm text-gray-600">No players added yet</p>
-            {!isAdding && editingId === null && (
+          <div className="flex flex-col items-center justify-center py-10 text-center gap-2">
+            <div className="text-3xl">👤</div>
+            <p className="text-sm font-bold text-gray-700">No players yet</p>
+            <p className="text-xs font-medium text-gray-500">
+              Add players to this team to get started
+            </p>
+            {isIdle && (
               <button
                 onClick={() => setIsAdding(true)}
-                className="mt-3 text-blue-900 hover:text-blue-700 text-sm font-semibold
+                className="mt-1 text-blue-900 hover:text-blue-700 text-sm font-semibold
                            px-4 py-1.5 rounded-md bg-blue-50 border border-blue-200
                            hover:bg-blue-100 transition-colors"
               >
-                ➕ Add First Player
+                + Add First Player
               </button>
             )}
           </div>
@@ -132,7 +127,7 @@ const TeamPlayers = () => {
           </div>
         )}
       </div>
-    </PageWindow>
+    </div>
   )
 }
 

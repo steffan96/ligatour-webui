@@ -14,10 +14,6 @@ export const inputCls = (readOnly?: boolean) =>
    text-sm font-medium focus:ring-2 
    focus:ring-green-900 focus:border-green-900 ${readOnly ? 'bg-gray-50 text-gray-700' : 'text-gray-900'}`
 
-export const SectionHeader = ({ label }: { label: string }) => (
-  <p className="text-sm font-bold text-gray-900 mb-2.5 pb-1.5 border-b border-gray-300">{label}</p>
-)
-
 export const isValidEmail = (email: string) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim())
 
 export const emptyPlayer = { first_name: '', last_name: '', email: '' }
@@ -37,9 +33,8 @@ export const PlayerCard = ({
   editingId: number | null
 }) => (
   <div
-    className={`border rounded-md p-4 ${
-      editingId === index ? 'border-blue-300 bg-blue-50' : 'border-gray-300 bg-gray-100 hover:border-gray-400'
-    } transition-all`}
+    className={`border rounded-md p-4 ${editingId === index ? 'border-blue-300 bg-blue-50' : 'border-gray-300 bg-gray-100 hover:border-gray-400'
+      } transition-all`}
   >
     <div className="flex items-start justify-between gap-4">
       <div className="flex-1">
@@ -97,7 +92,6 @@ export const AddPlayerForm = ({
 
   return (
     <div className="border border-green-300 bg-green-50 rounded-md p-4">
-      <SectionHeader label="Add New Player" />
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
         <Field label="First Name">
           <input
@@ -178,7 +172,6 @@ export const EditPlayerForm = ({
 
   return (
     <div className="border border-blue-300 bg-blue-50 rounded-md p-4">
-      <SectionHeader label={`Edit Player: ${editingPlayer.first_name} ${editingPlayer.last_name}`} />
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
         <Field label="First Name">
           <input

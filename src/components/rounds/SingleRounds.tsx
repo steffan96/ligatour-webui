@@ -1,6 +1,4 @@
 import React, { useEffect, useState } from "react";
-import { useParams, useNavigate } from "react-router-dom";
-import PageWindow from "../shared/PageWindow";
 import { useToastStore } from "../../api/stores/useToastStore";
 import { getRound } from "../../api/rounds";
 import { updateMatch } from "../../api/matches";
@@ -68,9 +66,7 @@ const MatchCard = ({
   const isDraw = match.draw === true;
 
   const [isEditing, setIsEditing] = useState(false);
-  const [winnerId, setWinnerId] = useState<number | "">(
-    match.winner_team_id ?? "",
-  );
+  const [winnerId, setWinnerId] = useState<number | "">(match.winner_team_id ?? "");
   const [isSaving, setIsSaving] = useState(false);
 
   useEffect(() => {
@@ -96,9 +92,7 @@ const MatchCard = ({
     >
       <div className="px-4 py-3 flex items-center justify-between gap-4">
         <div className="flex-1 flex items-center justify-end gap-3 min-w-0">
-          <span
-            className={`text-sm font-bold truncate ${homeWins ? "text-green-800" : ""}`}
-          >
+          <span className={`text-sm font-bold truncate ${homeWins ? "text-green-800" : ""}`}>
             {match.home_team_name}
           </span>
           {homeWins && <span>🏆</span>}
@@ -111,9 +105,7 @@ const MatchCard = ({
         </div>
         <div className="flex-1 flex items-center gap-3 min-w-0">
           {awayWins && <span>🏆</span>}
-          <span
-            className={`text-sm font-bold truncate ${awayWins ? "text-green-800" : ""}`}
-          >
+          <span className={`text-sm font-bold truncate ${awayWins ? "text-green-800" : ""}`}>
             {isBye ? "Bye" : match.away_team_name}
           </span>
         </div>
@@ -160,18 +152,21 @@ const MatchCard = ({
   );
 };
 
-const SingleRound = () => {
-  const { id, roundId } = useParams<{ id: string; roundId: string }>();
-  const navigate = useNavigate();
+interface SingleRoundProps {
+  competitionId: number;
+  roundId: number;
+  onBack: () => void;
+}
+
+const SingleRound = ({ competitionId, roundId, onBack }: SingleRoundProps) => {
   const { showToast } = useToastStore();
   const [round, setRound] = useState<Round | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
   const loadRound = async () => {
-    if (!id || !roundId) return;
     setIsLoading(true);
     try {
-      const response = await getRound(Number(id), Number(roundId));
+      const response = await getRound(competitionId, roundId);
       const data: Round = response.data ?? response;
       setRound(data);
     } catch (err: any) {
@@ -183,17 +178,11 @@ const SingleRound = () => {
 
   useEffect(() => {
     loadRound();
-  }, [id, roundId]);
+  }, [competitionId, roundId]);
 
   const handleUpdateMatch = async (mId: number, wId: number | null) => {
-    if (!id || !roundId) return;
     try {
-      await updateMatch(
-        Number(id),
-        Number(roundId),
-        mId,
-        wId as unknown as number,
-      );
+      await updateMatch(competitionId, roundId, mId, wId as unknown as number);
       await loadRound();
       showToast("Match updated!", true);
     } catch (err: any) {
@@ -202,45 +191,42 @@ const SingleRound = () => {
   };
 
   return (
-    <PageWindow
-      title={round ? `Round ${round.round_number}` : "Round"}
-      headerActionButtons={
-        <div className="flex gap-2">
-          <button
-            onClick={() => navigate(`/competition/${id}/rounds`)}
-            className="bg-gray-100 px-3 py-1 rounded"
-          >
-             <span>←</span> Back to rounds
-          </button>
-        </div>
-      }
-    >
+    <div className="space-y-5">
+      {/* Header row — matches Teams / TeamPlayers style */}
+      <div className="flex items-center justify-between pb-3 border-b border-gray-200">
+        {round && (
+          <p className="text-xs text-gray-500 font-medium">
+            Round {round.round_number}
+            {round.stage && (
+              <span className="ml-1.5 capitalize text-gray-400">
+                · {round.stage.replace(/_/g, " ")}
+              </span>
+            )}
+          </p>
+        )}
+      </div>
+
+      {/* Content */}
       {isLoading ? (
         <div className="animate-pulse h-20 bg-gray-100 rounded" />
       ) : !round ? (
-        <div>Not found</div>
+        <div className="text-sm text-gray-500 text-center py-10">Round not found.</div>
       ) : (
         <div className="flex flex-col gap-6">
-          <div className="bg-white border rounded-lg p-4">
-            <span className="text-xs font-bold text-gray-500 uppercase">
-              Status
-            </span>
-            <div className="font-bold capitalize">
+          <div className="bg-white border border-gray-200 rounded-lg p-4">
+            <span className="text-xs font-bold text-gray-500 uppercase">Status</span>
+            <div className="font-bold capitalize mt-0.5">
               {round.status.replace(/_/g, " ")}
             </div>
           </div>
           <div className="flex flex-col gap-2.5">
             {round.matches?.map((m) => (
-              <MatchCard
-                key={m.id}
-                match={m}
-                onUpdateMatch={handleUpdateMatch}
-              />
+              <MatchCard key={m.id} match={m} onUpdateMatch={handleUpdateMatch} />
             ))}
           </div>
         </div>
       )}
-    </PageWindow>
+    </div>
   );
 };
 

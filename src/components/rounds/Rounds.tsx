@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
 import { useToastStore } from "../../api/stores/useToastStore";
 import { listRounds, startRound } from "../../api/rounds";
 import { CompetitionInterface } from "../../api/competitions";
@@ -29,7 +28,6 @@ interface Round {
   created_at: string;
   matches: Match[];
 }
-
 
 const SectionHeader = ({ label }: { label: string }) => (
   <p className="text-sm font-bold text-gray-900 mb-2.5 pb-1.5 border-b border-gray-300">
@@ -104,19 +102,14 @@ const NoRoundsState = () => (
   </div>
 );
 
-// ─── Props ──────────────────────────────────────────────────────────────────────
-
 interface RoundsProps {
   competition: CompetitionInterface;
+  onSelectRound: (roundId: number) => void;
 }
-
-// ─── Constants ─────────────────────────────────────────────────────────────────
 
 const ROUNDS_PER_PAGE = 5;
 
-
-const Rounds = ({ competition }: RoundsProps) => {
-  const navigate = useNavigate();
+const Rounds = ({ competition, onSelectRound }: RoundsProps) => {
   const { showToast } = useToastStore();
 
   const [rounds, setRounds] = useState<Round[]>([]);
@@ -167,21 +160,6 @@ const Rounds = ({ competition }: RoundsProps) => {
 
   return (
     <div className="space-y-5">
-      {/* Header row */}
-      {/* <div className="flex items-center justify-between pb-3 border-b border-gray-200">
-        {!isLoading && visibleRounds.length > 0 && (
-          <button
-            onClick={() => setShowStartRoundModal(true)}
-            disabled={isStarting}
-            className="bg-green-900 text-white text-sm font-bold px-3.5 py-1.5 
-                       rounded-md hover:bg-green-800 flex items-center gap-2 
-                       transition-colors disabled:opacity-50"
-          >
-            <span>▶</span> Start Next Round
-          </button>
-        )}
-      </div> */}
-
       {/* Round list */}
       <div>
         <SectionHeader label="Rounds" />
@@ -195,9 +173,7 @@ const Rounds = ({ competition }: RoundsProps) => {
               <RoundRow
                 key={round.id}
                 round={round}
-                onSelect={() =>
-                  navigate(`/competition/${competition.id}/rounds/${round.id}`)
-                }
+                onSelect={() => onSelectRound(round.id)}
               />
             ))}
           </div>
@@ -218,7 +194,6 @@ const Rounds = ({ competition }: RoundsProps) => {
         />
       )}
 
-      {/* Confirm modal */}
       {showStartRoundModal && (
         <ConfirmModal
           title="Start Next Round?"

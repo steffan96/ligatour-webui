@@ -1,10 +1,10 @@
 import React, { useState } from 'react'
-import { useNavigate } from 'react-router-dom'
 import { addTeamToCompetition } from 'api/competitions'
 import { deleteTeam, updateTeam } from 'api/teams'
 import { CompetitionInterface } from '../../api/competitions'
 import { useCompetitionParticipants } from '../competitions/UseCompetitionParticipants'
 import { useToastStore } from '../../api/stores/useToastStore'
+import Pagination from '../common/Pagination'
 
 // ─── Shared primitives ─────────────────────────────────────────────────────────
 
@@ -19,12 +19,6 @@ const inputCls = (readOnly?: boolean) =>
   `w-full px-2.5 py-1.5 border border-gray-300 rounded-md 
    text-sm font-medium focus:ring-2 
    focus:ring-green-900 focus:border-green-900 ${readOnly ? 'bg-gray-50 text-gray-700' : 'text-gray-900'}`
-
-const SectionHeader = ({ label }: { label: string }) => (
-  <p className="text-sm font-bold text-gray-900 mb-2.5 pb-1.5 border-b border-gray-300">
-    {label}
-  </p>
-)
 
 // ─── Team row ──────────────────────────────────────────────────────────────────
 
@@ -81,7 +75,6 @@ const TeamRow = ({
 // ─── Inline form (shared by add + edit) ───────────────────────────────────────
 
 const InlineForm = ({
-  title,
   accent,
   fieldLabel,
   value,
@@ -91,7 +84,6 @@ const InlineForm = ({
   onConfirm,
   onCancel,
 }: {
-  title: string
   accent: 'green' | 'blue'
   fieldLabel: string
   value: string
@@ -104,7 +96,6 @@ const InlineForm = ({
   const g = accent === 'green'
   return (
     <div className={`border rounded-md p-4 mb-1 ${g ? 'border-green-300 bg-green-50' : 'border-blue-300 bg-blue-50'}`}>
-      <SectionHeader label={title} />
       <Field label={fieldLabel}>
         <input
           type="text"
@@ -143,12 +134,16 @@ const InlineForm = ({
 
 interface TeamsProps {
   competition: CompetitionInterface
+  onManagePlayers: (teamId: number) => void
 }
+
+// ─── Constants ─────────────────────────────────────────────────────────────────
+
+const TEAMS_PER_PAGE = 5
 
 const emptyTeam = { name: '' }
 
-const Teams = ({ competition }: TeamsProps) => {
-  const navigate = useNavigate()
+const Teams = ({ competition, onManagePlayers }: TeamsProps) => {
   const { showToast } = useToastStore()
 
   const {
@@ -165,10 +160,15 @@ const Teams = ({ competition }: TeamsProps) => {
   } = useCompetitionParticipants()
 
   const [newTeam, setNewTeam] = useState(emptyTeam)
+  const [currentPage, setCurrentPage] = useState(1)
 
   const label = competition.individual ? 'Player' : 'Team'
   const resetNew = () => setNewTeam(emptyTeam)
   const isIdle = !isAdding && editingId === null
+
+  const totalPages = Math.ceil(participants.length / TEAMS_PER_PAGE)
+  const startIndex = (currentPage - 1) * TEAMS_PER_PAGE
+  const paginatedParticipants = participants.slice(startIndex, startIndex + TEAMS_PER_PAGE)
 
   const handleAddTeam = async () => {
     if (!newTeam.name.trim()) {
@@ -177,9 +177,11 @@ const Teams = ({ competition }: TeamsProps) => {
     }
     try {
       const response = await addTeamToCompetition(String(competition.id), newTeam.name)
-      setParticipants([...participants, response?.data])
+      const updated = [...participants, response?.data]
+      setParticipants(updated)
       resetNew()
       setIsAdding(false)
+      setCurrentPage(Math.ceil(updated.length / TEAMS_PER_PAGE))
       showToast(`${label} added successfully!`, true)
     } catch (err: any) {
       showToast(err || 'Failed to add participant', false)
@@ -208,7 +210,10 @@ const Teams = ({ competition }: TeamsProps) => {
   const handleRemoveTeam = async (index: number) => {
     try {
       await deleteTeam(String(participants[index].id))
-      setParticipants(participants.filter((_, i) => i !== index))
+      const updated = participants.filter((_, i) => i !== index)
+      setParticipants(updated)
+      const newTotalPages = Math.ceil(updated.length / TEAMS_PER_PAGE)
+      if (currentPage > newTotalPages) setCurrentPage(Math.max(1, newTotalPages))
       showToast(`${label} removed`, true)
     } catch (err: any) {
       showToast(err || 'Failed to remove participant', false)
@@ -217,7 +222,7 @@ const Teams = ({ competition }: TeamsProps) => {
 
   return (
     <div className="space-y-5">
-      {/* Header row — mirrors CompetitionSettings edit-toggle row */}
+      {/* Header row */}
       <div className="flex items-center justify-between pb-3 border-b border-gray-200">
         <p className="text-xs text-gray-500 font-medium">
           {participants.length === 0
@@ -239,7 +244,6 @@ const Teams = ({ competition }: TeamsProps) => {
       {/* Add form */}
       {isAdding && (
         <InlineForm
-          title={`Add New ${label}`}
           accent="green"
           fieldLabel={`${label} Name`}
           value={newTeam.name}
@@ -254,7 +258,6 @@ const Teams = ({ competition }: TeamsProps) => {
       {/* Edit form */}
       {editingId !== null && editingParticipant && (
         <InlineForm
-          title={`Edit ${label}: ${editingParticipant.name}`}
           accent="blue"
           fieldLabel={`${label} Name`}
           value={editingParticipant.name ?? ''}
@@ -268,7 +271,6 @@ const Teams = ({ competition }: TeamsProps) => {
 
       {/* Participants list */}
       <div>
-        <SectionHeader label={`${label}s (${participants.length})`} />
         {participants.length === 0 ? (
           <div className="flex flex-col items-center justify-center py-10 text-center gap-2">
             <div className="text-3xl">👥</div>
@@ -279,20 +281,37 @@ const Teams = ({ competition }: TeamsProps) => {
           </div>
         ) : (
           <div>
-            {participants.map((team, index) => (
-              <TeamRow
-                key={team.id ?? index}
-                participant={team}
-                index={index}
-                editingId={editingId}
-                onEdit={() => handleEditParticipant(index)}
-                onRemove={() => handleRemoveTeam(index)}
-                onManagePlayers={() => navigate(`/team/${team.id}/players`)}
-              />
-            ))}
+            {paginatedParticipants.map((team, pageIndex) => {
+              const globalIndex = startIndex + pageIndex
+              return (
+                <TeamRow
+                  key={team.id ?? globalIndex}
+                  participant={team}
+                  index={globalIndex}
+                  editingId={editingId}
+                  onEdit={() => handleEditParticipant(globalIndex)}
+                  onRemove={() => handleRemoveTeam(globalIndex)}
+                  onManagePlayers={() => onManagePlayers(team.id)}
+                />
+              )
+            })}
           </div>
         )}
       </div>
+
+      {/* Pagination */}
+      {participants.length > TEAMS_PER_PAGE && (
+        <Pagination
+          currentPage={currentPage}
+          totalPages={totalPages}
+          totalItems={participants.length}
+          itemLabel={`${label.toLowerCase()}s`}
+          onPageChange={(page) => {
+            setCurrentPage(page)
+            window.scrollTo({ top: 0, behavior: 'smooth' })
+          }}
+        />
+      )}
     </div>
   )
 }
