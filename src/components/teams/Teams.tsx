@@ -6,8 +6,6 @@ import { useCompetitionParticipants } from '../competitions/UseCompetitionPartic
 import { useToastStore } from '../../api/stores/useToastStore'
 import Pagination from '../common/Pagination'
 
-// ─── Shared primitives ─────────────────────────────────────────────────────────
-
 const Field = ({ label, children }: { label: string; children: React.ReactNode }) => (
   <div className="space-y-1.5">
     <label className="block text-sm font-bold text-gray-900">{label}</label>
@@ -20,8 +18,6 @@ const inputCls = (readOnly?: boolean) =>
    text-sm font-medium focus:ring-2 
    focus:ring-green-900 focus:border-green-900 ${readOnly ? 'bg-gray-50 text-gray-700' : 'text-gray-900'}`
 
-// ─── Team row ──────────────────────────────────────────────────────────────────
-
 const TeamRow = ({
   participant,
   index,
@@ -29,6 +25,7 @@ const TeamRow = ({
   onEdit,
   onRemove,
   onManagePlayers,
+  individual,
 }: {
   participant: any
   index: number
@@ -36,6 +33,7 @@ const TeamRow = ({
   onEdit: () => void
   onRemove: () => void
   onManagePlayers: () => void
+  individual: boolean
 }) => (
   <div
     className={`flex items-center justify-between py-2.5 border-b last:border-0
@@ -44,6 +42,7 @@ const TeamRow = ({
   >
     <span className="text-sm font-semibold text-gray-900">{participant.name}</span>
     <div className="flex gap-2">
+      {!individual &&
       <button
         onClick={onManagePlayers}
         className="text-green-900 hover:text-green-700 text-xs font-semibold
@@ -52,6 +51,7 @@ const TeamRow = ({
       >
         Players
       </button>
+      }
       <button
         onClick={onEdit}
         className="text-blue-900 hover:text-blue-700 text-xs font-semibold
@@ -71,8 +71,6 @@ const TeamRow = ({
     </div>
   </div>
 )
-
-// ─── Inline form (shared by add + edit) ───────────────────────────────────────
 
 const InlineForm = ({
   accent,
@@ -130,16 +128,12 @@ const InlineForm = ({
   )
 }
 
-// ─── Props ─────────────────────────────────────────────────────────────────────
-
 interface TeamsProps {
   competition: CompetitionInterface
   onManagePlayers: (teamId: number) => void
 }
 
-// ─── Constants ─────────────────────────────────────────────────────────────────
-
-const TEAMS_PER_PAGE = 5
+const TEAMS_PER_PAGE = 10
 
 const emptyTeam = { name: '' }
 
@@ -222,7 +216,6 @@ const Teams = ({ competition, onManagePlayers }: TeamsProps) => {
 
   return (
     <div className="space-y-5">
-      {/* Header row */}
       <div className="flex items-center justify-between pb-3 border-b border-gray-200">
         <p className="text-xs text-gray-500 font-medium">
           {participants.length === 0
@@ -241,7 +234,6 @@ const Teams = ({ competition, onManagePlayers }: TeamsProps) => {
         )}
       </div>
 
-      {/* Add form */}
       {isAdding && (
         <InlineForm
           accent="green"
@@ -255,7 +247,6 @@ const Teams = ({ competition, onManagePlayers }: TeamsProps) => {
         />
       )}
 
-      {/* Edit form */}
       {editingId !== null && editingParticipant && (
         <InlineForm
           accent="blue"
@@ -269,7 +260,6 @@ const Teams = ({ competition, onManagePlayers }: TeamsProps) => {
         />
       )}
 
-      {/* Participants list */}
       <div>
         {participants.length === 0 ? (
           <div className="flex flex-col items-center justify-center py-10 text-center gap-2">
@@ -292,6 +282,7 @@ const Teams = ({ competition, onManagePlayers }: TeamsProps) => {
                   onEdit={() => handleEditParticipant(globalIndex)}
                   onRemove={() => handleRemoveTeam(globalIndex)}
                   onManagePlayers={() => onManagePlayers(team.id)}
+                  individual={competition.individual}
                 />
               )
             })}
@@ -299,7 +290,6 @@ const Teams = ({ competition, onManagePlayers }: TeamsProps) => {
         )}
       </div>
 
-      {/* Pagination */}
       {participants.length > TEAMS_PER_PAGE && (
         <Pagination
           currentPage={currentPage}

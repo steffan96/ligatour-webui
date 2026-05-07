@@ -215,7 +215,7 @@ const SingleCompetition = () => {
 
   return (
     <PageWindow
-      title={`Manage competition - ${competition.name}`}
+      title={`${competition.name}`}
       headerActionButtons={headerActionButton}
     >
       {showStartModal && (
