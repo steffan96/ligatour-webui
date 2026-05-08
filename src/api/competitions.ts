@@ -133,9 +133,9 @@ export const startCompetition = async (competitionId: number) => {
   }
 };
 
-export const getPublicCompetition = async (competitionSlug: string) => {
+export const getPublicCompetition = async (competitionType: string, competitionSlug: string) => {
   try {
-    const response = await axiosInstance.get(`/api/public/${competitionSlug}`);
+    const response = await axiosInstance.get(`/api/public/${competitionType}/${competitionSlug}`);
     return response;
   } catch (error: any) {
     if (error.response?.data?.message) {

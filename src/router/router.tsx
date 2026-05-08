@@ -10,7 +10,7 @@ import ForgotPasswordComponent from '../components/auth/ForgotPassword'
 import SingleCompetition from '../components/competitions/SingleCompetition'
 import ProfileComponent from '../components/auth/Profile'
 import PublicRoundRobin from '../components/competitions/PublicRoundRobin'
-import SingleRound from '../components/rounds/SingleRounds'
+import PublicKnockout from '../components/competitions/PublicKnockout'
 
 export const router = createBrowserRouter([
   {
@@ -18,8 +18,12 @@ export const router = createBrowserRouter([
     element: <PublicLayout />,
     children: [
       {
-        path: '/public/:slug',
+        path: 'round_robin/:slug',
         element: <PublicRoundRobin />,
+      },
+      {
+        path: 'knockout/:slug',
+        element: <PublicKnockout />,
       },
     ],
   },

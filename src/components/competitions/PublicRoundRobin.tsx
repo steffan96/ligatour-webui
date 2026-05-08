@@ -162,9 +162,8 @@ const StandingsTable = ({ standings, isIndividual }: { standings: Standing[]; is
             return (
               <tr
                 key={standing.id}
-                className={`transition-colors duration-100 ${
-                  isTop3 ? 'bg-green-50/40 hover:bg-green-50' : 'hover:bg-gray-50/60'
-                }`}
+                className={`transition-colors duration-100 ${isTop3 ? 'bg-green-50/40 hover:bg-green-50' : 'hover:bg-gray-50/60'
+                  }`}
               >
                 <td className="px-4 py-3.5">
                   <RankBadge rank={rank} />
@@ -178,7 +177,7 @@ const StandingsTable = ({ standings, isIndividual }: { standings: Standing[]; is
                 <StatCell value={standing.wins} />
                 <StatCell value={standing.draws} />
                 <StatCell value={standing.losses} />
-                
+
                 {/* Commented out to match the headers */}
                 {/* <StatCell value={standing.goals_for} /> */}
                 {/* <StatCell value={standing.goals_against} /> */}
@@ -239,14 +238,14 @@ const StatusBadge = ({ status }: { status?: string }) => {
 }
 
 const PublicRoundRobin = () => {
-  const { slug } = useParams<{ slug: string }>()
+  const { type, slug } = useParams<{ type: string; slug: string }>();
   const [competition, setCompetition] = useState<CompetitionInterface | null>(null)
   const [standings, setStandings] = useState<Standing[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
 
   const fetchData = async () => {
-    if (!slug) {
+    if (!slug || !type) {
       setError('Invalid competition link')
       setLoading(false)
       return
@@ -254,7 +253,7 @@ const PublicRoundRobin = () => {
     setLoading(true)
     setError(null)
     try {
-      const response = await getPublicCompetition(slug)
+      const response = await getPublicCompetition(type, slug)
       const { competition: competitionData, standings: standingsData } = response.data
       if (!competitionData) throw new Error('Competition not found')
       setCompetition(competitionData)
