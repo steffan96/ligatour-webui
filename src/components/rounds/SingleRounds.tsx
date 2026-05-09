@@ -17,6 +17,7 @@ interface Match {
   winner_team_id: number | null;
   created_at: string;
   draw: boolean;
+  type: string;
 }
 
 interface Round {
@@ -127,6 +128,7 @@ const MatchCard = ({
             }
             className="text-sm border rounded px-2 py-1"
           >
+            {/* {match.type != 'knockout' && <option value={0}>Draw</option>} */}
             <option value={0}>Draw</option>
             <option value={match.home_team_id}>{match.home_team_name}</option>
             <option value={match.away_team_id}>{match.away_team_name}</option>
@@ -155,10 +157,9 @@ const MatchCard = ({
 interface SingleRoundProps {
   competitionId: number;
   roundId: number;
-  onBack: () => void;
 }
 
-const SingleRound = ({ competitionId, roundId, onBack }: SingleRoundProps) => {
+const SingleRound = ({ competitionId, roundId }: SingleRoundProps) => {
   const { showToast } = useToastStore();
   const [round, setRound] = useState<Round | null>(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -192,38 +193,36 @@ const SingleRound = ({ competitionId, roundId, onBack }: SingleRoundProps) => {
 
   return (
     <div className="space-y-5">
-      {/* Header row — matches Teams / TeamPlayers style */}
       <div className="flex items-center justify-between pb-3 border-b border-gray-200">
-        {round && (
+        <div className="flex items-center gap-3">
           <p className="text-xs text-gray-500 font-medium">
-            Round {round.round_number}
-            {round.stage && (
-              <span className="ml-1.5 capitalize text-gray-400">
-                · {round.stage.replace(/_/g, " ")}
-              </span>
+            {round ? (
+              <>
+                {round.stage && (
+                  <span className="ml-1.5 capitalize text-gray-400">
+                    · {round.stage.replace(/_/g, " ")}
+                  </span>
+                )}
+                <span className="ml-1.5 capitalize text-gray-400">
+                  · {round.status.replace(/_/g, " ")}
+                </span>
+              </>
+            ) : (
+              <span className="text-gray-300">Loading…</span>
             )}
           </p>
-        )}
+        </div>
       </div>
 
-      {/* Content */}
       {isLoading ? (
         <div className="animate-pulse h-20 bg-gray-100 rounded" />
       ) : !round ? (
         <div className="text-sm text-gray-500 text-center py-10">Round not found.</div>
       ) : (
-        <div className="flex flex-col gap-6">
-          <div className="bg-white border border-gray-200 rounded-lg p-4">
-            <span className="text-xs font-bold text-gray-500 uppercase">Status</span>
-            <div className="font-bold capitalize mt-0.5">
-              {round.status.replace(/_/g, " ")}
-            </div>
-          </div>
-          <div className="flex flex-col gap-2.5">
-            {round.matches?.map((m) => (
-              <MatchCard key={m.id} match={m} onUpdateMatch={handleUpdateMatch} />
-            ))}
-          </div>
+        <div className="flex flex-col gap-2.5">
+          {round.matches?.map((m) => (
+            <MatchCard key={m.id} match={m} onUpdateMatch={handleUpdateMatch} />
+          ))}
         </div>
       )}
     </div>

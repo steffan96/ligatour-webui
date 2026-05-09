@@ -29,11 +29,62 @@ interface KnockoutRound {
   id: number;
   name: string;
   round_number: number;
-  stage?: string | null;          // new — e.g. "Quarter-Final"
+  stage?: string | null;
   matches: KnockoutMatch[];
 }
 
-// ─── Layout constants ─────────────────────────────────────────────────────────
+interface RawMatch {
+  id: number;
+  competition_id: number;
+  round_id: number;
+  home_team_id: number;
+  away_team_id: number;
+  home_team_name: string;
+  away_team_name: string;
+  home_score: number | null;
+  away_score: number | null;
+  status: "scheduled" | "live" | "completed" | "walkover" | "bye";
+  winner_team_id: number;
+  draw: boolean;
+  scheduled_at?: string | null;
+}
+
+interface RawRound {
+  id: number;
+  competition_id: number;
+  round_number: number;
+  stage: string;
+  status: string;
+  created_at: string;
+  matches: RawMatch[];
+}
+
+function formatStageLabel(stage: string): string {
+  return stage
+    .split("_")
+    .map((w) => w.charAt(0).toUpperCase() + w.slice(1))
+    .join(" ");
+}
+
+function transformRound(raw: RawRound): KnockoutRound {
+  return {
+    id: raw.id,
+    name: formatStageLabel(raw.stage),
+    round_number: raw.round_number,
+    stage: formatStageLabel(raw.stage),
+    matches: raw.matches.map((m): KnockoutMatch => ({
+      id: m.id,
+      position: m.id,
+      home_team: m.home_team_id ? { id: m.home_team_id, name: m.home_team_name } : null,
+      away_team: m.away_team_id ? { id: m.away_team_id, name: m.away_team_name } : null,
+      home_score: m.home_score,
+      away_score: m.away_score,
+      status: m.status,
+      winner_id: m.winner_team_id > 0 ? m.winner_team_id : null,
+      scheduled_at: m.scheduled_at ?? null,
+    })),
+  };
+}
 
 const CARD_H = 88;
 const MATCH_GAP = 12;
@@ -44,8 +95,6 @@ const ROUND_COL_W = 200;
 function slotH(roundIdx: number): number {
   return BASE_SLOT_H * Math.pow(2, roundIdx);
 }
-
-// ─── Shared sub-components ────────────────────────────────────────────────────
 
 const LoadingSpinner = () => (
   <div className="flex flex-col justify-center items-center min-h-[400px] gap-4">
@@ -346,8 +395,6 @@ const RoundColumn = ({ round, roundIdx }: { round: KnockoutRound; roundIdx: numb
   );
 };
 
-// ─── Empty state ──────────────────────────────────────────────────────────────
-
 const EmptyBracket = () => (
   <div className="flex flex-col items-center justify-center py-20 text-center">
     <div className="w-14 h-14 bg-gray-100 rounded-full flex items-center justify-center mb-3">
@@ -367,8 +414,6 @@ const EmptyBracket = () => (
     <p className="text-xs text-gray-400 mt-1">Check back once the knockout stage begins</p>
   </div>
 );
-
-// ─── Bracket display ──────────────────────────────────────────────────────────
 
 const BracketDisplay = ({ rounds }: { rounds: KnockoutRound[] }) => {
   if (!rounds || rounds.length === 0) return <EmptyBracket />;
@@ -392,8 +437,8 @@ const BracketDisplay = ({ rounds }: { rounds: KnockoutRound[] }) => {
 
 // ─── Page component ───────────────────────────────────────────────────────────
 
-const PublicKnockoutBracket = () => {
-  const { type, slug } = useParams<{ type: string; slug: string }>();
+const PublicKnockout = () => {
+  const { slug } = useParams<{ slug: string }>();
   const [competition, setCompetition] = useState<CompetitionInterface | null>(null);
   const [rounds, setRounds] = useState<KnockoutRound[]>([]);
   const [loading, setLoading] = useState(true);
@@ -401,7 +446,7 @@ const PublicKnockoutBracket = () => {
 
   // useCallback so the same reference is safe to use in both effects
   const fetchData = useCallback(async () => {
-    if (!slug || !type) {
+    if (!slug) {
       setError("Invalid competition link");
       setLoading(false);
       return;
@@ -409,11 +454,13 @@ const PublicKnockoutBracket = () => {
     setLoading(true);
     setError(null);
     try {
-      const response = await getPublicCompetition(type, slug);
-      const { competition: competitionData, rounds: roundsData } = response.data;
+      const response = await getPublicCompetition(`knockout/${slug}`);
+      const { competition: competitionData, rounds: rawRounds } = response.data;
       if (!competitionData) throw new Error("Competition not found");
       setCompetition(competitionData);
-      setRounds(Array.isArray(roundsData) ? roundsData : []);
+      setRounds(
+        Array.isArray(rawRounds) ? rawRounds.map(transformRound) : []
+      );
     } catch (err: any) {
       console.error("Failed to load knockout bracket:", err);
       setError(err?.message || "Failed to load bracket. The link may be invalid or expired.");
@@ -494,4 +541,4 @@ const PublicKnockoutBracket = () => {
   );
 };
 
-export default PublicKnockoutBracket;
+export default PublicKnockout;

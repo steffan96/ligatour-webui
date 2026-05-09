@@ -252,8 +252,7 @@ const SingleCompetition = () => {
         selectedRoundId === null
           ? <Rounds competition={competition} onSelectRound={setSelectedRoundId} />
           : <SingleRound competitionId={competition.id}
-            roundId={selectedRoundId}
-            onBack={() => setSelectedRoundId(null)} />
+            roundId={selectedRoundId} />
       )}
 
       {activeTab === 'settings' && (

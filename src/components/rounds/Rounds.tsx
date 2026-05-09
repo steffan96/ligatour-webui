@@ -48,11 +48,8 @@ const RoundRow = ({
                cursor-pointer hover:bg-gray-50 -mx-1 px-1 rounded transition-colors"
   >
     <div className="flex items-center gap-3">
-      <span className="text-sm font-bold text-gray-900">
-        Round {round.round_number}
-      </span>
       {round.stage && (
-        <span className="text-xs font-medium text-gray-500 capitalize">
+        <span className="text-xs font-bold text-gray-900 capitalize">
           {round.stage.replace(/_/g, " ")}
         </span>
       )}

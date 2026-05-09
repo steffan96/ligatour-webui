@@ -238,14 +238,14 @@ const StatusBadge = ({ status }: { status?: string }) => {
 }
 
 const PublicRoundRobin = () => {
-  const { type, slug } = useParams<{ type: string; slug: string }>();
+  const { slug } = useParams<{ slug: string }>();
   const [competition, setCompetition] = useState<CompetitionInterface | null>(null)
   const [standings, setStandings] = useState<Standing[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
 
   const fetchData = async () => {
-    if (!slug || !type) {
+    if (!slug) {
       setError('Invalid competition link')
       setLoading(false)
       return
@@ -253,7 +253,7 @@ const PublicRoundRobin = () => {
     setLoading(true)
     setError(null)
     try {
-      const response = await getPublicCompetition(type, slug)
+      const response = await getPublicCompetition(`round_robin/${slug}`)
       const { competition: competitionData, standings: standingsData } = response.data
       if (!competitionData) throw new Error('Competition not found')
       setCompetition(competitionData)
