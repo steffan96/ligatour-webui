@@ -2,8 +2,6 @@ import React, { useCallback, useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { getPublicCompetition, CompetitionInterface } from "api/competitions";
 
-// ─── Types ───────────────────────────────────────────────────────────────────
-
 interface Team {
   id: number;
   name: string;
@@ -22,7 +20,7 @@ interface KnockoutMatch {
   status: "scheduled" | "live" | "completed" | "walkover" | "bye";
   winner_id: number | null;
   scheduled_at?: string | null;
-  venue?: string | null;          // new — optional venue label
+  venue?: string | null;
 }
 
 interface KnockoutRound {
@@ -158,42 +156,6 @@ const ErrorDisplay = ({
     )}
   </div>
 );
-
-const StatusBadge = ({ status }: { status?: string }) => {
-  if (!status) return null;
-  const map: Record<string, { label: string; classes: string; dot: string }> = {
-    active: {
-      label: "Live",
-      classes: "bg-green-100 text-green-800 border-green-200",
-      dot: "bg-green-500 animate-pulse",
-    },
-    completed: {
-      label: "Completed",
-      classes: "bg-gray-100 text-gray-600 border-gray-200",
-      dot: "bg-gray-400",
-    },
-    pending: {
-      label: "Upcoming",
-      classes: "bg-yellow-50 text-yellow-700 border-yellow-200",
-      dot: "bg-yellow-400",
-    },
-  };
-  const cfg = map[status] ?? {
-    label: status,
-    classes: "bg-gray-100 text-gray-600 border-gray-200",
-    dot: "bg-gray-400",
-  };
-  return (
-    <span
-      className={`inline-flex items-center gap-1.5 text-xs font-semibold px-2.5 py-1 rounded-full border ${cfg.classes}`}
-    >
-      <span className={`w-1.5 h-1.5 rounded-full ${cfg.dot}`} />
-      {cfg.label}
-    </span>
-  );
-};
-
-// ─── Bracket sub-components ───────────────────────────────────────────────────
 
 interface TeamRowProps {
   team: Team | null;
@@ -518,9 +480,6 @@ const PublicKnockout = () => {
                   </p>
                 )}
               </div>
-            </div>
-            <div className="flex items-center gap-3">
-              <StatusBadge status={competition.status} />
             </div>
           </div>
         </div>

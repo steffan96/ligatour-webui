@@ -151,6 +151,9 @@ const Rounds = ({ competition, onSelectRound }: RoundsProps) => {
     .filter((r) => r.matches.length > 0)
     .sort((a, b) => a.round_number - b.round_number);
 
+  const lastRound = visibleRounds[visibleRounds.length - 1];
+  const canStartRound = visibleRounds.length === 0 || lastRound?.status === "completed";
+
   const totalPages = Math.ceil(visibleRounds.length / ROUNDS_PER_PAGE);
   const startIndex = (currentPage - 1) * ROUNDS_PER_PAGE;
   const paginatedRounds = visibleRounds.slice(startIndex, startIndex + ROUNDS_PER_PAGE);
@@ -190,12 +193,22 @@ const Rounds = ({ competition, onSelectRound }: RoundsProps) => {
           }}
         />
       )}
+      {!isLoading && canStartRound && (
+        <button
+          onClick={() => setShowStartRoundModal(true)}
+          className="inline-flex items-center gap-1.5 text-xs font-medium
+                     text-gray-600 bg-gray-100 hover:bg-gray-200 hover:text-gray-900
+                     border border-gray-200 rounded-full px-3 py-1.5 transition-colors"
+        >
+          ▶ Start Next Round
+        </button>
+      )}
 
       {showStartRoundModal && (
         <ConfirmModal
           title="Start Next Round?"
           description="This will generate matches for the next round. This action cannot be undone."
-          confirmLabel="▶ Start"
+          confirmLabel={isStarting ? "Starting…" : "▶ Start"}
           onConfirm={handleStartRound}
           onCancel={() => setShowStartRoundModal(false)}
         />
