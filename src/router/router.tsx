@@ -11,6 +11,7 @@ import SingleCompetition from '../components/competitions/SingleCompetition'
 import ProfileComponent from '../components/auth/Profile'
 import PublicRoundRobin from '../components/competitions/PublicRoundRobin'
 import PublicKnockout from '../components/competitions/PublicKnockout'
+// import { ProtectedRoute } from '../components/ProtectedRoute'
 
 export const router = createBrowserRouter([
   {
@@ -31,19 +32,7 @@ export const router = createBrowserRouter([
     path: '/',
     element: <RootLayout />,
     children: [
-      {
-        path: '/',
-        index: true,
-        element: <DashboardComponent />,
-      },
-      {
-        path: '/competitions',
-        element: <DashboardComponent />,
-      },
-      {
-        path: '/competition/:id',
-        element: <SingleCompetition />,
-      },
+      // — Public auth routes —
       {
         path: '/register',
         element: <RegisterComponent />,
@@ -59,6 +48,25 @@ export const router = createBrowserRouter([
       {
         path: '/forgot-password',
         element: <ForgotPasswordComponent />,
+      },
+      // — Protected routes —
+      // {
+      //   path: '/',
+      //   index: true,
+      //   element: <ProtectedRoute><DashboardComponent /></ProtectedRoute>,
+      // },
+      {
+        path: '/',
+        index: true,
+        element: <DashboardComponent />,
+      },
+      {
+        path: '/competitions',
+        element: <DashboardComponent />,
+      },
+      {
+        path: '/competition/:id',
+        element: <SingleCompetition />,
       },
       {
         path: '/profile',

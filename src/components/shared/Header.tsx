@@ -2,6 +2,7 @@ import React from 'react'
 import HeaderButton from './HeaderButton'
 import { useNavigate } from 'react-router-dom'
 import { useState } from 'react'
+import { loginWithGoogle } from '../../api/auth'
 
 const Header = () => {
   const navigate = useNavigate()
@@ -16,11 +17,10 @@ const Header = () => {
               text-gray-700 px-5 py-2 rounded-lg 
               font-semibold hover:border-green-900 
               hover:text-green-900 transition-colors`,
-    logout: `bg-transparent border-2 border-gray-300 
-            text-gray-700 px-5 py-2 rounded-lg 
-            font-semibold hover:bg-red-50 
-            hover:border-red-600 hover:text-red-600 
-            transition-colors`,
+    google: `flex items-center gap-2 bg-white border-2 
+             border-gray-300 text-gray-700 px-5 py-2 
+             rounded-lg font-semibold hover:border-blue-500 
+             hover:text-blue-600 transition-colors`,
   }
 
   return (
@@ -49,11 +49,20 @@ const Header = () => {
                 setActiveButton('register')
               }}
             />
+            <button
+              className={buttonStyles.google}
+              onClick={loginWithGoogle}
+            >
+              <img
+                src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg"
+                alt="Google"
+                className="w-3 h-5"
+              />
+              Continue with Google
+            </button>
           </>
         ) : null}
       </div>
-
-      {/* Right Section - CTA / Logout */}
       <div className="flex items-center gap-4">
         <p className="text-lg font-semibold text-gray-700">Start your own competition.</p>
       </div>

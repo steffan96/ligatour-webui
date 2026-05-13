@@ -1,12 +1,21 @@
-import React from 'react';
-import { Navigate, Outlet } from 'react-router-dom';
-import { useAuth } from '../../context/AuthContext';
+// import {useEffect} from 'react';
 
-export default function ProtectedRoute() {
-  const { user, loading } = useAuth();
+// interface ProtectedRouteProps {
+//   children: React.ReactNode;
+// }
 
-  if (loading) return <p>Loading...</p>;
-  if (!user)   return <Navigate to="/login" replace />;
+// export function ProtectedRoute({ children }: ProtectedRouteProps) {
+//   const { user, login } = useAuth();
 
-  return <Outlet />;
-}
+//   useEffect(() => {
+//     if (!user) {
+
+//     }
+//   }, [user]); // only fires when auth state settles
+
+//   if (!user) {
+//     return null; // login() is already being called via useEffect
+//   }
+
+//   return <>{children}</>;
+// }

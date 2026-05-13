@@ -16,6 +16,9 @@ const SidebarComponent = () => {
   const handleLogout = () => {
     logoutUser()
     showToast('Logout successful!', true)
+    setTimeout(() => {
+      window.location.reload();
+  }, 900);
   }
 
   const isUserLoggedIn = Boolean(localStorage.getItem('token') || localStorage.getItem('refreshToken'))

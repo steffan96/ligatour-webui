@@ -80,3 +80,32 @@ export const resetPassword = async (token: string, password: string, confirmPass
 		throw error.message || 'Password reset failed.';
 	}
 };
+
+export const loginWithGoogle = () => {
+  try {
+    const backendGoogleLoginUrl = `${process.env.REACT_APP_BASE_URL}/api/auth/google/login`;
+    window.location.href = backendGoogleLoginUrl;
+  } catch (error: any) {
+    throw error.message || 'Google login failed.';
+  }
+};
+
+export const handleGoogleCallback = async (code: string, state: string) => {
+  try {
+    const response = await axiosInstance.get('/api/auth/google', {
+      params: { code, state },
+    });
+    if (response?.data) {
+      localStorage.setItem('token', response.data.token);
+      localStorage.setItem('refreshToken', response.data.refresh_token);
+      localStorage.setItem('userID', response.data.user.id);
+      return response.data;
+    }
+    return null;
+  } catch (error: any) {
+    if (error.response?.data?.message) {
+      throw error.response.data.message;
+    }
+    throw error.message || 'Google login failed.';
+  }
+};
