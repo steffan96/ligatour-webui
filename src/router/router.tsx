@@ -11,6 +11,7 @@ import SingleCompetition from '../components/competitions/SingleCompetition'
 import ProfileComponent from '../components/auth/Profile'
 import PublicRoundRobin from '../components/competitions/PublicRoundRobin'
 import PublicKnockout from '../components/competitions/PublicKnockout'
+import AuthCallback from '../components/auth/AuthCallback'
 // import { ProtectedRoute } from '../components/ProtectedRoute'
 
 export const router = createBrowserRouter([
@@ -27,6 +28,10 @@ export const router = createBrowserRouter([
         element: <PublicKnockout />,
       },
     ],
+  },
+  {
+    path: '/auth/callback',
+    element: <AuthCallback />,
   },
   {
     path: '/',
