@@ -11,9 +11,7 @@ export default function AuthCallback() {
     if (token) {
       localStorage.setItem('token', token);
       window.history.replaceState({}, '', '/');
-      navigate('/dashboard');
-    } else {
-      navigate('/login');
+      navigate('/');
     }
   }, []);
 

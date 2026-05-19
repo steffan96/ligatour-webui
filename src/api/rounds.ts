@@ -2,7 +2,7 @@ import axiosInstance from '../router/axios'
 
 export const startRound = async (competitionId: number) => {
   try {
-    const response = await axiosInstance.post(`/api/v1/rounds/${competitionId}`)
+    const response = await axiosInstance.post(`/api/v1/rounds/${competitionId}/next-round`)
     return response
   } catch (error: any) {
     if (error.response?.data?.message) {

@@ -1,7 +1,8 @@
 import React, { useEffect, useState } from "react";
 import { useToastStore } from "../../api/stores/useToastStore";
-import { getRound } from "../../api/rounds";
+import { getRound, startRound } from "../../api/rounds";
 import { updateMatch } from "../../api/matches";
+import ConfirmModal from "../common/ConfirmModal";
 
 interface Match {
   id: number;
@@ -163,6 +164,8 @@ const SingleRound = ({ competitionId, roundId }: SingleRoundProps) => {
   const { showToast } = useToastStore();
   const [round, setRound] = useState<Round | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [isStarting, setIsStarting] = useState(false);
+  const [showStartRoundModal, setShowStartRoundModal] = useState(false);
 
   const loadRound = async () => {
     setIsLoading(true);
@@ -190,6 +193,21 @@ const SingleRound = ({ competitionId, roundId }: SingleRoundProps) => {
       showToast(err || "Match update failed.", false);
     }
   };
+
+  const handleStartRound = async () => {
+    setIsStarting(true);
+    try {
+      await startRound(competitionId);
+      showToast("Next round generated.", true);
+    } catch (err: any) {
+      showToast(err || "Failed to start round.", false);
+    } finally {
+      setIsStarting(false);
+      setShowStartRoundModal(false);
+    }
+  };
+
+  const canStartRound = !isLoading && round?.status === "completed";
 
   return (
     <div className="space-y-5">
@@ -224,6 +242,27 @@ const SingleRound = ({ competitionId, roundId }: SingleRoundProps) => {
             <MatchCard key={m.id} match={m} onUpdateMatch={handleUpdateMatch} />
           ))}
         </div>
+      )}
+
+      {canStartRound && (
+        <button
+          onClick={() => setShowStartRoundModal(true)}
+          className="inline-flex items-center gap-1.5 text-xs font-medium
+                     text-gray-600 bg-gray-100 hover:bg-gray-200 hover:text-gray-900
+                     border border-gray-200 rounded-full px-3 py-1.5 transition-colors"
+        >
+          ▶ Start Next Round
+        </button>
+      )}
+
+      {showStartRoundModal && (
+        <ConfirmModal
+          title="Start Next Round?"
+          description="This will generate matches for the next round. This action cannot be undone."
+          confirmLabel={isStarting ? "Starting…" : "▶ Start"}
+          onConfirm={handleStartRound}
+          onCancel={() => setShowStartRoundModal(false)}
+        />
       )}
     </div>
   );
