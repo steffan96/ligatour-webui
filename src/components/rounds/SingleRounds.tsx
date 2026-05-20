@@ -29,6 +29,7 @@ interface Round {
   status: "scheduled" | "in_progress" | "completed";
   created_at: string;
   matches: Match[];
+  type: string;
 }
 
 const MatchStatusBadge = ({ status }: { status: Match["status"] }) => {
@@ -244,7 +245,7 @@ const SingleRound = ({ competitionId, roundId }: SingleRoundProps) => {
         </div>
       )}
 
-      {canStartRound && (
+      {canStartRound && round.type != 'round_robin' && (
         <button
           onClick={() => setShowStartRoundModal(true)}
           className="inline-flex items-center gap-1.5 text-xs font-medium
@@ -257,8 +258,10 @@ const SingleRound = ({ competitionId, roundId }: SingleRoundProps) => {
 
       {showStartRoundModal && (
         <ConfirmModal
-          title="Start Next Round?"
-          description="This will generate matches for the next round. This action cannot be undone."
+          title={round?.type === "round_robin" ? "Generate All Rounds?" : "Start Next Round?"}
+          description={round?.type === "round_robin" ? 
+            "This will generate matches for all rounds. Are you sure you want to proceed?" 
+            : "This will generate matches for the next round. Are you sure you want to proceed?"}
           confirmLabel={isStarting ? "Starting…" : "▶ Start"}
           onConfirm={handleStartRound}
           onCancel={() => setShowStartRoundModal(false)}

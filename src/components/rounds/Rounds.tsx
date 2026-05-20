@@ -199,15 +199,17 @@ const Rounds = ({ competition, onSelectRound }: RoundsProps) => {
           className="inline-flex items-center gap-1.5 text-xs font-medium
                      text-gray-600 bg-gray-100 hover:bg-gray-200 hover:text-gray-900
                      border border-gray-200 rounded-full px-3 py-1.5 transition-colors"
-        >
-          ▶ Start Next Round
+      >
+          {competition.type === "round_robin" ? "▶ Generate All Rounds" : "▶ Start Next Round"}
         </button>
       )}
 
       {showStartRoundModal && (
         <ConfirmModal
-          title="Start Next Round?"
-          description="This will generate matches for the next round. This action cannot be undone."
+          title={competition.type === "round_robin" ? "Generate All Rounds?" : "Start Next Round?"}
+          description={competition.type === "round_robin" ? 
+            "This will generate matches for all rounds. Are you sure you want to proceed?" 
+            : "This will generate matches for the next round. Are you sure you want to proceed?"}
           confirmLabel={isStarting ? "Starting…" : "▶ Start"}
           onConfirm={handleStartRound}
           onCancel={() => setShowStartRoundModal(false)}
