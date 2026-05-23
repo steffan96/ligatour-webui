@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
-import { getCompetition, startCompetition, CompetitionInterface } from 'api/competitions'
+import { getCompetition, CompetitionInterface } from 'api/competitions'
 import PageWindow from '../shared/PageWindow'
 import { useToastStore } from '../../api/stores/useToastStore'
 import CompetitionSettings from './CompetitionSettings'
@@ -8,7 +8,6 @@ import Teams from '../teams/Teams'
 import TeamPlayers from '../teams/TeamPlayers'
 import Rounds from '../rounds/Rounds'
 import SingleRound from '../rounds/SingleRounds'
-import ConfirmModal from '../common/ConfirmModal'
 
 type TabId = 'overview' | 'settings' | 'teams' | 'rounds'
 
@@ -114,48 +113,16 @@ const PublicLink = ({
   </div>
 )
 
-const StartBanner = ({ onStart }: { onStart: () => void }) => (
-  <div className="pt-4 border-t border-gray-200">
-    <div className="rounded-xl border border-green-200 bg-gradient-to-br from-green-50 to-emerald-50 p-5">
-      <div className="flex items-center justify-between gap-4">
-        <div>
-          <p className="text-sm font-bold text-green-900">Ready to begin?</p>
-          <p className="text-xs text-green-700 mt-0.5">
-            Starting the competition will lock its settings and generate matches and rounds.
-          </p>
-        </div>
-        <button
-          onClick={onStart}
-          className="shrink-0 flex items-center gap-2 bg-green-900 hover:bg-green-800
-                     active:scale-95 text-white text-sm font-bold
-                     px-5 py-2.5 rounded-lg shadow-sm transition-all duration-150"
-        >
-          <span className="text-base">🚀</span>
-          Start Competition
-        </button>
-      </div>
-    </div>
-  </div>
-)
-
 const CompetitionOverview = ({
   competition,
   onCopy,
-  onStart,
 }: {
   competition: CompetitionInterface
   onCopy: (text: string) => void
-  onStart: () => void
 }) => {
-  const isPending = competition.status !== 'active' && competition.status !== 'completed'
-
   return (
     <div className="space-y-5">
-      {competition.public_link
-        ? <PublicLink link={competition.public_link} onCopy={onCopy} />
-        : <p className="text-sm text-gray-400 italic">No public link available for this competition.</p>
-      }
-      {isPending && <StartBanner onStart={onStart} />}
+      {competition.public_link && <PublicLink link={competition.public_link} onCopy={onCopy} />}
     </div>
   )
 }
@@ -168,7 +135,6 @@ const SingleCompetition = () => {
   const [activeTab, setActiveTab] = useState<TabId>('overview')
   const [selectedTeamId, setSelectedTeamId] = useState<number | null>(null)
   const [selectedRoundId, setSelectedRoundId] = useState<number | null>(null)
-  const [showStartModal, setShowStartModal] = useState(false)
 
   useEffect(() => {
     if (!id) return
@@ -179,18 +145,6 @@ const SingleCompetition = () => {
         navigate('/competitions')
       })
   }, [id, navigate, showToast])
-
-  const handleStartCompetition = useCallback(async () => {
-    if (!competition) return
-    setShowStartModal(false)
-    try {
-      const res = await startCompetition(competition.id)
-      setCompetition(res?.data)
-      showToast('Competition started!', true)
-    } catch (err: any) {
-      showToast(err || 'Failed to activate competition.', false)
-    }
-  }, [competition, showToast])
 
   const handleTabChange = useCallback((tab: TabId) => {
     setActiveTab(tab)
@@ -218,16 +172,6 @@ const SingleCompetition = () => {
       title={`${competition.name}`}
       headerActionButtons={headerActionButton}
     >
-      {showStartModal && (
-        <ConfirmModal
-          title="Start Competition?"
-          description="This will lock settings and begin match generation. This action cannot be undone."
-          confirmLabel="Start"
-          onConfirm={handleStartCompetition}
-          onCancel={() => setShowStartModal(false)}
-        />
-      )}
-
       <TabBar
         activeTab={activeTab}
         onTabChange={handleTabChange}
@@ -238,7 +182,6 @@ const SingleCompetition = () => {
         <CompetitionOverview
           competition={competition}
           onCopy={handleCopyLink}
-          onStart={() => setShowStartModal(true)}
         />
       )}
 

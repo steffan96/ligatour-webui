@@ -121,18 +121,6 @@ export const removeTeamFromCompetition = async (competitionId: string, teamId: s
   }
 };
 
-export const startCompetition = async (competitionId: number) => {
-  try {
-    const response = await axiosInstance.post(`/api/v1/competitions/${competitionId}/start-competition`);
-    return response;
-  } catch (error: any) {
-    if (error.response?.data?.message) {
-      throw error.response.data.message;
-    }
-    throw error.message || 'Failed to update competition.';
-  }
-};
-
 export const getPublicCompetition = async (competitionSlug: string) => {
   try {
     const response = await axiosInstance.get(`/api/public/${competitionSlug}`);
