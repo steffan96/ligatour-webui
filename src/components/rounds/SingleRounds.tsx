@@ -66,7 +66,7 @@ const MatchCard = ({
   const isBye = match.status === "bye";
   const homeWins = match.winner_team_id === match.home_team_id;
   const awayWins = match.winner_team_id === match.away_team_id;
-  const isDraw = match.draw === true;
+  const isDraw = match.draw === true && match.winner_team_id === 0;
 
   const [isEditing, setIsEditing] = useState(false);
   const [winnerId, setWinnerId] = useState<number | "">(match.winner_team_id ?? "");

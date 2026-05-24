@@ -177,25 +177,6 @@ const StandingsTable = ({ standings, isIndividual }: { standings: Standing[]; is
                 <StatCell value={standing.wins} />
                 <StatCell value={standing.draws} />
                 <StatCell value={standing.losses} />
-
-                {/* Commented out to match the headers */}
-                {/* <StatCell value={standing.goals_for} /> */}
-                {/* <StatCell value={standing.goals_against} /> */}
-                {/* <td className="px-4 py-3.5 text-sm text-center tabular-nums">
-                  <span
-                    className={`font-medium ${
-                      standing.goal_diff > 0
-                        ? 'text-green-700'
-                        : standing.goal_diff < 0
-                        ? 'text-red-500'
-                        : 'text-gray-500'
-                    }`}
-                  >
-                    {standing.goal_diff > 0 ? '+' : ''}
-                    {standing.goal_diff}
-                  </span>
-                </td> */}
-
                 <td className="px-4 py-3.5 text-center">
                   <span
                     className={
