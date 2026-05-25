@@ -1,6 +1,6 @@
-import React from 'react';
-import {ThemeProvider, createTheme} from '@mui/material/styles';
-import {type ReactNode} from 'react';
+import React from "react";
+import { ThemeProvider, createTheme } from "@mui/material/styles";
+import type { ReactNode } from "react";
 
 type AppThemeProperties = {
 	children: ReactNode;
