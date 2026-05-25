@@ -1,36 +1,32 @@
 {
-	"env": {
-		"browser": true,
-		"es2021": true,
-		"node": true
-	},
-	"extends": [
-		"eslint:recommended",
-		"plugin:react/recommended",
-		"plugin:@typescript-eslint/recommended"
-	],
-	"parser": "@typescript-eslint/parser",
-	"plugins": ["react", "@typescript-eslint"],
-	"rules": {
-		"max-len": [
-			"error",
-			{
-				"code": 120,
-				"tabWidth": 2,
-				"ignoreComments": true,
-				"ignoreUrls": true,
-				// "ignoreStrings": true,
-				"ignoreTemplateLiterals": true,
-				"ignoreRegExpLiterals": true,
-				"ignorePattern": "^import\\s.+\\sfrom\\s.+|^export\\s.+\\sfrom\\s.+"
-			}
-		],
-		"@typescript-eslint/no-explicit-any": "off",
-		"no-mixed-spaces-and-tabs": "off"
-	},
-	"settings": {
-		"react": {
-			"version": "detect"
-		}
-	}
+  "env": {
+    "browser": true,
+    "es2021": true,
+    "node": true
+  },
+  "extends": ["eslint:recommended", "plugin:react/recommended", "plugin:@typescript-eslint/recommended"],
+  "parser": "@typescript-eslint/parser",
+  "plugins": ["react", "@typescript-eslint"],
+  "rules": {
+    "max-len": [
+      "error",
+      {
+        "code": 120,
+        "tabWidth": 2,
+        "ignoreComments": true,
+        "ignoreUrls": true,
+        // "ignoreStrings": true,
+        "ignoreTemplateLiterals": true,
+        "ignoreRegExpLiterals": true,
+        "ignorePattern": "^import\\s.+\\sfrom\\s.+|^export\\s.+\\sfrom\\s.+"
+      }
+    ],
+    "@typescript-eslint/no-explicit-any": "off",
+    "no-mixed-spaces-and-tabs": "off"
+  },
+  "settings": {
+    "react": {
+      "version": "detect"
+    }
+  }
 }

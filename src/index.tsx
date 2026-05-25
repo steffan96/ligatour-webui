@@ -1,19 +1,20 @@
-import React from "react";
-import ReactDOM from "react-dom/client";
-import "./globals.css";
-import App from "./App";
+import React from 'react';
+import ReactDOM from 'react-dom/client';
+import './globals.css';
+import App from './App';
+
 // Import reportWebVitals from './reportWebVitals.js';
 
-const rootElement = document.querySelector("#root");
+const rootElement = document.querySelector('#root');
 if (rootElement) {
-	const root = ReactDOM.createRoot(rootElement);
-	root.render(
-		<React.StrictMode>
-			<App />
-		</React.StrictMode>,
-	);
+  const root = ReactDOM.createRoot(rootElement);
+  root.render(
+    <React.StrictMode>
+      <App />
+    </React.StrictMode>,
+  );
 } else {
-	throw new Error("Root element not found");
+  throw new Error('Root element not found');
 }
 
 // If you want to start measuring performance in your app, pass a function
