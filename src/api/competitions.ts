@@ -129,3 +129,15 @@ export const getPublicCompetition = async (competitionSlug: string) => {
     throw error.message || 'Failed to load';
   }
 };
+
+export const getPublicGroupStageCompetition = async (competitionSlug: string) => {
+  try {
+    const response = await axiosInstance.get(`/api/public/group_stage/${competitionSlug}`);
+    return response;
+  } catch (error: any) {
+    if (error.response?.data?.message) {
+      throw error.response.data.message;
+    }
+    throw error.message || 'Failed to load';
+  }
+};
