@@ -77,6 +77,7 @@ const MatchCard = ({
 	const [winnerId, setWinnerId] = useState<number | "">(match.winner_team_id ?? "");
 
 	const [isSaving, setIsSaving] = useState(false);
+	const [showRestartModal, setShowRestartModal] = useState(false);
 
 	useEffect(() => {
 		setWinnerId(match.winner_team_id ?? "");
@@ -100,6 +101,7 @@ const MatchCard = ({
 		try {
 			await onRestartMatch(match.id);
 			setIsEditing(false);
+			setShowRestartModal(false);
 		} finally {
 			setIsSaving(false);
 		}
@@ -155,7 +157,7 @@ const MatchCard = ({
 
 					<div className="flex justify-end gap-2">
 						<button
-							onClick={handleRestart}
+							onClick={() => setShowRestartModal(true)}
 							disabled={isSaving}
 							className="text-xs px-3 py-1 bg-red-100 text-red-700 rounded"
 						>
@@ -175,6 +177,16 @@ const MatchCard = ({
 						</button>
 					</div>
 				</div>
+			)}
+
+			{showRestartModal && (
+				<ConfirmModal
+					title="Restart Match?"
+					description="This will clear the result and reset the match to scheduled. Are you sure?"
+					confirmLabel={isSaving ? "Restarting…" : "↺ Restart"}
+					onConfirm={handleRestart}
+					onCancel={() => setShowRestartModal(false)}
+				/>
 			)}
 		</div>
 	);

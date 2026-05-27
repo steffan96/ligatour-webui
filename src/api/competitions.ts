@@ -19,6 +19,7 @@ export interface CompetitionInterface {
 	teams_per_group: number;
 	individual: boolean;
 	public_link: string;
+	group_stage: boolean;
 }
 
 export const createCompetition = async (name: string, type: string, individual: boolean) => {

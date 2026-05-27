@@ -61,12 +61,16 @@ const StatusBadge = ({ status }: { status: string }) => {
 		inactive: "bg-yellow-50 text-yellow-800 border-yellow-200",
 		active: "bg-green-50 text-green-800 border-green-200",
 		completed: "bg-gray-100 text-gray-700 border-gray-300",
+		cancelled: "bg-red-50 text-red-800 border-red-200",
 	};
+
 	const labels: Record<string, string> = {
 		inactive: "⏳ Inactive",
 		active: "🟢 Active",
 		completed: "✅ Completed",
+		cancelled: "❌ Cancelled",
 	};
+
 	return (
 		<span className={`text-xs font-bold px-2.5 py-1 rounded-md border ${styles[status] ?? styles.inactive}`}>
 			{labels[status] ?? status}
@@ -85,25 +89,34 @@ interface CompetitionSettingsProps {
 
 const CompetitionSettings = ({ competition, onCompetitionChange }: CompetitionSettingsProps) => {
 	const { showToast } = useToastStore();
+
 	const [draft, setDraft] = useState<CompetitionInterface>(competition);
 	const [isSaving, setIsSaving] = useState(false);
 	const [isEditing, setIsEditing] = useState(false);
 
 	const ro = !isEditing;
 
-	const set = (field: keyof CompetitionInterface, value: any) => setDraft((prev) => ({ ...prev, [field]: value }));
+	const set = (field: keyof CompetitionInterface, value: any) =>
+		setDraft((prev) => ({
+			...prev,
+			[field]: value,
+		}));
 
 	const handleSave = async (overrides?: Partial<CompetitionInterface>) => {
 		setIsSaving(true);
+
 		try {
 			const response = await updateCompetition(competition.id, {
 				...draft,
 				...overrides,
 			});
+
 			const updated = response?.data;
+
 			onCompetitionChange(updated);
 			setDraft(updated);
 			setIsEditing(false);
+
 			showToast("Changes saved successfully!", true);
 		} catch (err: any) {
 			showToast(err || "Failed to save changes. Please try again.", false);
@@ -124,6 +137,7 @@ const CompetitionSettings = ({ competition, onCompetitionChange }: CompetitionSe
 				<p className="text-xs text-gray-500 font-medium">
 					{isEditing ? "Editing mode — make your changes below" : "View mode — click Edit to make changes"}
 				</p>
+
 				<button
 					className="bg-white text-green-900 text-sm font-bold 
                      px-3.5 py-1.5 rounded-md hover:bg-green-50 
@@ -149,6 +163,7 @@ const CompetitionSettings = ({ competition, onCompetitionChange }: CompetitionSe
 						placeholder="Competition name"
 					/>
 				</Field>
+
 				<Field label="Status">
 					<div className="flex items-center h-[34px]">
 						<StatusBadge status={competition.status} />
@@ -156,6 +171,7 @@ const CompetitionSettings = ({ competition, onCompetitionChange }: CompetitionSe
 				</Field>
 			</div>
 
+			{/* Competition Type */}
 			<div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
 				<Field label="Competition Type">
 					<div className={inputCls(true)}>
@@ -163,9 +179,55 @@ const CompetitionSettings = ({ competition, onCompetitionChange }: CompetitionSe
 					</div>
 				</Field>
 			</div>
+
+			{/* Group Stage Settings */}
+			{draft.type !== "swiss" && (
+				<div>
+					<SectionHeader label="Group Stage Settings" />
+
+					<Toggle
+						label="Enable Group Stage"
+						description="Competition starts with a group stage"
+						checked={draft.group_stage ?? false}
+						disabled={ro}
+						onChange={() => set("group_stage", !draft.group_stage)}
+					/>
+
+					{draft.group_stage && (
+						<div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5 mt-4">
+							<Field label="Number of Groups">
+								<input
+									type="number"
+									min={1}
+									value={draft.number_of_groups ?? null}
+									readOnly={ro}
+									onChange={(e) => set("number_of_groups", Number(e.target.value))}
+									className={inputCls(ro)}
+									placeholder="e.g. 4"
+								/>
+							</Field>
+
+							<Field label="Teams per Group">
+								<input
+									type="number"
+									min={1}
+									value={draft.teams_per_group ?? null}
+									readOnly={ro}
+									onChange={(e) => set("teams_per_group", Number(e.target.value))}
+									className={inputCls(ro)}
+									placeholder="e.g. 4"
+								/>
+							</Field>
+						</div>
+					)}
+				</div>
+			)}
+
+			{/* Match Settings */}
 			{(draft.has_third_place !== undefined || draft.two_legged !== undefined) && (
 				<div>
 					<SectionHeader label="Match Settings" />
+
 					{draft.has_third_place !== undefined && (
 						<Toggle
 							label="3rd Place Match"
@@ -175,6 +237,7 @@ const CompetitionSettings = ({ competition, onCompetitionChange }: CompetitionSe
 							onChange={() => set("has_third_place", !draft.has_third_place)}
 						/>
 					)}
+
 					{draft.two_legged !== undefined && (
 						<Toggle
 							label="Two-Legged"
@@ -186,6 +249,7 @@ const CompetitionSettings = ({ competition, onCompetitionChange }: CompetitionSe
 					)}
 				</div>
 			)}
+
 			{/* Individual Toggle */}
 			{draft.individual !== undefined && (
 				<Toggle
@@ -211,6 +275,7 @@ const CompetitionSettings = ({ competition, onCompetitionChange }: CompetitionSe
 							Cancel
 						</button>
 					)}
+
 					<button
 						onClick={() => handleSave()}
 						disabled={isSaving || ro}
