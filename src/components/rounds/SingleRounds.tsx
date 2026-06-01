@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { restartMatch, updateMatch } from "../../api/matches";
-import { getRound, startRound } from "../../api/rounds";
+import { deleteRound, getRound, startRound } from "../../api/rounds";
 import { useToastStore } from "../../api/stores/useToastStore";
 import ConfirmModal from "../common/ConfirmModal";
 
@@ -199,6 +200,7 @@ interface SingleRoundProps {
 
 const SingleRound = ({ competitionId, roundId }: SingleRoundProps) => {
 	const { showToast } = useToastStore();
+	const navigate = useNavigate();
 
 	const [round, setRound] = useState<Round | null>(null);
 	const [isLoading, setIsLoading] = useState(true);
@@ -206,6 +208,7 @@ const SingleRound = ({ competitionId, roundId }: SingleRoundProps) => {
 	const [isStarting, setIsStarting] = useState(false);
 
 	const [showStartRoundModal, setShowStartRoundModal] = useState(false);
+	const [showDeleteRoundModal, setShowDeleteRoundModal] = useState(false);
 
 	const loadRound = async () => {
 		setIsLoading(true);
@@ -266,6 +269,18 @@ const SingleRound = ({ competitionId, roundId }: SingleRoundProps) => {
 		}
 	};
 
+	const handleDeleteRound = async () => {
+		try {
+			await deleteRound(competitionId, roundId);
+			showToast("Round deleted!", true);
+			setTimeout(() => {
+				window.location.reload();
+			}, 600);
+		} catch (err: any) {
+			showToast(err || "Failed to delete round.", false);
+		}
+	};
+
 	const canStartRound = !isLoading && round?.status === "completed";
 
 	return (
@@ -322,6 +337,22 @@ const SingleRound = ({ competitionId, roundId }: SingleRoundProps) => {
 					confirmLabel={isStarting ? "Starting…" : "▶ Start"}
 					onConfirm={handleStartRound}
 					onCancel={() => setShowStartRoundModal(false)}
+				/>
+			)}
+			<button
+				onClick={() => setShowDeleteRoundModal(true)}
+				className="text-xs px-3 py-1 bg-red-100 text-red-700 rounded"
+			>
+				Delete Round
+			</button>
+
+			{showDeleteRoundModal && (
+				<ConfirmModal
+					title="Delete Round?"
+					description="This will delete round and all it's results. Are you sure?"
+					confirmLabel={"Deleting round"}
+					onConfirm={handleDeleteRound}
+					onCancel={() => setShowDeleteRoundModal(false)}
 				/>
 			)}
 		</div>

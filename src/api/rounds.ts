@@ -53,7 +53,7 @@ export const updateRound = async (competitionId: number, roundId: number, data: 
 	}
 };
 
-export const deleteRound = async (competitionId: number, roundId: number) => {
+export const deleteRound = async (competitionId: number, roundId: number | undefined) => {
 	try {
 		const response = await axiosInstance.delete(`/api/v1/rounds/${competitionId}/${roundId}`);
 		return response;

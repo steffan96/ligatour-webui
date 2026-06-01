@@ -119,15 +119,28 @@ const CompetitionOverview = ({
 };
 
 const SingleCompetition = () => {
+	const getInitialActiveTab = (): TabId => {
+		const savedTab = localStorage.getItem("activeTab") as TabId; //TODO check if localstorage is right choice here.
+		if (savedTab && ["overview", "settings", "teams", "rounds"].includes(savedTab)) {
+			return savedTab;
+		}
+		return "overview";
+	};
+
 	const { id } = useParams<{ id: string }>();
 	const navigate = useNavigate();
 	const { showToast } = useToastStore();
 	const [competition, setCompetition] = useState<CompetitionInterface | null>(null);
-	const [activeTab, setActiveTab] = useState<TabId>("overview");
+	const [activeTab, setActiveTab] = useState<TabId>(getInitialActiveTab);
+
 	const [selectedTeamId, setSelectedTeamId] = useState<number | null>(null);
 	const [selectedRoundId, setSelectedRoundId] = useState<number | null>(null);
 
 	useEffect(() => {
+		const savedTab = localStorage.getItem("activeTab") as TabId;
+		if (savedTab && ["overview", "settings", "teams", "rounds"].includes(savedTab)) {
+			setActiveTab(savedTab);
+		}
 		if (!id) return;
 		getCompetition(Number(id))
 			.then((res) => setCompetition(res?.data ?? null))
@@ -141,6 +154,7 @@ const SingleCompetition = () => {
 		setActiveTab(tab);
 		if (tab !== "teams") setSelectedTeamId(null);
 		if (tab !== "rounds") setSelectedRoundId(null);
+		localStorage.setItem("activeTab", tab);
 	}, []);
 
 	const handleCopyLink = useCallback(
