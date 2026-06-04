@@ -1,15 +1,3 @@
-/**
- * PublicCompetitionShared.tsx
- *
- * Shared primitives used by every public competition page:
- *   - LoadingSpinner
- *   - ErrorDisplay
- *   - StatusBadge
- *   - TabBar  (generic — pass your own tab definitions)
- *   - CompetitionPageShell  (full-page layout: header + content card)
- *   - useCompetitionData  (fetch / loading / error / auto-refresh hook)
- */
-
 import { type CompetitionInterface, getPublicCompetition } from "api/competitions";
 import type React from "react";
 import { useCallback, useEffect, useState } from "react";

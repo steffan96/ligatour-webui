@@ -138,7 +138,7 @@ const Rounds = ({ competition, onSelectRound }: RoundsProps) => {
 		}
 	};
 
-	const visibleRounds = rounds.filter((r) => r.matches.length > 0).sort((a, b) => a.round_number - b.round_number);
+	const visibleRounds = rounds.filter((r) => r.matches?.length > 0).sort((a, b) => a.round_number - b.round_number);
 
 	const lastRound = visibleRounds[visibleRounds.length - 1];
 	const canStartRound = visibleRounds.length === 0 || lastRound?.status === "completed";
