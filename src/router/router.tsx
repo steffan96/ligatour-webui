@@ -7,10 +7,12 @@ import ProfileComponent from "../components/auth/Profile";
 import RegisterComponent from "../components/auth/Register";
 import ResetPasswordComponent from "../components/auth/ResetPassword";
 import DashboardComponent from "../components/competitions/Dashboard";
+import PublicGroupStage from "../components/competitions/PublicGroupStage";
 import PublicKnockout from "../components/competitions/PublicKnockout";
 import PublicRoundRobin from "../components/competitions/PublicRoundRobin";
 import SingleCompetition from "../components/competitions/SingleCompetition";
 import PublicLayout from "../components/home/PublicLayout";
+
 import RootLayout from "../components/home/RootLayout";
 // import { ProtectedRoute } from '../components/ProtectedRoute'
 
@@ -26,6 +28,10 @@ export const router = createBrowserRouter([
 			{
 				path: "knockout/:slug",
 				element: <PublicKnockout />,
+			},
+			{
+				path: "group_stage/:slug",
+				element: <PublicGroupStage />,
 			},
 		],
 	},

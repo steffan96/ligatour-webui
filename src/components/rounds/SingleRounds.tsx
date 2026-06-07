@@ -20,6 +20,7 @@ interface Match {
 	created_at: string;
 	draw: boolean;
 	type: string;
+	bracket_place: string | null;
 }
 
 interface Round {
@@ -31,6 +32,15 @@ interface Round {
 	created_at: string;
 	matches: Match[];
 	type: string;
+}
+
+function groupByBracketPlace(matches: Match[]): Record<string, Match[]> {
+	return matches.reduce<Record<string, Match[]>>((acc, match) => {
+		const key = match.bracket_place || "Unassigned";
+		if (!acc[key]) acc[key] = [];
+		acc[key].push(match);
+		return acc;
+	}, {});
 }
 
 const MatchStatusBadge = ({ status }: { status: Match["status"] }) => {
@@ -283,6 +293,8 @@ const SingleRound = ({ competitionId, roundId }: SingleRoundProps) => {
 
 	const canStartRound = !isLoading && round?.status === "completed";
 
+	const hasGroups = round?.matches?.some((m) => m.bracket_place);
+
 	return (
 		<div className="space-y-5">
 			<div className="flex items-center justify-between pb-3 border-b border-gray-200">
@@ -307,6 +319,29 @@ const SingleRound = ({ competitionId, roundId }: SingleRoundProps) => {
 				<div className="animate-pulse h-20 bg-gray-100 rounded" />
 			) : !round ? (
 				<div className="text-sm text-gray-500 text-center py-10">Round not found.</div>
+			) : hasGroups ? (
+				<div className="flex flex-col gap-5">
+					{Object.entries(groupByBracketPlace(round.matches)).map(([place, matches]) => (
+						<div key={place}>
+							<p
+								className="text-xs font-semibold uppercase tracking-widest 
+							text-gray-400 mb-2 pb-1.5 border-b border-gray-100"
+							>
+								{place}
+							</p>
+							<div className="flex flex-col gap-2.5">
+								{matches.map((m) => (
+									<MatchCard
+										key={m.id}
+										match={m}
+										onUpdateMatch={handleUpdateMatch}
+										onRestartMatch={handleRestartMatch}
+									/>
+								))}
+							</div>
+						</div>
+					))}
+				</div>
 			) : (
 				<div className="flex flex-col gap-2.5">
 					{round.matches?.map((m) => (

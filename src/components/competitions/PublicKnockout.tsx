@@ -1,22 +1,17 @@
-import GroupStageTab from "components/competitions/GroupStageTab";
 import {
-	CompetitionPageShell,
-	ErrorDisplay,
-	LoadingSpinner,
-	TabBar,
+	CompetitionPage,
+	CompetitionTabContent,
+	EmptyState,
 	type TabDef,
+	type Team,
 	useCompetitionData,
 } from "components/competitions/PublicCompetitionShared";
+import PublicGroupStage from "components/competitions/PublicGroupStage";
+
 import React, { useState } from "react";
 import { useParams } from "react-router-dom";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
-
-interface Team {
-	id: number;
-	name: string;
-	logo?: string;
-}
 
 interface KnockoutMatch {
 	id: number;
@@ -67,7 +62,7 @@ interface RawRound {
 	matches: RawMatch[];
 }
 
-type Tab = "bracket" | "group_stage";
+type Tab = "bracket";
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
@@ -119,11 +114,9 @@ const BASE_SLOT_H = CARD_H + MATCH_GAP;
 const CONNECTOR_W = 36;
 const ROUND_COL_W = 200;
 
-function slotH(roundIdx: number): number {
-	return BASE_SLOT_H * 2 ** roundIdx;
-}
+const slotH = (roundIdx: number) => BASE_SLOT_H * 2 ** roundIdx;
 
-// ─── Match card sub-components ────────────────────────────────────────────────
+// ─── TeamRow ──────────────────────────────────────────────────────────────────
 
 interface TeamRowProps {
 	team: Team | null;
@@ -150,7 +143,6 @@ const TeamRow = ({ team, score, penalties, isWinner, isLoser, isWalkover }: Team
 		>
 			{team ? team.name : "TBD"}
 		</span>
-
 		<div className="flex items-center gap-1.5 flex-shrink-0">
 			{isWalkover && isWinner && <span className="text-[10px] text-gray-400 italic">w/o</span>}
 			{penalties != null && <span className="text-[10px] text-gray-400 tabular-nums">({penalties})</span>}
@@ -178,6 +170,8 @@ const TeamRow = ({ team, score, penalties, isWinner, isLoser, isWalkover }: Team
 		</div>
 	</div>
 );
+
+// ─── MatchCard ────────────────────────────────────────────────────────────────
 
 const MatchCard = ({ match }: { match: KnockoutMatch }) => {
 	const homeWon = match.winner_id != null && match.home_team?.id === match.winner_id;
@@ -211,7 +205,6 @@ const MatchCard = ({ match }: { match: KnockoutMatch }) => {
 					{isLive ? "Live" : isWalkover ? "Walkover" : "Bye"}
 				</div>
 			)}
-
 			<div className="flex flex-col flex-1 justify-center">
 				<TeamRow
 					team={match.home_team}
@@ -231,7 +224,6 @@ const MatchCard = ({ match }: { match: KnockoutMatch }) => {
 					isWalkover={isWalkover}
 				/>
 			</div>
-
 			{!decided && match.scheduled_at && (
 				<div className="px-3 pb-1.5 flex items-center gap-1 flex-shrink-0">
 					<svg
@@ -257,27 +249,26 @@ const MatchCard = ({ match }: { match: KnockoutMatch }) => {
 	);
 };
 
-// ─── Bracket layout ───────────────────────────────────────────────────────────
+// ─── ConnectorSVG ─────────────────────────────────────────────────────────────
 
 const ConnectorSVG = ({ matchCount, roundIdx }: { matchCount: number; roundIdx: number }) => {
 	const slot = slotH(roundIdx);
 	const totalH = matchCount * slot;
 	const w = CONNECTOR_W;
-	const segments: React.ReactElement[] = [];
 
-	for (let i = 0; i < matchCount; i += 2) {
-		const topY = i * slot + slot / 2;
-		const bottomY = (i + 1) * slot + slot / 2;
+	const segments = Array.from({ length: Math.floor(matchCount / 2) }, (_, i) => {
+		const topY = i * 2 * slot + slot / 2;
+		const bottomY = (i * 2 + 1) * slot + slot / 2;
 		const midY = (topY + bottomY) / 2;
-		segments.push(
+		return (
 			<g key={i}>
 				<line x1={0} y1={topY} x2={w / 2} y2={topY} stroke="#d1d5db" strokeWidth={1.5} />
 				<line x1={0} y1={bottomY} x2={w / 2} y2={bottomY} stroke="#d1d5db" strokeWidth={1.5} />
 				<line x1={w / 2} y1={topY} x2={w / 2} y2={bottomY} stroke="#d1d5db" strokeWidth={1.5} />
 				<line x1={w / 2} y1={midY} x2={w} y2={midY} stroke="#d1d5db" strokeWidth={1.5} />
-			</g>,
+			</g>
 		);
-	}
+	});
 
 	return (
 		<svg
@@ -292,10 +283,11 @@ const ConnectorSVG = ({ matchCount, roundIdx }: { matchCount: number; roundIdx: 
 	);
 };
 
+// ─── RoundColumn ──────────────────────────────────────────────────────────────
+
 const RoundColumn = ({ round, roundIdx }: { round: KnockoutRound; roundIdx: number }) => {
 	const slot = slotH(roundIdx);
 	const padV = (slot - CARD_H) / 2;
-
 	return (
 		<div className="flex flex-col flex-shrink-0" style={{ width: ROUND_COL_W }}>
 			<div className="pb-3 text-center">
@@ -304,15 +296,7 @@ const RoundColumn = ({ round, roundIdx }: { round: KnockoutRound; roundIdx: numb
 				</span>
 			</div>
 			{round.matches.map((match) => (
-				<div
-					key={match.id}
-					style={{
-						height: slot,
-						paddingTop: padV,
-						paddingBottom: padV,
-						boxSizing: "border-box",
-					}}
-				>
+				<div key={match.id} style={{ height: slot, paddingTop: padV, paddingBottom: padV, boxSizing: "border-box" }}>
 					<MatchCard match={match} />
 				</div>
 			))}
@@ -320,47 +304,41 @@ const RoundColumn = ({ round, roundIdx }: { round: KnockoutRound; roundIdx: numb
 	);
 };
 
-const EmptyBracket = () => (
-	<div className="flex flex-col items-center justify-center py-20 text-center">
-		<div className="w-14 h-14 bg-gray-100 rounded-full flex items-center justify-center mb-3">
-			<svg className="w-6 h-6 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-				<path
-					strokeLinecap="round"
-					strokeLinejoin="round"
-					strokeWidth={1.5}
-					d={
-						"M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 " +
-						"012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
-					}
-				/>
-			</svg>
-		</div>
-		<p className="text-sm font-medium text-gray-500">No bracket data available yet</p>
-		<p className="text-xs text-gray-400 mt-1">Check back once the knockout stage begins</p>
-	</div>
-);
+// ─── BracketDisplay ───────────────────────────────────────────────────────────
 
 const BracketDisplay = ({ rounds }: { rounds: KnockoutRound[] }) => {
-	if (!rounds || rounds.length === 0) return <EmptyBracket />;
+	if (!rounds || rounds.length === 0) {
+		return <EmptyState message="No bracket data available yet" hint="Check back once the knockout stage begins" />;
+	}
+
 	const sorted = [...rounds].sort((a, b) => a.round_number - b.round_number);
+
 	return (
 		<div className="overflow-x-auto">
 			<div className="inline-flex items-start gap-0 px-6 py-6" style={{ minWidth: "max-content" }}>
-				{sorted.map((round, rIdx) => {
-					const isLast = rIdx === sorted.length - 1;
-					return (
-						<React.Fragment key={round.id}>
-							<RoundColumn round={round} roundIdx={rIdx} />
-							{!isLast && <ConnectorSVG matchCount={round.matches.length} roundIdx={rIdx} />}
-						</React.Fragment>
-					);
-				})}
+				{sorted.map((round, rIdx) => (
+					<React.Fragment key={round.id}>
+						<RoundColumn round={round} roundIdx={rIdx} />
+						{rIdx < sorted.length - 1 && <ConnectorSVG matchCount={round.matches.length} roundIdx={rIdx} />}
+					</React.Fragment>
+				))}
 			</div>
 		</div>
 	);
 };
 
-// ─── Tab definitions ──────────────────────────────────────────────────────────
+// ─── Tab / icon definitions ───────────────────────────────────────────────────
+
+const BracketIcon = (
+	<svg className="w-5 h-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+		<path
+			strokeLinecap="round"
+			strokeLinejoin="round"
+			strokeWidth={1.8}
+			d="M4 5h4v4H4V5zm0 10h4v4H4v-4zm12-5h4v4h-4v-4zM8 7h4M8 17h4m0-5h4"
+		/>
+	</svg>
+);
 
 const TABS: TabDef<Tab>[] = [
 	{
@@ -377,40 +355,14 @@ const TABS: TabDef<Tab>[] = [
 			</svg>
 		),
 	},
-	{
-		key: "group_stage",
-		label: "Group Stage",
-		icon: (
-			<svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-				<path
-					strokeLinecap="round"
-					strokeLinejoin="round"
-					strokeWidth={1.8}
-					d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"
-				/>
-			</svg>
-		),
-	},
 ];
-
-// ─── Header icon ──────────────────────────────────────────────────────────────
-
-const BracketIcon = (
-	<svg className="w-5 h-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-		<path
-			strokeLinecap="round"
-			strokeLinejoin="round"
-			strokeWidth={1.8}
-			d="M4 5h4v4H4V5zm0 10h4v4H4v-4zm12-5h4v4h-4v-4zM8 7h4M8 17h4m0-5h4"
-		/>
-	</svg>
-);
 
 // ─── Page component ───────────────────────────────────────────────────────────
 
 const PublicKnockout = () => {
 	const { slug } = useParams<{ slug: string }>();
 	const [activeTab, setActiveTab] = useState<Tab>("bracket");
+	const [showGroupStage, setShowGroupStage] = useState(false);
 
 	const {
 		competition,
@@ -425,40 +377,27 @@ const PublicKnockout = () => {
 		[],
 	);
 
-	// ── Full-screen loading / error (before competition metadata arrives) ──────
-	if (loading && !competition) {
-		return (
-			<div className="min-h-screen bg-gray-50 flex items-center justify-center">
-				<LoadingSpinner label="Loading bracket…" />
-			</div>
-		);
-	}
-
-	if (error || !competition) {
-		return (
-			<div className="min-h-screen bg-gray-50 flex items-center justify-center">
-				<div className="bg-white rounded-xl shadow-sm border border-gray-200 max-w-md w-full mx-4">
-					<ErrorDisplay title="Unable to Load Bracket" message={error || "Competition not found"} onRetry={refetch} />
-				</div>
-			</div>
-		);
-	}
-
 	return (
-		<CompetitionPageShell competition={competition} headerIcon={BracketIcon} showStatus={false}>
-			<TabBar tabs={TABS} active={activeTab} onChange={setActiveTab} />
-
-			<div className="flex-1 overflow-auto">
+		<CompetitionPage
+			competition={competition}
+			loading={loading}
+			error={error}
+			refetch={refetch}
+			loadingLabel="Loading bracket…"
+			errorTitle="Unable to Load Bracket"
+			headerIcon={BracketIcon}
+			showStatus={false}
+		>
+			<CompetitionTabContent
+				tabs={TABS}
+				activeTab={activeTab}
+				onTabChange={setActiveTab}
+				onGroupStage={() => setShowGroupStage(true)}
+			>
 				{activeTab === "bracket" && <BracketDisplay rounds={rounds} />}
-				{activeTab === "group_stage" && slug && (
-					<GroupStageTab
-						slug={slug}
-						isIndividual={competition.individual ?? false}
-						isActive={competition.status === "active"}
-					/>
-				)}
-			</div>
-		</CompetitionPageShell>
+			</CompetitionTabContent>
+			{showGroupStage && <PublicGroupStage onClose={() => setShowGroupStage(false)} />}
+		</CompetitionPage>
 	);
 };
 

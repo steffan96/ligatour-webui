@@ -2,6 +2,14 @@ import { type CompetitionInterface, getPublicCompetition } from "api/competition
 import type React from "react";
 import { useCallback, useEffect, useState } from "react";
 
+// ─── Common Types ─────────────────────────────────────────────────────────────
+
+export interface Team {
+	id: number;
+	name: string;
+	logo?: string;
+}
+
 // ─── LoadingSpinner ────────────────────────────────────────────────────────────
 
 export const LoadingSpinner = ({ label = "Loading…" }: { label?: string }) => (
@@ -64,6 +72,28 @@ export const ErrorDisplay = ({
 				Try Again
 			</button>
 		)}
+	</div>
+);
+
+// ─── EmptyState ───────────────────────────────────────────────────────────────
+
+export const EmptyState = ({ message, hint }: { message: string; hint: string }) => (
+	<div className="flex flex-col items-center justify-center py-16 text-center">
+		<div className="w-14 h-14 bg-gray-100 rounded-full flex items-center justify-center mb-3">
+			<svg className="w-6 h-6 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+				<path
+					strokeLinecap="round"
+					strokeLinejoin="round"
+					strokeWidth={1.5}
+					d={
+						"M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586" +
+						"a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
+					}
+				/>
+			</svg>
+		</div>
+		<p className="text-sm font-medium text-gray-500">{message}</p>
+		<p className="text-xs text-gray-400 mt-1">{hint}</p>
 	</div>
 );
 
@@ -146,17 +176,59 @@ export function TabBar<T extends string>({
 	);
 }
 
+// ─── GroupStageButton ─────────────────────────────────────────────────────────
+//
+// The "Group Stage" toggle button shared by both PublicKnockout and
+// PublicRoundRobin. Renders flush-right above the tab bar.
+//
+
+export const GroupStageButton = ({ onClick }: { onClick: () => void }) => (
+	<div className="flex items-center justify-end px-5 pt-3 flex-shrink-0">
+		<button
+			onClick={onClick}
+			className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg
+                 text-xs font-semibold text-green-800 bg-green-50
+                 border border-green-200 hover:bg-green-100 transition-colors"
+		>
+			<svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+				<path
+					strokeLinecap="round"
+					strokeLinejoin="round"
+					strokeWidth={1.8}
+					d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857
+             M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0
+             0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"
+				/>
+			</svg>
+			Group Stage
+		</button>
+	</div>
+);
+
+export function CompetitionTabContent<T extends string>({
+	tabs,
+	activeTab,
+	onTabChange,
+	onGroupStage,
+	children,
+}: {
+	tabs: TabDef<T>[];
+	activeTab: T;
+	onTabChange: (t: T) => void;
+	onGroupStage: () => void;
+	children: React.ReactNode;
+}) {
+	return (
+		<>
+			<GroupStageButton onClick={onGroupStage} />
+			<TabBar tabs={tabs} active={activeTab} onChange={onTabChange} />
+			<div className="flex-1 overflow-auto">{children}</div>
+		</>
+	);
+}
+
 // ─── CompetitionPageShell ──────────────────────────────────────────────────────
 
-/**
- * Full-page wrapper shared by all public competition views.
- *
- * Renders:
- *   - A top header bar with a coloured icon, the competition name / type, and an
- *     optional status badge.
- *   - A padded content area containing a white rounded card. Pass the tab bar and
- *     tab content as `children`; the card already handles overflow.
- */
 export const CompetitionPageShell = ({
 	competition,
 	headerIcon,
@@ -164,14 +236,11 @@ export const CompetitionPageShell = ({
 	children,
 }: {
 	competition: CompetitionInterface;
-	/** SVG icon rendered inside the green rounded square in the header */
 	headerIcon: React.ReactNode;
-	/** Whether to render the StatusBadge next to the competition title */
 	showStatus?: boolean;
 	children: React.ReactNode;
 }) => (
 	<div className="min-h-screen bg-gray-50 flex flex-col">
-		{/* ── Header ── */}
 		<div className="bg-white border-b border-gray-200 shadow-sm flex-shrink-0">
 			<div className="w-full px-4 sm:px-6 lg:px-8 py-5">
 				<div className="flex items-center justify-between gap-4 flex-wrap">
@@ -195,7 +264,6 @@ export const CompetitionPageShell = ({
 			</div>
 		</div>
 
-		{/* ── Content card ── */}
 		<div className="flex-1 flex flex-col w-full px-4 sm:px-6 lg:px-8 py-6">
 			<div className="flex-1 bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden flex flex-col">
 				{children}
@@ -204,25 +272,60 @@ export const CompetitionPageShell = ({
 	</div>
 );
 
+// ─── CompetitionPage ──────────────────────────────────────────────────────────
+//
+// Higher-level wrapper that handles the full-screen loading / error states
+// that both PublicRoundRobin and PublicKnockout previously duplicated.
+//
+
+export const CompetitionPage = ({
+	competition,
+	loading,
+	error,
+	refetch,
+	loadingLabel,
+	errorTitle,
+	headerIcon,
+	showStatus,
+	children,
+}: {
+	competition: CompetitionInterface | null;
+	loading: boolean;
+	error: string | null;
+	refetch: () => void;
+	loadingLabel?: string;
+	errorTitle?: string;
+	headerIcon: React.ReactNode;
+	showStatus?: boolean;
+	children: React.ReactNode;
+}) => {
+	if (loading && !competition) {
+		return (
+			<div className="min-h-screen bg-gray-50 flex items-center justify-center">
+				<LoadingSpinner label={loadingLabel} />
+			</div>
+		);
+	}
+
+	if (error || !competition) {
+		return (
+			<div className="min-h-screen bg-gray-50 flex items-center justify-center">
+				<div className="bg-white rounded-xl shadow-sm border border-gray-200 max-w-md w-full mx-4">
+					<ErrorDisplay title={errorTitle} message={error || "Competition not found"} onRetry={refetch} />
+				</div>
+			</div>
+		);
+	}
+
+	return (
+		<CompetitionPageShell competition={competition} headerIcon={headerIcon} showStatus={showStatus}>
+			{children}
+		</CompetitionPageShell>
+	);
+};
+
 // ─── useCompetitionData ────────────────────────────────────────────────────────
 
-/**
- * Generic data-fetching hook for public competition pages.
- *
- * Handles:
- *  - Initial fetch on mount
- *  - Loading / error state
- *  - A `transform` function to convert the raw API response payload into the
- *    shape your page needs
- *  - Auto-refresh every 30 s when `competition.status === "active"`
- *
- * @param slug       The URL slug from `useParams`
- * @param pathPrefix API sub-path, e.g. `"round_robin"` or `"knockout"`.
- *                   The hook will call `getPublicCompetition(`${pathPrefix}/${slug}`)`.
- * @param transform  `(responseData) => T` — extracts your page-specific data from
- *                   the raw API response (`response.data`).
- * @param initial    Initial value for the page-specific data (before first fetch).
- */
 export function useCompetitionData<T>(
 	slug: string | undefined,
 	pathPrefix: string,
@@ -257,12 +360,10 @@ export function useCompetitionData<T>(
 		}
 	}, [slug, pathPrefix]); // `transform` is intentionally excluded — callers should memoize or define it outside render
 
-	// Initial fetch
 	useEffect(() => {
 		fetchData();
 	}, [fetchData]);
 
-	// Auto-refresh for live competitions
 	useEffect(() => {
 		if (competition?.status !== "active") return;
 		const id = setInterval(fetchData, 30_000);

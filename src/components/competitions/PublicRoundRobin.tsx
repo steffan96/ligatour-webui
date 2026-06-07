@@ -1,25 +1,15 @@
-import GroupStageTab from "components/competitions/GroupStageTab";
 import {
-	CompetitionPageShell,
-	ErrorDisplay,
-	LoadingSpinner,
-	TabBar,
+	CompetitionPage,
+	CompetitionTabContent,
+	EmptyState,
 	type TabDef,
 	useCompetitionData,
 } from "components/competitions/PublicCompetitionShared";
 import React, { useState } from "react";
 import { useParams } from "react-router-dom";
+import PublicGroupStage from "components/competitions/PublicGroupStage";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
-
-interface Team {
-	id: number;
-	name: string;
-	logo: string;
-	competition_id: number;
-	created_at: string;
-	players: null | any[];
-}
 
 interface Standing {
 	id: number;
@@ -37,13 +27,13 @@ interface Standing {
 	sonneborn_berger_score: number;
 	updated_at: string;
 	created_at: string;
-	team: Team;
+	team: { id: number; name: string; logo: string; competition_id: number; created_at: string; players: null | any[] };
 	player_name?: string;
 }
 
-type Tab = "standings" | "group_stage";
+type Tab = "standings";
 
-// ─── StandingsTable ───────────────────────────────────────────────────────────
+// ─── RankBadge ────────────────────────────────────────────────────────────────
 
 const badgeBase = "inline-flex items-center justify-center w-7 h-7 rounded-full text-xs font-bold shadow-sm";
 
@@ -58,46 +48,32 @@ const RankBadge = ({ rank }: { rank: number }) => {
 	);
 };
 
+// ─── StandingsTable ───────────────────────────────────────────────────────────
+
 const StatCell = ({ value }: { value: number | string }) => (
 	<td className="px-4 py-3.5 text-sm text-center tabular-nums text-gray-600">{value}</td>
 );
 
+const HEADERS = [
+	{ label: "#", title: "Rank", align: "left" },
+	{ label: "MP", title: "Matches Played", align: "center" },
+	{ label: "W", title: "Wins", align: "center" },
+	{ label: "D", title: "Draws", align: "center" },
+	{ label: "L", title: "Losses", align: "center" },
+	{ label: "Pts", title: "Points", align: "center" },
+] as const;
+
 const StandingsTable = ({ standings, isIndividual }: { standings: Standing[]; isIndividual: boolean }) => {
 	if (!standings || standings.length === 0) {
-		return (
-			<div className="flex flex-col items-center justify-center py-16 text-center">
-				<div className="w-14 h-14 bg-gray-100 rounded-full flex items-center justify-center mb-3">
-					<svg className="w-6 h-6 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-						<path
-							strokeLinecap="round"
-							strokeLinejoin="round"
-							strokeWidth={1.5}
-							d={
-								"M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586" +
-								"a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
-							}
-						/>
-					</svg>
-				</div>
-				<p className="text-sm font-medium text-gray-500">No standings data available yet</p>
-				<p className="text-xs text-gray-400 mt-1">Check back once matches have been played</p>
-			</div>
-		);
+		return <EmptyState message="No standings data available yet" hint="Check back once matches have been played" />;
 	}
 
-	const headers = [
-		{ label: "#", align: "left", title: "Rank" },
-		{
-			label: isIndividual ? "Player" : "Team",
-			align: "left",
-			title: isIndividual ? "Player" : "Team",
-		},
-		{ label: "MP", align: "center", title: "Matches Played" },
-		{ label: "W", align: "center", title: "Wins" },
-		{ label: "D", align: "center", title: "Draws" },
-		{ label: "L", align: "center", title: "Losses" },
-		{ label: "Pts", align: "center", title: "Points" },
-	];
+	const entityHeader = {
+		label: isIndividual ? "Player" : "Team",
+		title: isIndividual ? "Player" : "Team",
+		align: "left",
+	} as const;
+	const headers = [HEADERS[0], entityHeader, ...HEADERS.slice(1)];
 
 	return (
 		<div className="overflow-x-auto">
@@ -161,7 +137,18 @@ const StandingsTable = ({ standings, isIndividual }: { standings: Standing[]; is
 	);
 };
 
-// ─── Tab definitions ──────────────────────────────────────────────────────────
+// ─── Tab / icon definitions ───────────────────────────────────────────────────
+
+const BarChartIcon = (
+	<svg className="w-5 h-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+		<path
+			strokeLinecap="round"
+			strokeLinejoin="round"
+			strokeWidth={1.8}
+			d="M16 8v8m-4-5v5m-4-2v2m-2 4h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"
+		/>
+	</svg>
+);
 
 const TABS: TabDef<Tab>[] = [
 	{
@@ -178,42 +165,14 @@ const TABS: TabDef<Tab>[] = [
 			</svg>
 		),
 	},
-	{
-		key: "group_stage",
-		label: "Group Stage",
-		icon: (
-			<svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-				<path
-					strokeLinecap="round"
-					strokeLinejoin="round"
-					strokeWidth={1.8}
-					d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3
-					 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 
-					 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"
-				/>
-			</svg>
-		),
-	},
 ];
-
-// ─── Header icon ──────────────────────────────────────────────────────────────
-
-const BarChartIcon = (
-	<svg className="w-5 h-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-		<path
-			strokeLinecap="round"
-			strokeLinejoin="round"
-			strokeWidth={1.8}
-			d="M16 8v8m-4-5v5m-4-2v2m-2 4h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"
-		/>
-	</svg>
-);
 
 // ─── Page component ───────────────────────────────────────────────────────────
 
 const PublicRoundRobin = () => {
 	const { slug } = useParams<{ slug: string }>();
 	const [activeTab, setActiveTab] = useState<Tab>("standings");
+	const [showGroupStage, setShowGroupStage] = useState(false);
 
 	const {
 		competition,
@@ -228,46 +187,29 @@ const PublicRoundRobin = () => {
 		[],
 	);
 
-	// ── Full-screen loading / error (before competition metadata arrives) ──────
-	if (loading && !competition) {
-		return (
-			<div className="min-h-screen bg-gray-50 flex items-center justify-center">
-				<LoadingSpinner label="Loading competition…" />
-			</div>
-		);
-	}
-
-	if (error || !competition) {
-		return (
-			<div className="min-h-screen bg-gray-50 flex items-center justify-center">
-				<div className="bg-white rounded-xl shadow-sm border border-gray-200 max-w-md w-full mx-4">
-					<ErrorDisplay
-						title="Unable to Load Competition"
-						message={error || "Competition not found"}
-						onRetry={refetch}
-					/>
-				</div>
-			</div>
-		);
-	}
-
 	return (
-		<CompetitionPageShell competition={competition} headerIcon={BarChartIcon} showStatus>
-			<TabBar tabs={TABS} active={activeTab} onChange={setActiveTab} />
-
-			<div className="flex-1 overflow-auto">
+		<CompetitionPage
+			competition={competition}
+			loading={loading}
+			error={error}
+			refetch={refetch}
+			loadingLabel="Loading competition…"
+			errorTitle="Unable to Load Competition"
+			headerIcon={BarChartIcon}
+			showStatus
+		>
+			<CompetitionTabContent
+				tabs={TABS}
+				activeTab={activeTab}
+				onTabChange={setActiveTab}
+				onGroupStage={() => setShowGroupStage(true)}
+			>
 				{activeTab === "standings" && (
-					<StandingsTable standings={standings} isIndividual={competition.individual ?? false} />
+					<StandingsTable standings={standings} isIndividual={competition?.individual ?? false} />
 				)}
-				{activeTab === "group_stage" && slug && (
-					<GroupStageTab
-						slug={slug}
-						isIndividual={competition.individual ?? false}
-						isActive={competition.status === "active"}
-					/>
-				)}
-			</div>
-		</CompetitionPageShell>
+			</CompetitionTabContent>
+			{showGroupStage && <PublicGroupStage onClose={() => setShowGroupStage(false)} />}
+		</CompetitionPage>
 	);
 };
 
