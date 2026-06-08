@@ -151,9 +151,11 @@ const GroupTable = ({ group, isIndividual }: { group: Group; isIndividual: boole
 								<StatCell value={s.goals_against} />
 								<StatCell value={s.goal_diff > 0 ? `+${s.goal_diff}` : s.goal_diff} />
 								<td className="px-3 py-3 text-center">
-									<span className="inline-flex items-center justify-center
+									<span
+										className="inline-flex items-center justify-center
 									 min-w-[1.75rem] px-1.5 py-0.5 rounded-md bg-green-900 text-white 
-									 text-xs font-bold tabular-nums shadow-sm">
+									 text-xs font-bold tabular-nums shadow-sm"
+									>
 										{s.points}
 									</span>
 								</td>

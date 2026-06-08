@@ -5,9 +5,9 @@ import {
 	type TabDef,
 	useCompetitionData,
 } from "components/competitions/PublicCompetitionShared";
+import PublicGroupStage from "components/competitions/PublicGroupStage";
 import React, { useState } from "react";
 import { useParams } from "react-router-dom";
-import PublicGroupStage from "components/competitions/PublicGroupStage";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -97,6 +97,7 @@ const StandingsTable = ({ standings, isIndividual }: { standings: Standing[]; is
 				</thead>
 				<tbody className="divide-y divide-gray-100">
 					{standings.map((standing, index) => {
+						//TODO standings are leftover. it should be named competitionteam
 						const rank = index + 1;
 						const isTop3 = rank <= 3;
 						return (

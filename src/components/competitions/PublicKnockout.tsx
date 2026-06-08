@@ -1,3 +1,4 @@
+import type { CompetitionInterface } from "api/competitions";
 import {
 	CompetitionPage,
 	CompetitionTabContent,
@@ -7,7 +8,6 @@ import {
 	useCompetitionData,
 } from "components/competitions/PublicCompetitionShared";
 import PublicGroupStage from "components/competitions/PublicGroupStage";
-
 import React, { useState } from "react";
 import { useParams } from "react-router-dom";
 
@@ -306,7 +306,13 @@ const RoundColumn = ({ round, roundIdx }: { round: KnockoutRound; roundIdx: numb
 
 // ─── BracketDisplay ───────────────────────────────────────────────────────────
 
-const BracketDisplay = ({ rounds }: { rounds: KnockoutRound[] }) => {
+const BracketDisplay = ({
+	rounds,
+	competition,
+}: {
+	rounds: KnockoutRound[];
+	competition: CompetitionInterface | null;
+}) => {
 	if (!rounds || rounds.length === 0) {
 		return <EmptyState message="No bracket data available yet" hint="Check back once the knockout stage begins" />;
 	}
@@ -318,7 +324,9 @@ const BracketDisplay = ({ rounds }: { rounds: KnockoutRound[] }) => {
 			<div className="inline-flex items-start gap-0 px-6 py-6" style={{ minWidth: "max-content" }}>
 				{sorted.map((round, rIdx) => (
 					<React.Fragment key={round.id}>
-						<RoundColumn round={round} roundIdx={rIdx} />
+						{competition?.group_stage ? null : (
+							<RoundColumn round={round} roundIdx={rIdx} />
+						)}
 						{rIdx < sorted.length - 1 && <ConnectorSVG matchCount={round.matches.length} roundIdx={rIdx} />}
 					</React.Fragment>
 				))}
@@ -394,7 +402,7 @@ const PublicKnockout = () => {
 				onTabChange={setActiveTab}
 				onGroupStage={() => setShowGroupStage(true)}
 			>
-				{activeTab === "bracket" && <BracketDisplay rounds={rounds} />}
+				{activeTab === "bracket" && <BracketDisplay rounds={rounds} competition={competition} />}
 			</CompetitionTabContent>
 			{showGroupStage && <PublicGroupStage onClose={() => setShowGroupStage(false)} />}
 		</CompetitionPage>
