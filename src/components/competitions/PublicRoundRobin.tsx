@@ -203,7 +203,8 @@ const PublicRoundRobin = () => {
 				tabs={TABS}
 				activeTab={activeTab}
 				onTabChange={setActiveTab}
-				onGroupStage={() => setShowGroupStage(true)}
+				onAction={() => setShowGroupStage(true)}
+				actionLabel="Playoffs"
 			>
 				{activeTab === "standings" && (
 					<StandingsTable standings={standings} isIndividual={competition?.individual ?? false} />

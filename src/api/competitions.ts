@@ -20,6 +20,7 @@ export interface CompetitionInterface {
 	individual: boolean;
 	public_link: string;
 	group_stage: boolean;
+	playoffs?: boolean;
 }
 
 export const createCompetition = async (name: string, type: string, individual: boolean) => {

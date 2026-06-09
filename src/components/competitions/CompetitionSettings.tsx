@@ -180,8 +180,22 @@ const CompetitionSettings = ({ competition, onCompetitionChange }: CompetitionSe
 				</Field>
 			</div>
 
-			{/* Group Stage Settings */}
-			{draft.type !== "swiss" && (
+			{/* Group Stage Settings / Playoffs */}
+			{draft.type === "round_robin" && (
+				<div>
+					<SectionHeader label="Playoffs" />
+
+					<Toggle
+						label="Enable Playoffs"
+						description="Competition includes a knockout playoff phase after the round robin"
+						checked={draft.playoffs ?? false}
+						disabled={ro}
+						onChange={() => set("playoffs", !draft.playoffs)}
+					/>
+				</div>
+			)}
+
+			{draft.type !== "swiss" && draft.type !== "round_robin" && (
 				<div>
 					<SectionHeader label="Group Stage Settings" />
 

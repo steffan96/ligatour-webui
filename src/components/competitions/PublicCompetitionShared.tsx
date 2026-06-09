@@ -176,13 +176,7 @@ export function TabBar<T extends string>({
 	);
 }
 
-// ─── GroupStageButton ─────────────────────────────────────────────────────────
-//
-// The "Group Stage" toggle button shared by both PublicKnockout and
-// PublicRoundRobin. Renders flush-right above the tab bar.
-//
-
-export const GroupStageButton = ({ onClick }: { onClick: () => void }) => (
+export const ActionButton = ({ label, onClick }: { label: string; onClick: () => void }) => (
 	<div className="flex items-center justify-end px-5 pt-3 flex-shrink-0">
 		<button
 			onClick={onClick}
@@ -200,7 +194,7 @@ export const GroupStageButton = ({ onClick }: { onClick: () => void }) => (
              0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"
 				/>
 			</svg>
-			Group Stage
+			{label}
 		</button>
 	</div>
 );
@@ -209,18 +203,20 @@ export function CompetitionTabContent<T extends string>({
 	tabs,
 	activeTab,
 	onTabChange,
-	onGroupStage,
+	onAction,
+	actionLabel,
 	children,
 }: {
 	tabs: TabDef<T>[];
 	activeTab: T;
 	onTabChange: (t: T) => void;
-	onGroupStage: () => void;
+	onAction: () => void;
+	actionLabel?: string;
 	children: React.ReactNode;
 }) {
 	return (
 		<>
-			<GroupStageButton onClick={onGroupStage} />
+			<ActionButton label={actionLabel ?? "Group Stage"} onClick={onAction} />
 			<TabBar tabs={tabs} active={activeTab} onChange={onTabChange} />
 			<div className="flex-1 overflow-auto">{children}</div>
 		</>
@@ -358,7 +354,7 @@ export function useCompetitionData<T>(
 		} finally {
 			setLoading(false);
 		}
-	}, [slug, pathPrefix]); // `transform` is intentionally excluded — callers should memoize or define it outside render
+	}, [slug, pathPrefix]);
 
 	useEffect(() => {
 		fetchData();

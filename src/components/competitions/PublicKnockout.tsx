@@ -8,7 +8,7 @@ import {
 	useCompetitionData,
 } from "components/competitions/PublicCompetitionShared";
 import PublicGroupStage from "components/competitions/PublicGroupStage";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
@@ -369,9 +369,6 @@ const TABS: TabDef<Tab>[] = [
 
 const PublicKnockout = () => {
 	const { slug } = useParams<{ slug: string }>();
-	const [activeTab, setActiveTab] = useState<Tab>("bracket");
-	const [showGroupStage, setShowGroupStage] = useState(false);
-
 	const {
 		competition,
 		data: rounds,
@@ -384,6 +381,14 @@ const PublicKnockout = () => {
 		(payload) => (Array.isArray(payload.rounds) ? payload.rounds.map(transformRound) : []),
 		[],
 	);
+	const [activeTab, setActiveTab] = useState<Tab>("bracket");
+	const [showGroupStage, setShowGroupStage] = useState(competition?.group_stage ?? false);
+
+	useEffect(() => {
+		if (competition) {
+			setShowGroupStage(!!competition.group_stage);
+		}
+	}, [competition]);
 
 	return (
 		<CompetitionPage
@@ -400,7 +405,7 @@ const PublicKnockout = () => {
 				tabs={TABS}
 				activeTab={activeTab}
 				onTabChange={setActiveTab}
-				onGroupStage={() => setShowGroupStage(true)}
+				onAction={() => setShowGroupStage(true)}
 			>
 				{activeTab === "bracket" && <BracketDisplay rounds={rounds} competition={competition} />}
 			</CompetitionTabContent>

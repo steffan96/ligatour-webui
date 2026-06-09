@@ -222,8 +222,8 @@ const PublicGroupStage: React.FC<PublicGroupStageProps> = ({ onClose }) => {
 				{/* Backdrop */}
 				<div className="absolute inset-0 bg-black/30 backdrop-blur-[2px]" onClick={onClose} />
 
-				{/* Panel — slides in from the right */}
-				<div className="relative ml-auto flex flex-col w-full max-w-3xl h-full bg-gray-50 shadow-2xl overflow-hidden">
+				{/* Panel — full-screen overlay */}
+				<div className="relative flex flex-col w-full h-full bg-gray-50 shadow-2xl overflow-hidden">
 					{/* Panel header */}
 					<div className="flex items-center justify-between px-5 py-3 bg-green-900 flex-shrink-0">
 						<div className="flex items-center gap-2.5">
