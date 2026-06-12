@@ -10,6 +10,8 @@ interface GroupStageGroup {
 	group_number: number;
 	name: string;
 	status: string;
+	created_at: string;
+    updated_at: string;
 }
 
 const statusClass: Record<string, string> = {
@@ -20,7 +22,6 @@ const statusClass: Record<string, string> = {
 
 const PublicGroupStage: React.FC = () => {
 	const { slug } = useParams<{ slug: string }>();
-	const [competition, setCompetition] = useState<CompetitionInterface | null>(null);
 	const [groups, setGroups] = useState<GroupStageGroup[]>([]);
 	const [loading, setLoading] = useState(true);
 	const [error, setError] = useState<string | null>(null);
@@ -34,15 +35,11 @@ const PublicGroupStage: React.FC = () => {
 		setLoading(true);
 		setError(null);
 		try {
-			const [compRes, stageRes] = await Promise.all([
-				getPublicCompetition(slug),
-				getPublicCompetition(`group_stage/${slug}`),
-			]);
-			setCompetition(compRes.data.competition ?? null);
-			setGroups(stageRes.data.standings ?? []);
+			const response = await getPublicCompetition(`group_stage/${slug}`);
+			setGroups(response.data.standings);
 		} catch (err: any) {
-			console.error("[PublicGroupStage]", err);
-			setError(err?.message || "Failed to load group stage");
+			setError(err?.message || "Failed to load data.");
+			setGroups([]);
 		} finally {
 			setLoading(false);
 		}
@@ -52,32 +49,8 @@ const PublicGroupStage: React.FC = () => {
 		fetchData();
 	}, [fetchData]);
 
-	useEffect(() => {
-		if (competition?.status !== "active") return;
-		const id = setInterval(fetchData, 30_000);
-		return () => clearInterval(id);
-	}, [competition?.status, fetchData]);
-
 	return (
-		<CompetitionPage
-			competition={competition}
-			loading={loading}
-			error={error}
-			refetch={fetchData}
-			loadingLabel="Loading group stage…"
-			errorTitle="Unable to Load Group Stage"
-			headerIcon={
-				<svg className="w-5 h-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-					<path
-						strokeLinecap="round"
-						strokeLinejoin="round"
-						strokeWidth={1.8}
-						d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"
-					/>
-				</svg>
-			}
-			showStatus={false}
-		>
+
 			<div className="flex-1 overflow-auto p-5">
 				{loading && !groups.length ? (
 					<div className="flex items-center justify-center py-20">
@@ -116,7 +89,6 @@ const PublicGroupStage: React.FC = () => {
 					</div>
 				)}
 			</div>
-		</CompetitionPage>
 	);
 };
 
