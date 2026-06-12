@@ -132,9 +132,9 @@ export const getPublicCompetition = async (competitionSlug: string) => {
 	}
 };
 
-export const getPublicGroupStageCompetition = async (competitionSlug: string) => {
+export const getPublicGroupStageCompetition = async (competitionSlug: string, competitionType: string) => {
 	try {
-		const response = await axiosInstance.get(`/api/public/group_stage/${competitionSlug}`);
+		const response = await axiosInstance.get(`/api/public/group_stage/${competitionType}/${competitionSlug}`);
 		return response;
 	} catch (error: any) {
 		if (error.response?.data?.message) {

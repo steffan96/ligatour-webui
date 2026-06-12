@@ -1,14 +1,14 @@
 import type { CompetitionInterface } from "api/competitions";
 import {
 	CompetitionPage,
-	CompetitionTabContent,
 	EmptyState,
+	TabBar,
 	type TabDef,
 	type Team,
 	useCompetitionData,
 } from "components/competitions/PublicCompetitionShared";
 import PublicGroupStage from "components/competitions/PublicGroupStage";
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import { useParams } from "react-router-dom";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
@@ -62,7 +62,7 @@ interface RawRound {
 	matches: RawMatch[];
 }
 
-type Tab = "bracket";
+type Tab = "bracket" | "groups";
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
@@ -324,9 +324,7 @@ const BracketDisplay = ({
 			<div className="inline-flex items-start gap-0 px-6 py-6" style={{ minWidth: "max-content" }}>
 				{sorted.map((round, rIdx) => (
 					<React.Fragment key={round.id}>
-						{competition?.group_stage ? null : (
-							<RoundColumn round={round} roundIdx={rIdx} />
-						)}
+						{competition?.group_stage ? null : <RoundColumn round={round} roundIdx={rIdx} />}
 						{rIdx < sorted.length - 1 && <ConnectorSVG matchCount={round.matches.length} roundIdx={rIdx} />}
 					</React.Fragment>
 				))}
@@ -348,6 +346,20 @@ const BracketIcon = (
 	</svg>
 );
 
+const GroupStageTabIcon = (
+	<svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+		<path
+			strokeLinecap="round"
+			strokeLinejoin="round"
+			strokeWidth={1.8}
+			d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 
+			0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 
+			0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 
+			0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"
+		/>
+	</svg>
+);
+
 const TABS: TabDef<Tab>[] = [
 	{
 		key: "bracket",
@@ -362,6 +374,11 @@ const TABS: TabDef<Tab>[] = [
 				/>
 			</svg>
 		),
+	},
+	{
+		key: "groups",
+		label: "Group Stage",
+		icon: GroupStageTabIcon,
 	},
 ];
 
@@ -382,13 +399,6 @@ const PublicKnockout = () => {
 		[],
 	);
 	const [activeTab, setActiveTab] = useState<Tab>("bracket");
-	const [showGroupStage, setShowGroupStage] = useState(competition?.group_stage ?? false);
-
-	useEffect(() => {
-		if (competition) {
-			setShowGroupStage(!!competition.group_stage);
-		}
-	}, [competition]);
 
 	return (
 		<CompetitionPage
@@ -401,15 +411,11 @@ const PublicKnockout = () => {
 			headerIcon={BracketIcon}
 			showStatus={false}
 		>
-			<CompetitionTabContent
-				tabs={TABS}
-				activeTab={activeTab}
-				onTabChange={setActiveTab}
-				onAction={() => setShowGroupStage(true)}
-			>
+			<TabBar tabs={TABS} active={activeTab} onChange={setActiveTab} />
+			<div className="flex-1 overflow-auto">
 				{activeTab === "bracket" && <BracketDisplay rounds={rounds} competition={competition} />}
-			</CompetitionTabContent>
-			{showGroupStage && <PublicGroupStage onClose={() => setShowGroupStage(false)} />}
+				{activeTab === "groups" && <PublicGroupStage />}
+			</div>
 		</CompetitionPage>
 	);
 };
