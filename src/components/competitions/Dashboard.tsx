@@ -6,16 +6,17 @@ import Pagination from "../common/Pagination";
 import PageWindow from "../shared/PageWindow";
 import CompetitionCard from "./CompetitionCard";
 import CreateCompetitionComponent from "./CreateCompetition";
+import {TeamInterface} from "../../api/teams";
 
 export default function DashboardComponent() {
 	const { showToast } = useToastStore();
 	const [competitions, setCompetitions] = useState<
-		{ id: string; name: string; type?: string; number_of_teams?: number }[]
+		{ id: string; name: string; type?: string; teams: TeamInterface[] }[]
 	>([]);
 	const [searchTerm, setSearchTerm] = useState("");
 	const [selectedType, setSelectedType] = useState<string>("");
 	const [filteredCompetitions, setFilteredCompetitions] = useState<
-		{ id: string; name: string; type?: string; number_of_teams?: number }[]
+		{ id: string; name: string; type?: string; teams: TeamInterface[] }[]
 	>([]);
 	const [isLoading, setIsLoading] = useState(true);
 
@@ -99,7 +100,7 @@ export default function DashboardComponent() {
 							id={competition.id}
 							name={competition.name}
 							type={competition.type}
-							numberOfTeams={competition.number_of_teams}
+							teams={competition.teams}
 						/>
 					))
 				) : (

@@ -1,3 +1,4 @@
+import { UpdateRoundPayload } from "./interfaces/rounds";
 import axiosInstance from "../router/axios";
 
 export const startRound = async (competitionId: number) => {
@@ -35,11 +36,6 @@ export const listRounds = async (competitionId: number) => {
 		throw error.message || "Failed to fetch rounds.";
 	}
 };
-
-interface UpdateRoundPayload {
-	status?: "scheduled" | "in_progress" | "completed";
-	stage?: string;
-}
 
 export const updateRound = async (competitionId: number, roundId: number, data: UpdateRoundPayload) => {
 	try {

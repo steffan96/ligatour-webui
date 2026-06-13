@@ -1,15 +1,16 @@
 import React from "react";
 import { Link } from "react-router-dom";
 import { CompetitionTypeDisplay } from "../../api/interfaces/competitions";
+import {TeamInterface} from "../../api/teams";
 
 interface CompetitionCardProps {
 	id: string;
 	name: string;
 	type?: string;
-	numberOfTeams?: number;
+	teams: TeamInterface[];
 }
 
-export default function CompetitionCard({ id, name, type, numberOfTeams }: CompetitionCardProps) {
+export default function CompetitionCard({ id, name, type, teams }: CompetitionCardProps) {
 	return (
 		<Link to={`/competition/${id}`}>
 			<div
@@ -28,9 +29,9 @@ export default function CompetitionCard({ id, name, type, numberOfTeams }: Compe
 									{CompetitionTypeDisplay[type as keyof typeof CompetitionTypeDisplay] || type}
 								</span>
 							)}
-							{numberOfTeams !== undefined && (
+							{teams !== undefined && (
 								<span className="text-sm text-gray-600">
-									{numberOfTeams} participant{numberOfTeams !== 1 ? "s" : ""}
+									{teams.length} participant{teams.length !== 1 ? "s" : ""}
 								</span>
 							)}
 						</div>

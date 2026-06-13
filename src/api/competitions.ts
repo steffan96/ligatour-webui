@@ -9,7 +9,6 @@ export interface CompetitionInterface {
 	status: string;
 	created_at: string;
 	current_round: number;
-	number_of_teams: number;
 	points_for_win: number;
 	points_for_draw: number;
 	points_for_loss: number;

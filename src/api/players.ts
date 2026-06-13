@@ -1,16 +1,5 @@
+import { PlayerInterface } from "./interfaces/players";
 import axiosInstance from "../router/axios";
-
-export interface PlayerInterface {
-	id: number;
-	first_name: string;
-	last_name: string;
-	email: string;
-	competition_id: number;
-	team_id: number;
-	position: string;
-	profile_picture: string;
-	created_at: string;
-}
 
 export const createPlayer = async (data: Partial<PlayerInterface>) => {
 	try {

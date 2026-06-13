@@ -1,14 +1,20 @@
 import axiosInstance from "../router/axios";
 
-export interface TeamInterface {
-	id: number;
-	name: string;
-}
-
 export interface PlayerInterface {
 	first_name: string;
 	last_name: string;
 	email?: string;
+}
+
+export interface TeamInterface {
+	id: number;
+	name: string;
+	logo?: string;
+	competition_id?: number;
+	skipped_round?: boolean;
+	eliminated?: boolean;
+	created_at?: string;
+	players?: PlayerInterface[] | null;
 }
 
 export const createTeam = async (name: string) => {
